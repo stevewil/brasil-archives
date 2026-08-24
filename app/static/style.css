@@ -1,0 +1,114 @@
+/* brasil-archives — minimal Phase 1 styling.
+ * Deliberately understated; visual design comes later.
+ */
+
+:root {
+  --fg: #1a1a1a;
+  --bg: #fafaf7;
+  --muted: #666;
+  --accent: #005a2b;   /* verde brasil, muted */
+  --border: #e4e4de;
+  --max: 68rem;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.5;
+}
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  max-width: var(--max);
+  margin: 0 auto;
+}
+
+.brand {
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+
+.lang-switch a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.lang-switch a[aria-current="page"] {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.lang-switch .sep {
+  color: var(--border);
+  margin: 0 0.35rem;
+}
+
+.site-main {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.hero h1 {
+  font-size: 2rem;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.hero .lede {
+  font-size: 1.1rem;
+  color: var(--muted);
+  max-width: 44rem;
+}
+
+.stats dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+  padding: 0;
+  margin: 2rem 0;
+}
+
+.stats div {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  background: white;
+}
+
+.stats dt {
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.stats dd {
+  font-size: 2rem;
+  margin: 0.25rem 0 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.about h2 {
+  font-size: 1.25rem;
+  margin: 2rem 0 0.5rem;
+}
+
+.site-footer {
+  max-width: var(--max);
+  margin: 3rem auto 2rem;
+  padding: 1rem 1.5rem 0;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+}

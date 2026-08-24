@@ -23,7 +23,27 @@ Archives that cannot clear this bar are tracked internally to avoid re-litigatin
 
 ## Repository status
 
-Early scaffolding. See `docs/algorithm-v1.md` for the scoring-algorithm design.
+Phase 1 scaffolding — Flask app + SQLAlchemy models + Alembic migration in place. See `docs/` for design:
+
+- `docs/algorithm-v1.md` — scoring algorithm (8 scored dimensions, 12 facets)
+- `docs/standards.md` — standards conformance plan (Phases 1–6)
+- `docs/federation-v1.md` — upgrade-project federation contract (OAI-PMH + IIIF)
+- `docs/schema-v1.md` — data model sketch, mirrored in `app/models/`
+
+## Development
+
+```bash
+python -m venv .venv
+.venv/bin/pip install -r requirements-dev.txt
+cp .env.example .env
+
+export FLASK_APP=wsgi.py
+.venv/bin/flask db upgrade                # create/migrate SQLite DB
+.venv/bin/flask run                       # http://127.0.0.1:5000
+.venv/bin/python -m pytest                # test suite
+```
+
+Instance data (SQLite DB) lives under `instance/` and is git-ignored.
 
 ## Related
 

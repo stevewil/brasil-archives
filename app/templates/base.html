@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="{{ get_locale() }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ page_title }}{% endblock %} — brasil-archives</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="{{ url_for('main.index') }}">brasil-archives</a>
+    <nav class="lang-switch">
+      <a href="?lang=en" {% if get_locale() == 'en' %}aria-current="page"{% endif %}>EN</a>
+      <span class="sep">·</span>
+      <a href="?lang=pt" {% if get_locale() == 'pt' %}aria-current="page"{% endif %}>PT</a>
+    </nav>
+  </header>
+
+  <main class="site-main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <small>{{ _("Federated open metadata for Brazilian digital archives.") }}</small>
+  </footer>
+</body>
+</html>

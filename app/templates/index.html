@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+  <h1>{{ _("Brazilian Digital Archives") }}</h1>
+  <p class="lede">
+    {{ _("A federated catalog of Brazilian digital archives — standards-aware, bilingual, and built to support scholarship on the northeastern historical record.") }}
+  </p>
+</section>
+
+<section class="stats">
+  <dl>
+    <div>
+      <dt>{{ _("Archives cataloged") }}</dt>
+      <dd>{{ archive_count }}</dd>
+    </div>
+    <div>
+      <dt>{{ _("Upgrade projects registered") }}</dt>
+      <dd>{{ upgrade_count }}</dd>
+    </div>
+  </dl>
+</section>
+
+<section class="about">
+  <h2>{{ _("Status") }}</h2>
+  <p>
+    {{ _("Phase 1 scaffold. Data model live; survey load and scoring UI in progress.") }}
+  </p>
+</section>
+{% endblock %}
