@@ -6,6 +6,8 @@
 
 **Purpose:** Grade Brazilian digital archives on their fitness for Mipibu-style pipeline treatment, using a mix of scored dimensions (frame-neutral, comparable across archives) and facets (frame-dependent, filterable but not scored).
 
+**Standards positioning:** This algorithm is `brasil-archives`-specific. The federation contract (see `docs/federation-v1.md`) and the standards adopted by the project (see `docs/standards.md`) are separate concerns. The scoring dimensions reward archives whose delivery *conforms* to standards (OAI-PMH, IIIF, controlled authorities), but the dimensions themselves are project-authored.
+
 ## Design principles
 
 1. **Score frame-neutral properties; facet frame-dependent ones.** If a value judgment depends on the researcher's period, subfield, or methodological frame (e.g., which record types are "important," which themes are "significant"), it becomes a facet rather than a score. Scores are reserved for properties every serious researcher benefits from equally.
@@ -90,7 +92,7 @@ Ranks 3 and 8 intentionally reserved as buffer zones between tiers.
 2. **Direct file access** — the URL returns the file (PDF, JPG, TIFF), not a JS viewer wrapper
 3. **Adequate image resolution** — ≥150 dpi for readable text; ≥300 dpi preferred for masters
 4. **Per-document isolation** — one document per file, not multiple documents bundled
-5. **Enumerable structure** — either a sequential ID pattern, a machine-readable index, or a documented API (OAI-PMH, REST, sitemap, XML feed, or directory listing) that lets a pipeline discover documents systematically. Documented APIs and OAI-PMH count fully.
+5. **Enumerable structure** — either a sequential ID pattern, a machine-readable index, or a documented API (OAI-PMH, REST, sitemap, XML feed, or directory listing) that lets a pipeline discover documents systematically. Documented APIs and OAI-PMH count fully. OAI-PMH conformance per `docs/standards.md` is the preferred form.
 
 **Anchor scale:**
 
@@ -138,7 +140,7 @@ Unit heterogeneity acknowledged — pages of newspaper, items of judicial, hours
 
 **What it measures:** How well this archive's content connects to other archives via named entities, controlled vocabularies, and standardized identifiers. Distinct from Dimension 5's API/enumerability property, which is about *fetching*; this is about *connecting once fetched*.
 
-- **10** — Controlled authorities (VIAF, GeoNames, LOD linkage), standard identifiers, dense in extractable named entities. Aspirational; no current shortlist archive reaches this.
+- **10** — Controlled authorities (VIAF, GeoNames, LOD linkage) per `docs/standards.md`, standard identifiers (Handle, ARK, DOI), dense in extractable named entities. Aspirational; no current shortlist archive reaches this.
 - **8** — Rich structured metadata with consistent controlled vocabulary for at least one of place/person/institution; content dense in named entities extractable with modest work
 - **6** — Structured metadata for one entity type; content dense in names but requires transcription
 - **5** — High-linkage content in principle, but metadata-thin delivery; requires full pipeline work first
@@ -226,3 +228,4 @@ Full text lives in `LICENSING.md` when we get closer to public release.
 ## Change log
 
 - **2026-08-24** — Pass 1 complete. Eight scored dimensions, twelve facets, aggregation deferred. First test scope confirmed as the six Mipibu-fit archives (LABIM/UFRN as anchor + the five survey-listed pipeline-viable archives: TJMA, INTERPI, BCZM/UFRN, Jornais de Sergipe, Nupem).
+- **2026-08-24** — Standards positioning added; light cross-references to `docs/standards.md` and `docs/federation-v1.md` inserted. No dimension anchors changed.
