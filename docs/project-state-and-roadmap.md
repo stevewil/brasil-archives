@@ -80,7 +80,7 @@ The first federated archive companion app — bilingual explorer for the São Jo
 - Bucket `mipibu-corpus`: public-read on `data/*` prefix only; versioning on; SSE-S3
 - Bucket `brasil-archives-data`: private, empty, provisioned for future use
 - Independent access keys per bucket for rotation isolation
-- The mipibu-corpus URL is public: `https://s3.us-east-1.wasabisys.com/mipibu-corpus/data/sao-jose-mipibu-audit.db`
+- The mipibu-corpus URL is public: `https://s3.us-west-2.wasabisys.com/mipibu-corpus/data/sao-jose-mipibu-audit.db`
 
 ### Workstation setup
 
@@ -124,7 +124,7 @@ Ordered by **dependency and risk**, not by size. Each item lists what unblocks a
 ### Phase 1: Prove the Wasabi pipeline (unblocks everything else)
 
 **1.1 Create the `mipibu-corpus` Wasabi bucket**
-Console → new bucket, region us-east-1, versioning on, SSE-S3, public-read policy on `data/*`. Documented in [WASABI-SETUP.md](https://github.com/stevewil/mipibu/blob/main/WASABI-SETUP.md).
+Console → new bucket, region us-west-2, versioning on, SSE-S3, public-read policy on `data/*`. Documented in [WASABI-SETUP.md](https://github.com/stevewil/mipibu/blob/main/WASABI-SETUP.md).
 *Unblocks*: everything below.
 
 **1.2 Create the `brasil-archives-data` Wasabi bucket**
@@ -316,8 +316,8 @@ Every decision in the roadmap defers to these, established across the sessions l
 |---|---|---|
 | brasil-archives repo | [github.com/stevewil/brasil-archives](https://github.com/stevewil/brasil-archives) | Design docs, archive catalog, scoring |
 | mipibu repo | [github.com/stevewil/mipibu](https://github.com/stevewil/mipibu) | São José de Mipibu corpus explorer |
-| mipibu-corpus Wasabi bucket | `s3://mipibu-corpus/data/*` (public-read), region us-east-1 | Corpus DB hosting |
-| brasil-archives-data Wasabi bucket | private, region us-east-1 | Future asset hosting |
+| mipibu-corpus Wasabi bucket | `s3://mipibu-corpus/data/*` (public-read), region us-west-2 | Corpus DB hosting |
+| brasil-archives-data Wasabi bucket | private, region us-west-2 | Future asset hosting |
 | Workstation | Windows + Git Bash, Git 2.53, AWS CLI v2 | Development + push |
 | cPanel host | Serves https://mipibu.from-bottom-to.top/ from ~/apps/mipibu-explorer | Mipibu production runtime |
 | Mipibu public URL | https://mipibu.from-bottom-to.top/ | Federation endpoints at /health, /api/federation/* |
@@ -331,7 +331,7 @@ Every decision in the roadmap defers to these, established across the sessions l
 Things we've deliberately not chosen yet, and what triggers the choice:
 
 - **brasil-archives public site substrate** (Sitecraft/MkDocs/Flask/Pages). Trigger: starting Phase 4.
-- **Custom Wasabi domain** (`corpus.mipibu.from-bottom-to.top` vs default `s3.us-east-1.wasabisys.com`). Trigger: any operational reason the default URL becomes awkward — SEO, sharing, branding.
+- **Custom Wasabi domain** (`corpus.mipibu.from-bottom-to.top` vs default `s3.us-west-2.wasabisys.com`). Trigger: any operational reason the default URL becomes awkward — SEO, sharing, branding.
 - **Federation URL prefix** (`/api/federation/*` vs sibling `/api/records`). Provisionally: `/api/federation/*` to avoid collision with existing `/api/cases`. Confirm in Phase 3.
 - **Second corpus choice** (povos-indigenas vs other). Trigger: end of Phase 4.
 - **Corpus-DB-in-Wasabi vs later migration to Git LFS**. Current answer: Wasabi. Reconsider if Wasabi cost model changes.
