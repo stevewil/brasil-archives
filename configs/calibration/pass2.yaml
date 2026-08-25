@@ -1,0 +1,714 @@
+# Pass 2 calibration scores — six anchor archives.
+#
+# Each entry supplies scores for all eight scored dimensions (0–10) and,
+# where knowable from the survey and site inspection, the human-tagged
+# facet values defined in docs/algorithm-v1.md § "Facet fields".
+#
+# Justifications cite anchor language from the algorithm doc and specific
+# evidence from the Nordeste digital-archives survey. They are audit
+# trails, not marketing copy; short and specific by design.
+#
+# Loader semantics (see scripts/load_calibration.py):
+#   * Each score is written via app.services.scoring.record_score, so
+#     re-runs supersede the prior active row for that (archive, dim) —
+#     history is preserved.
+#   * Facet values go through set_facet_value; identical inputs no-op.
+#   * scored_by defaults to "calibration/pass2" so these rows are
+#     distinguishable from live human input.
+
+scored_by: "calibration/pass2"
+
+archives:
+
+  # ------------------------------------------------------------------
+  - slug: ma-tribunal-de-justica-do-maranhao-arquivo-judiciario-acervo-pe-t1r1
+    display_name: "TJMA — Arquivo Judiciário, Acervo Permanente"
+    scores:
+      accessibility:
+        score: 8
+        justification_en: |
+          Anonymous browsing through a viewer with 33 restored processes
+          offered as downloads on the same page; algorithm anchor 8
+          "anonymous browsing through a viewer" cites TJMA restored
+          processes directly.
+        justification_pt: |
+          Acesso anônimo via visualizador com 33 processos restaurados
+          disponibilizados como downloads na mesma página; ancoragem 8
+          do algoritmo cita justamente os processos restaurados do TJMA.
+      provenance_curatorial:
+        score: 5
+        justification_en: |
+          Basic metadata reliable at title + date + comarca; scans lack
+          transcription. Inventário-analítico series (RDC-Arq) provides
+          finding-aid-level description but not per-document ISAD(G).
+        justification_pt: |
+          Metadados básicos confiáveis quanto a título, data e comarca;
+          sem transcrição. A série de inventários analíticos (RDC-Arq)
+          fornece descrição a nível de instrumento de pesquisa, mas
+          não ISAD(G) por documento.
+      corpus_completeness:
+        score: 2
+        justification_en: |
+          ~10,000 processos and 600 registry books publicly accessible
+          out of ~60,000 digitized processos and a stated permanent
+          acervo of ~350,000 documents — token coverage of stated scope.
+        justification_pt: |
+          ~10.000 processos e 600 livros de registro publicamente
+          acessíveis frente a ~60.000 processos digitalizados e um
+          acervo permanente de ~350.000 documentos — cobertura simbólica
+          do escopo declarado.
+      finding_aids:
+        score: 6
+        justification_en: |
+          Per-comarca inventário PDFs (Guimarães, Loreto, Mirador,
+          Porto Franco, Viana, Itapecuru-Mirim, Passagem Franca) plus a
+          hotsite that surfaces metadata search — well-organized browse
+          hierarchy, no full-text search.
+        justification_pt: |
+          Inventários por comarca em PDF (Guimarães, Loreto, Mirador,
+          Porto Franco, Viana, Itapecuru-Mirim, Passagem Franca) mais um
+          hotsite com busca por metadados — hierarquia de navegação bem
+          organizada, sem busca em texto completo.
+      pipeline_ingestion_readiness:
+        score: 4
+        justification_en: |
+          Property 1 (addressable pages) and 4 (isolation) hold, but
+          direct file URLs are not exposed in page text (property 2
+          broken) and there is no enumerable API (property 5 fails).
+          Two of five properties met.
+        justification_pt: |
+          Propriedades 1 (páginas endereçáveis) e 4 (isolamento) atendidas,
+          mas URLs diretas dos arquivos não são expostas no texto da
+          página (propriedade 2 quebrada) e não há API enumerável
+          (propriedade 5 falha). Duas de cinco propriedades.
+      uniqueness_non_duplication:
+        score: 10
+        justification_en: |
+          Only known digital source for MA colonial-to-mid-20c judicial
+          records including inventários, testamentos and ações de
+          liberdade de escravos — nothing comparable digitally.
+        justification_pt: |
+          Única fonte digital conhecida para registros judiciais do MA
+          do período colonial ao meio do século XX, incluindo
+          inventários, testamentos e ações de liberdade de escravos —
+          sem equivalente digital.
+      scale:
+        score: 10
+        justification_en: |
+          ~2.5M images digitized overall; 10,000 processes public would
+          alone exceed 50,000 page-equivalents. Anchor 10 = 50,000+.
+        justification_pt: |
+          ~2,5 milhões de imagens digitalizadas ao todo; apenas os
+          10.000 processos públicos ultrapassam 50.000 páginas
+          equivalentes. Ancoragem 10 = 50.000+.
+      linkage_potential:
+        score: 5
+        justification_en: |
+          High-linkage in principle — inventários dense in named
+          persons, places and dates — but metadata-thin delivery
+          requires full transcription pipeline first.
+        justification_pt: |
+          Alto potencial de vinculação em tese — inventários densos em
+          pessoas, lugares e datas — mas entrega pobre em metadados
+          exige antes um pipeline completo de transcrição.
+    facets:
+      institutional_type: state-court
+      licensing_posture: citation-only
+      stated_roadmap: informal
+      fair_use_eligible: true
+      size_unit_note: |
+        Counts denominated in "processos" (bundles) and "imagens" (single
+        scanned pages). One processo typically bundles 10s–100s of pages.
+      curatorial_rarity_notes: |
+        Holds "Inventário de Joseph Martins" (Caxias, 25.05.1747), the
+        oldest process in the acervo; "Ação de liberdade da escrava
+        Carolina" (São Luís, 17.09.1883) is one of the surviving
+        pre-abolition liberty actions with a preserved judicial trail.
+      prior_use_note: |
+        Cited in TJMA's own Dia Internacional do Arquivo communications
+        and in IRIB coverage; academic prior use limited by access.
+    tags:
+      periods:
+        - late-colonial-pombaline-1700-1808
+        - joanine-1808-1822
+        - independence-first-reign-1822-1831
+        - regency-1831-1840
+        - second-reign-imperio-1840-1889
+        - old-republic-1889-1930
+        - vargas-1930-1945
+        - second-republic-1945-1964
+      record_types:
+        - judicial
+        - slavery-post-abolition
+      themes:
+        - slavery-freedom
+        - crime-punishment
+        - family-kinship
+
+  # ------------------------------------------------------------------
+  - slug: pi-interpi-biblioteca-virtual-sistema-de-cadastros-e-registros-t1r2
+    display_name: "INTERPI — Biblioteca Virtual (sesmarias / land grants)"
+    scores:
+      accessibility:
+        score: 8
+        justification_en: |
+          Public JSF search app; results return record data plus JPG,
+          TIFF or PDF images. Anonymous browsing through a viewer.
+        justification_pt: |
+          Aplicação de busca JSF pública; resultados devolvem dados do
+          registro mais imagens em JPG, TIFF ou PDF. Navegação anônima
+          por visualizador.
+      provenance_curatorial:
+        score: 9
+        justification_en: |
+          Partial verified transcription: sesmarias 1724–1760 typed and
+          reviewed; Cadastro de Possuidores digitally transcribed;
+          Arquivo Ultramarino manuscritos avulsos catalogued.
+          Algorithm tier 9 = "partial or unverified transcription".
+        justification_pt: |
+          Transcrição parcial verificada: sesmarias 1724–1760 digitadas
+          e revistas; Cadastro de Possuidores transcrito digitalmente;
+          manuscritos avulsos do Arquivo Ultramarino catalogados.
+          Faixa 9 do algoritmo = "transcrição parcial ou não verificada".
+      corpus_completeness:
+        score: 6
+        justification_en: |
+          Core colonial series (1684–1828) present and 16,000+
+          localities indexed, but land registers "desde 1674 até os
+          dias atuais" imply much material beyond the transcribed core.
+          Partial (30–60%) coverage of the stated multi-century scope.
+        justification_pt: |
+          Núcleo colonial (1684–1828) presente e mais de 16.000
+          localidades indexadas, mas registros "desde 1674 até os dias
+          atuais" indicam material muito além do núcleo transcrito.
+          Cobertura parcial (30–60%) do escopo declarado.
+      finding_aids:
+        score: 6
+        justification_en: |
+          Metadata search by property name and holder name plus
+          locality filter; "sunburst" chart shows temporal division.
+          Basic metadata search — no full-text.
+        justification_pt: |
+          Busca por nome de propriedade e de titular com filtro por
+          localidade; gráfico "sunburst" com a divisão temporal. Busca
+          por metadados básica — sem texto completo.
+      pipeline_ingestion_readiness:
+        score: 4
+        justification_en: |
+          JSF viewer wraps image delivery (property 2 partially broken),
+          search-driven access rather than enumerable pattern
+          (property 5 partial). Two of five properties clean.
+        justification_pt: |
+          Visualizador JSF encapsula a entrega das imagens (propriedade
+          2 parcialmente quebrada); acesso baseado em busca em vez de
+          padrão enumerável (propriedade 5 parcial). Duas de cinco
+          propriedades limpas.
+      uniqueness_non_duplication:
+        score: 10
+        justification_en: |
+          Only digital source for Piauí sesmarias plus the Projeto
+          Resgate manuscritos avulsos of the Capitania do Piauí held
+          in Lisbon; no competing digitization at comparable scope.
+        justification_pt: |
+          Única fonte digital para as sesmarias do Piauí e os
+          manuscritos avulsos da Capitania do Piauí (Projeto Resgate,
+          Lisboa); sem digitalização concorrente em escopo comparável.
+      scale:
+        score: 6
+        justification_en: |
+          Thousands of records inferred; 16,000+ localities in the
+          associated database; 1,000–10,000 page-equivalents range.
+        justification_pt: |
+          Milhares de registros inferidos; mais de 16.000 localidades
+          na base associada; faixa 1.000–10.000 páginas equivalentes.
+      linkage_potential:
+        score: 8
+        justification_en: |
+          Transcribed sesmaria text plus consistent controlled
+          vocabulary for place (locality index) and holder name = rich
+          structured metadata for at least one entity type.
+        justification_pt: |
+          Texto de sesmaria transcrito mais vocabulário controlado
+          consistente para lugar (índice de localidades) e nome de
+          titular = metadados estruturados ricos para pelo menos um
+          tipo de entidade.
+    facets:
+      institutional_type: state-archive
+      licensing_posture: citation-only
+      stated_roadmap: published-and-active
+      fair_use_eligible: true
+      size_unit_note: |
+        Records denominated in cadastral entries + associated images
+        (JPG/TIFF/PDF); one entry may reference several image files.
+      curatorial_rarity_notes: |
+        Piauí sesmarias 1724–1760 are held here with a full digital
+        transcription, an unusually strong provenance package for a
+        colonial-Brazilian land corpus.
+      prior_use_note: |
+        Land-tenure and family-history research; INTERPI portal
+        announcement + Projeto Resgate lineage.
+    tags:
+      periods:
+        - late-colonial-pombaline-1700-1808
+        - joanine-1808-1822
+        - independence-first-reign-1822-1831
+        - regency-1831-1840
+        - second-reign-imperio-1840-1889
+        - old-republic-1889-1930
+        - new-republic-1985-present
+      record_types:
+        - notarial-land
+        - administrative-legislative
+      themes:
+        - land-property
+        - state-formation
+
+  # ------------------------------------------------------------------
+  - slug: rn-biblioteca-central-zila-mamede-bczm-ufrn-jornais-digitalizad-t1r3
+    display_name: "BCZM/UFRN — Jornais Digitalizados"
+    scores:
+      accessibility:
+        score: 10
+        justification_en: |
+          Anonymous open direct download via Apache directory listing;
+          algorithm anchor 10 cites BCZM/UFRN newspaper directory as
+          the canonical example.
+        justification_pt: |
+          Download direto aberto e anônimo via listagem de diretório
+          Apache; ancoragem 10 do algoritmo cita justamente o diretório
+          de jornais da BCZM/UFRN como exemplo canônico.
+      provenance_curatorial:
+        score: 2
+        justification_en: |
+          Folder listing exposes only Name / Last modified / Size — no
+          issue-level metadata, no fonds structure, no transcription.
+          Undescribed image bundles tier.
+        justification_pt: |
+          Listagem de pastas expõe apenas Nome / Modificado / Tamanho —
+          sem metadados por edição, sem estrutura de fundo, sem
+          transcrição. Faixa de "conjuntos de imagens sem descrição".
+      corpus_completeness:
+        score: 8
+        justification_en: |
+          69 titles across ~53,000 page-level PDFs; scope is small RN
+          newspapers 1862–1987, substantially complete for the stated
+          scope with disclosed gaps (Tribuna do Norte excluded).
+        justification_pt: |
+          69 títulos em cerca de 53.000 PDFs por página; escopo é o de
+          jornais pequenos do RN 1862–1987, substancialmente completo
+          para o escopo declarado com lacunas divulgadas (Tribuna do
+          Norte excluída).
+      finding_aids:
+        score: 4
+        justification_en: |
+          Filename-only search over flat listing; an index PDF exists
+          but there is no facet search, no metadata database.
+        justification_pt: |
+          Busca apenas por nome de arquivo sobre listagem plana; existe
+          um PDF-índice, mas sem facetas nem base de metadados.
+      pipeline_ingestion_readiness:
+        score: 8
+        justification_en: |
+          Properties 1–4 clean; property 5 met by enumerable directory
+          pattern /jornais/<TITLE>/<YEAR>/. Four of five properties
+          fully clean with the enumerability route being directory
+          walking rather than OAI-PMH.
+        justification_pt: |
+          Propriedades 1–4 limpas; propriedade 5 atendida pelo padrão
+          enumerável /jornais/<TITLE>/<YEAR>/. Quatro de cinco
+          propriedades plenamente atendidas, com a enumerabilidade
+          via caminhamento de diretório em vez de OAI-PMH.
+      uniqueness_non_duplication:
+        score: 8
+        justification_en: |
+          Effectively unique — most titles are not in Hemeroteca Digital
+          Brasileira (Brado Conservador is the noted overlap); no
+          competing digitization at comparable scope/quality.
+        justification_pt: |
+          Efetivamente único — a maioria dos títulos não está na
+          Hemeroteca Digital Brasileira (Brado Conservador é a
+          sobreposição conhecida); sem digitalização concorrente em
+          escopo/qualidade comparáveis.
+      scale:
+        score: 10
+        justification_en: |
+          ~53,000 page-level PDFs across 69 titles, ~15 GB. Comfortably
+          in the 50,000+ page-equivalents anchor.
+        justification_pt: |
+          Cerca de 53.000 PDFs por página em 69 títulos, ~15 GB.
+          Confortavelmente na ancoragem de 50.000+ páginas equivalentes.
+      linkage_potential:
+        score: 3
+        justification_en: |
+          Name-dense newspaper content but pre-OCR and metadata-thin —
+          entity extraction requires full pipeline work first.
+        justification_pt: |
+          Conteúdo de jornais denso em nomes, mas pré-OCR e pobre em
+          metadados — extração de entidades exige antes um pipeline
+          completo.
+    facets:
+      institutional_type: federal-university
+      licensing_posture: redistribution-friendly
+      stated_roadmap: informal
+      fair_use_eligible: true
+      size_unit_note: |
+        ~53,000 page-level PDFs; each PDF is one newspaper page.
+      curatorial_rarity_notes: |
+        Holds RN newspaper titles largely absent from Hemeroteca Digital
+        Brasileira, notably O Barbeiro (22 Oct 1862), Brado Conservador,
+        O Nortista and Gazeta do Natal.
+      prior_use_note: |
+        Referenced in RN historical journalism scholarship and by IHGRN;
+        directory link circulated by regional press.
+    tags:
+      periods:
+        - second-reign-imperio-1840-1889
+        - old-republic-1889-1930
+        - vargas-1930-1945
+        - second-republic-1945-1964
+        - military-dictatorship-1964-1985
+      record_types:
+        - press-periodicals
+      themes:
+        - urban-history
+
+  # ------------------------------------------------------------------
+  - slug: se-jornais-de-sergipe-sibiufs-ufs-t1r4
+    display_name: "Jornais de Sergipe (SIBIUFS/UFS)"
+    scores:
+      accessibility:
+        score: 8
+        justification_en: |
+          Anonymous browsing through a DSpace-style viewer; algorithm
+          anchor 8 explicitly cites "Jornais de Sergipe DSpace".
+        justification_pt: |
+          Navegação anônima por visualizador tipo DSpace; ancoragem 8
+          do algoritmo cita explicitamente "Jornais de Sergipe DSpace".
+      provenance_curatorial:
+        score: 5
+        justification_en: |
+          Basic metadata reliable at newspaper title + year level; no
+          per-issue description, no transcription.
+        justification_pt: |
+          Metadados básicos confiáveis a nível de título de jornal e
+          ano; sem descrição por edição, sem transcrição.
+      corpus_completeness:
+        score: 6
+        justification_en: |
+          32 titles from 1871–2004 in a stated Sergipe-press scope;
+          coverage partial (30–60%) — no total-issue figure disclosed
+          and long runs still missing from several titles.
+        justification_pt: |
+          32 títulos de 1871–2004 no escopo declarado da imprensa
+          sergipana; cobertura parcial (30–60%) — sem número total de
+          edições divulgado e várias séries com lacunas.
+      finding_aids:
+        score: 6
+        justification_en: |
+          Browse by publication title then by year in cronological
+          order — well-organized browse hierarchy; no full-text search.
+        justification_pt: |
+          Navegação por título de publicação e por ano em ordem
+          cronológica — hierarquia de navegação bem organizada; sem
+          busca em texto completo.
+      pipeline_ingestion_readiness:
+        score: 6
+        justification_en: |
+          Property 1 (addressable pages) and 4 (isolation) hold; DSpace
+          viewer wraps direct file (property 2 partial); enumerable by
+          title/year pattern (property 5 met). Three of five clean.
+        justification_pt: |
+          Propriedades 1 (páginas endereçáveis) e 4 (isolamento)
+          atendidas; visualizador DSpace encapsula o arquivo direto
+          (propriedade 2 parcial); enumerável pelo padrão
+          título/ano (propriedade 5 atendida). Três de cinco limpas.
+      uniqueness_non_duplication:
+        score: 8
+        justification_en: |
+          Effectively unique for practical purposes — Sergipe-specific
+          titles largely absent from Hemeroteca Digital Brasileira at
+          comparable per-title runs.
+        justification_pt: |
+          Efetivamente único para fins práticos — títulos específicos
+          de Sergipe pouco presentes na Hemeroteca Digital Brasileira
+          em séries por título comparáveis.
+      scale:
+        score: 8
+        justification_en: |
+          32 titles × multi-decade runs; conservative page-equivalent
+          estimate places holdings in the 10,000–50,000 range.
+        justification_pt: |
+          32 títulos × séries de várias décadas; estimativa conservadora
+          em páginas equivalentes coloca o acervo entre 10.000 e 50.000.
+      linkage_potential:
+        score: 5
+        justification_en: |
+          High-linkage content in principle (regional press dense in
+          persons + places) but metadata-thin delivery requires full
+          transcription pipeline first.
+        justification_pt: |
+          Conteúdo de alta vinculação em tese (imprensa regional densa
+          em pessoas e lugares), mas entrega pobre em metadados exige
+          antes um pipeline completo de transcrição.
+    facets:
+      institutional_type: federal-university
+      licensing_posture: citation-only
+      stated_roadmap: informal
+      fair_use_eligible: true
+      size_unit_note: |
+        Denominated in newspaper title × year × issue; per-issue counts
+        not disclosed on the front page.
+      curatorial_rarity_notes: |
+        Holds long runs of Sergipe-specific titles including Jornal do
+        Aracaju (1871–1875), O Horizonte (1885–1886) and Gazeta de
+        Sergipe (1890–2004) that are largely absent from Hemeroteca
+        Digital Brasileira.
+      prior_use_note: |
+        Referenced in SE regional historiography and journalism
+        scholarship through SIBIUFS/UFS channels.
+    tags:
+      periods:
+        - second-reign-imperio-1840-1889
+        - old-republic-1889-1930
+        - vargas-1930-1945
+        - second-republic-1945-1964
+        - military-dictatorship-1964-1985
+        - new-republic-1985-present
+      record_types:
+        - press-periodicals
+      themes:
+        - urban-history
+
+  # ------------------------------------------------------------------
+  - slug: pi-nupem-digital-nucleo-de-pesquisa-em-historia-e-memoria-do-pi-t1r5
+    display_name: "Nupem Digital — UFPI"
+    scores:
+      accessibility:
+        score: 8
+        justification_en: |
+          Consultation and download free through the virtual-library
+          interface; anonymous browsing through a viewer.
+        justification_pt: |
+          Consulta e download gratuitos via biblioteca virtual;
+          navegação anônima por visualizador.
+      provenance_curatorial:
+        score: 5
+        justification_en: |
+          Fundos organized by type (Judiciário PI, Executivo Piauiense,
+          Tribunal de Contas PI, Obras Raras, Periódicos) with basic
+          bibliographic metadata; no transcription; provenance to fundo
+          level but not ISAD(G)-complete per item.
+        justification_pt: |
+          Fundos organizados por tipo (Judiciário PI, Executivo
+          Piauiense, Tribunal de Contas PI, Obras Raras, Periódicos)
+          com metadados bibliográficos básicos; sem transcrição;
+          proveniência a nível de fundo, mas sem ISAD(G) completo por
+          item.
+      corpus_completeness:
+        score: 6
+        justification_en: |
+          23 years of accumulated collections across five named fundos;
+          no per-fundo completeness figure disclosed — partial
+          (30–60%) coverage of stated scope.
+        justification_pt: |
+          23 anos de acervos acumulados em cinco fundos nomeados; sem
+          figura de completude por fundo divulgada — cobertura parcial
+          (30–60%) do escopo declarado.
+      finding_aids:
+        score: 6
+        justification_en: |
+          Fundo structure = well-organized browse hierarchy; virtual
+          library exposes per-fundo listings; no full-text search.
+        justification_pt: |
+          Estrutura por fundo = hierarquia de navegação bem organizada;
+          biblioteca virtual expõe listagens por fundo; sem busca em
+          texto completo.
+      pipeline_ingestion_readiness:
+        score: 4
+        justification_en: |
+          Consultation + download works through the platform, but no
+          API/OAI-PMH is documented and URL patterns for individual
+          documents are not exposed. Two of five properties clean.
+        justification_pt: |
+          Consulta e download funcionam pela plataforma, mas sem API
+          ou OAI-PMH documentada e sem padrão de URL por documento.
+          Duas de cinco propriedades limpas.
+      uniqueness_non_duplication:
+        score: 10
+        justification_en: |
+          Only known digital source for the Fundo Judiciário do Estado
+          do Piauí (per Table 2 survey note on TJPI) plus Executivo
+          Piauiense and Tribunal de Contas PI runs.
+        justification_pt: |
+          Única fonte digital conhecida para o Fundo Judiciário do
+          Estado do Piauí (conforme nota do levantamento sobre o TJPI)
+          e para as séries do Executivo Piauiense e do Tribunal de
+          Contas do PI.
+      scale:
+        score: 6
+        justification_en: |
+          Multi-fundo platform accumulated over 23 years; unquantified
+          on the site but conservatively 1,000–10,000 page-equivalents.
+        justification_pt: |
+          Plataforma multi-fundo acumulada em 23 anos; sem quantificação
+          no site, mas conservadoramente 1.000–10.000 páginas
+          equivalentes.
+      linkage_potential:
+        score: 4
+        justification_en: |
+          Moderately name-dense content across judicial and executive
+          fundos; minimal metadata for entity extraction.
+        justification_pt: |
+          Conteúdo moderadamente denso em nomes nos fundos judicial e
+          executivo; metadados mínimos para extração de entidades.
+    facets:
+      institutional_type: research-project
+      licensing_posture: citation-only
+      stated_roadmap: informal
+      fair_use_eligible: true
+      size_unit_note: |
+        Multi-fundo repository; count not disclosed. Named fundos:
+        Judiciário PI, Executivo Piauiense, Tribunal de Contas PI,
+        Obras Raras, Periódicos.
+      curatorial_rarity_notes: |
+        Currently the practical digital access route to Piauí judicial
+        material given the absence of a TJPI digital repository (per
+        Table 2 CONARQ entry).
+      prior_use_note: |
+        Nupem/UFPI historical-memory research programme.
+    tags:
+      periods:
+        - second-reign-imperio-1840-1889
+        - old-republic-1889-1930
+        - vargas-1930-1945
+        - second-republic-1945-1964
+        - military-dictatorship-1964-1985
+      record_types:
+        - judicial
+        - administrative-legislative
+        - press-periodicals
+        - manuscripts-books
+      themes:
+        - crime-punishment
+        - state-formation
+        - politics-power
+
+  # ------------------------------------------------------------------
+  - slug: rn-laboratorio-de-imagens-labim-cchla-ufrn-repositorio-digital-t1r8
+    display_name: "LABIM/UFRN — Repositório Digital"
+    scores:
+      accessibility:
+        score: 8
+        justification_en: |
+          Anonymous browsing through a DSpace viewer; bitstream
+          downloads reachable from item pages.
+        justification_pt: |
+          Navegação anônima por visualizador DSpace; downloads de
+          bitstream acessíveis a partir das páginas de item.
+      provenance_curatorial:
+        score: 6
+        justification_en: |
+          DSpace descriptive metadata (Author, Subject, Date issued)
+          for ~2,505 items across three communities; strong descriptive
+          metadata but missing several ISAD(G) elements at item level.
+        justification_pt: |
+          Metadados descritivos DSpace (Autor, Assunto, Data de emissão)
+          para cerca de 2.505 itens em três comunidades; metadados
+          descritivos fortes, mas com elementos ISAD(G) faltantes por
+          item.
+      corpus_completeness:
+        score: 6
+        justification_en: |
+          Three communities (DEHIS, Diário de Natal 1939-2012, LABIM)
+          with ~2,505 items span a wide scope; per-community completeness
+          partial (30–60%) — Diário de Natal is the most complete run.
+        justification_pt: |
+          Três comunidades (DEHIS, Diário de Natal 1939-2012, LABIM) com
+          cerca de 2.505 itens em escopo amplo; completude por
+          comunidade parcial (30–60%) — Diário de Natal é a série mais
+          completa.
+      finding_aids:
+        score: 7
+        justification_en: |
+          DSpace faceted browse (Author, Subject, Date issued) plus
+          metadata search — faceted browse and metadata search, no
+          full-text.
+        justification_pt: |
+          Navegação facetada DSpace (Autor, Assunto, Data de emissão)
+          mais busca por metadados — navegação facetada e busca por
+          metadados, sem texto completo.
+      pipeline_ingestion_readiness:
+        score: 8
+        justification_en: |
+          Mipibu already built against LABIM; properties 1, 2, 3, 4
+          clean via DSpace bitstream URLs; property 5 met by
+          collection-listing enumeration (custom scraping, not
+          OAI-PMH). Four of five properties clean.
+        justification_pt: |
+          Mipibu já foi construído contra o LABIM; propriedades 1, 2,
+          3 e 4 limpas via URLs de bitstream DSpace; propriedade 5
+          atendida pela enumeração das listagens de coleção (raspagem
+          própria, não OAI-PMH). Quatro de cinco propriedades limpas.
+      uniqueness_non_duplication:
+        score: 8
+        justification_en: |
+          Effectively unique — Diário de Natal 1939-2012 and the
+          DEHIS/IHGRN materials have no comparable competing
+          digitization.
+        justification_pt: |
+          Efetivamente único — Diário de Natal 1939-2012 e os materiais
+          DEHIS/IHGRN não têm digitalização concorrente comparável.
+      scale:
+        score: 8
+        justification_en: |
+          ~2,505 items across newspapers, theses, books, photographs
+          and manuscripts; conservative page-equivalent estimate places
+          holdings in the 10,000–50,000 range.
+        justification_pt: |
+          Cerca de 2.505 itens entre jornais, teses, livros, fotografias
+          e manuscritos; estimativa conservadora em páginas equivalentes
+          coloca o acervo entre 10.000 e 50.000.
+      linkage_potential:
+        score: 6
+        justification_en: |
+          DSpace structured metadata for one entity type (Subject); name
+          density high in newspaper content but requires transcription
+          to unlock at scale.
+        justification_pt: |
+          Metadados estruturados DSpace para um tipo de entidade
+          (Assunto); alta densidade de nomes no conteúdo jornalístico,
+          mas exige transcrição para ser aproveitada em escala.
+    facets:
+      institutional_type: federal-university
+      licensing_posture: citation-only
+      stated_roadmap: informal
+      fair_use_eligible: true
+      size_unit_note: |
+        Item counts by community: DEHIS + Diário de Natal 1939-2012 +
+        LABIM = ~2,505 items. Item unit varies (issue, thesis, photo).
+      curatorial_rarity_notes: |
+        Reference source for RN historiography: Câmara Cascudo,
+        Enélio Petrovich, IHGRN, Diário de Natal 1939-2012 run,
+        Senado da Câmara do Natal fundo, colonial-era items (6 items
+        1700–1799; 4 items 1659–1699).
+      prior_use_note: |
+        Anchor archive for the Mipibu corpus explorer; MEDIA-DEHIS
+        publishing chain uses LABIM as source of record.
+    tags:
+      periods:
+        - late-colonial-pombaline-1700-1808
+        - joanine-1808-1822
+        - second-reign-imperio-1840-1889
+        - old-republic-1889-1930
+        - vargas-1930-1945
+        - second-republic-1945-1964
+        - military-dictatorship-1964-1985
+        - new-republic-1985-present
+      record_types:
+        - press-periodicals
+        - photographic-iconographic
+        - manuscripts-books
+        - personal-institutional-papers
+      themes:
+        - urban-history
+        - politics-power
