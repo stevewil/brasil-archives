@@ -1,0 +1,67 @@
+# Mipibu Corpus Explorer — upgrade project registration.
+# See docs/federation-v1.md §Registration for the schema of this file.
+
+slug: mipibu
+name: Mipibu Corpus Explorer
+name_pt: Explorador do Corpus de Mipibu
+
+# The source archive is looked up at load time. Provide one of:
+#   - source_archive_slug: exact match on archives.slug
+#   - source_archive_survey: {table: 1|2, row: N} to resolve by survey position
+#   - source_archive_name_match: case-insensitive substring in name_pt
+source_archive_survey:
+  table: 1
+  row: 8
+
+scope:
+  description_en: >
+    Judicial records from the First Registry of São José de Mipibu,
+    criminal proceedings 1872–1926 and probate/wills 1855–1926.
+  description_pt: >
+    Registros judiciais do Primeiro Cartório de São José de Mipibu,
+    processos crime 1872–1926 e inventários e testamentos 1855–1926.
+  period_tags:
+    - second-reign-imperio-1840-1889
+    - old-republic-1889-1930
+  # Record types are matched against configs/vocabularies/record_types.yaml
+  # by slug. Mipibu's fine-grained internal types roll up to 'judicial'.
+  record_types:
+    - judicial
+  geography:
+    - name: São José de Mipibu
+      geonames_id: 3450362
+  approximate_size:
+    document_count: 508
+    page_equivalents: 10000
+
+delivery:
+  primary_url: https://mipibu.pplx.app
+  source_repo: https://github.com/stevewil/mipibu
+  status: beta   # in-development | beta | stable | deprecated
+
+federation:
+  # OAI-PMH endpoint required by federation contract v1. Mipibu does
+  # not yet expose one; retrofit tracked after Pass 2 calibration.
+  oai_pmh_base_url: null
+  iiif_search_endpoint: null
+  ead_export_url: null
+  eac_cpf_export_url: null
+  supported_metadata_formats:
+    - oai_dc
+  supported_authorities:
+    - viaf
+    - geonames
+
+license:
+  code: MIT
+  data: CC-BY-SA-4.0
+  attribution_required: true
+
+maintainer:
+  name: Steve Williams
+  contact_email: stevewil@gmail.com
+
+# Dimension lifts: how each dimension is lifted vs. the source archive
+# score. Filled out during Pass 2; the loader accepts an empty map and
+# skips lift creation when no entries are present.
+lifts: {}

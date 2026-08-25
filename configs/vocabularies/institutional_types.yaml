@@ -1,0 +1,56 @@
+# Institutional-type facet — single-select per docs/algorithm-v1.md.
+
+- slug: national
+  label_en: National institution
+  label_pt: Instituição nacional
+  sort_order: 10
+
+- slug: federal-university
+  label_en: Federal university
+  label_pt: Universidade federal
+  sort_order: 20
+
+- slug: state-university
+  label_en: State university
+  label_pt: Universidade estadual
+  sort_order: 30
+
+- slug: state-court
+  label_en: State court / tribunal
+  label_pt: Tribunal de justiça estadual
+  sort_order: 40
+
+- slug: state-archive
+  label_en: State archive
+  label_pt: Arquivo público estadual
+  sort_order: 50
+
+- slug: municipal
+  label_en: Municipal institution
+  label_pt: Instituição municipal
+  sort_order: 60
+
+- slug: diocesan
+  label_en: Diocesan / ecclesiastical
+  label_pt: Diocesano / eclesiástico
+  sort_order: 70
+
+- slug: research-project
+  label_en: Research project
+  label_pt: Projeto de pesquisa
+  sort_order: 80
+
+- slug: individual
+  label_en: Individual scholar or collector
+  label_pt: Pesquisador ou colecionador individual
+  sort_order: 90
+
+- slug: third-party-hosted
+  label_en: Third-party hosted
+  label_pt: Hospedado por terceiros
+  sort_order: 100
+
+- slug: special-thematic
+  label_en: Special / thematic collection
+  label_pt: Coleção especial / temática
+  sort_order: 110

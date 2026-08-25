@@ -1,0 +1,121 @@
+# Themes vocabulary — provisional per docs/algorithm-v1.md.
+# All entries marked provisional=true; refine after Pass 2 tagging.
+
+- slug: slavery-freedom
+  label_en: Slavery and freedom
+  label_pt: Escravidão e liberdade
+  category: population
+  sort_order: 10
+  provisional: true
+
+- slug: indigenous-peoples
+  label_en: Indigenous peoples
+  label_pt: Povos indígenas
+  category: population
+  sort_order: 20
+  provisional: true
+
+- slug: migration-diaspora
+  label_en: Migration and diaspora
+  label_pt: Migração e diáspora
+  category: population
+  sort_order: 30
+  provisional: true
+
+- slug: family-kinship
+  label_en: Family and kinship
+  label_pt: Família e parentesco
+  category: population
+  sort_order: 40
+  provisional: true
+
+- slug: land-property
+  label_en: Land and property
+  label_pt: Terra e propriedade
+  category: economy
+  sort_order: 50
+  provisional: true
+
+- slug: commerce-trade
+  label_en: Commerce and trade
+  label_pt: Comércio
+  category: economy
+  sort_order: 60
+  provisional: true
+
+- slug: labor-work
+  label_en: Labor and work
+  label_pt: Trabalho
+  category: economy
+  sort_order: 70
+  provisional: true
+
+- slug: religious-life
+  label_en: Religious life
+  label_pt: Vida religiosa
+  category: culture
+  sort_order: 80
+  provisional: true
+
+- slug: education-literacy
+  label_en: Education and literacy
+  label_pt: Educação e alfabetização
+  category: culture
+  sort_order: 90
+  provisional: true
+
+- slug: public-health-medicine
+  label_en: Public health and medicine
+  label_pt: Saúde pública e medicina
+  category: society
+  sort_order: 100
+  provisional: true
+
+- slug: crime-punishment
+  label_en: Crime and punishment
+  label_pt: Crime e punição
+  category: society
+  sort_order: 110
+  provisional: true
+
+- slug: gender-women
+  label_en: Gender and women
+  label_pt: Gênero e mulheres
+  category: society
+  sort_order: 120
+  provisional: true
+
+- slug: politics-power
+  label_en: Politics and power
+  label_pt: Política e poder
+  category: politics
+  sort_order: 130
+  provisional: true
+
+- slug: state-formation
+  label_en: State formation
+  label_pt: Formação do Estado
+  category: politics
+  sort_order: 140
+  provisional: true
+
+- slug: environment-climate
+  label_en: Environment and climate
+  label_pt: Meio ambiente e clima
+  category: environment
+  sort_order: 150
+  provisional: true
+
+- slug: urban-history
+  label_en: Urban history
+  label_pt: História urbana
+  category: society
+  sort_order: 160
+  provisional: true
+
+- slug: rural-agrarian
+  label_en: Rural and agrarian history
+  label_pt: História rural e agrária
+  category: economy
+  sort_order: 170
+  provisional: true

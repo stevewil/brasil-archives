@@ -1,0 +1,87 @@
+# Time-period vocabulary — Burns/Skidmore 12-tag scheme.
+# Colonial subdivided per docs/algorithm-v1.md §Human-tagged facets.
+# Multi-select on archives and upgrade projects.
+
+- slug: pre-colonial
+  label_en: Pre-colonial
+  label_pt: Pré-colonial
+  sort_order: 10
+  start_year: null
+  end_year: 1500
+
+- slug: early-colonial-1500-1700
+  label_en: Early Colonial (1500–1700)
+  label_pt: Colônia — período inicial (1500–1700)
+  sort_order: 20
+  start_year: 1500
+  end_year: 1700
+
+- slug: late-colonial-pombaline-1700-1808
+  label_en: Late Colonial / Pombaline (1700–1808)
+  label_pt: Colônia — período pombalino (1700–1808)
+  sort_order: 30
+  start_year: 1700
+  end_year: 1808
+
+- slug: joanine-1808-1822
+  label_en: Joanine (1808–1822)
+  label_pt: Período joanino (1808–1822)
+  sort_order: 40
+  start_year: 1808
+  end_year: 1822
+
+- slug: independence-first-reign-1822-1831
+  label_en: Independence & First Reign (1822–1831)
+  label_pt: Independência e Primeiro Reinado (1822–1831)
+  sort_order: 50
+  start_year: 1822
+  end_year: 1831
+
+- slug: regency-1831-1840
+  label_en: Regency (1831–1840)
+  label_pt: Regência (1831–1840)
+  sort_order: 60
+  start_year: 1831
+  end_year: 1840
+
+- slug: second-reign-imperio-1840-1889
+  label_en: Second Reign / Império (1840–1889)
+  label_pt: Segundo Reinado / Império (1840–1889)
+  sort_order: 70
+  start_year: 1840
+  end_year: 1889
+
+- slug: old-republic-1889-1930
+  label_en: Old Republic (1889–1930)
+  label_pt: República Velha (1889–1930)
+  sort_order: 80
+  start_year: 1889
+  end_year: 1930
+
+- slug: vargas-1930-1945
+  label_en: Vargas (1930–1945)
+  label_pt: Era Vargas (1930–1945)
+  sort_order: 90
+  start_year: 1930
+  end_year: 1945
+
+- slug: second-republic-1945-1964
+  label_en: Second Republic (1945–1964)
+  label_pt: Segunda República (1945–1964)
+  sort_order: 100
+  start_year: 1945
+  end_year: 1964
+
+- slug: military-dictatorship-1964-1985
+  label_en: Military Dictatorship (1964–1985)
+  label_pt: Ditadura Militar (1964–1985)
+  sort_order: 110
+  start_year: 1964
+  end_year: 1985
+
+- slug: new-republic-1985-present
+  label_en: New Republic (1985–present)
+  label_pt: Nova República (1985–presente)
+  sort_order: 120
+  start_year: 1985
+  end_year: null

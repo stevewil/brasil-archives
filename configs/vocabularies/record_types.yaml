@@ -1,0 +1,68 @@
+# Record-type vocabulary — multi-select per docs/algorithm-v1.md §Human-tagged facets.
+# Category groups related types for UI faceted browse.
+
+- slug: judicial
+  label_en: Judicial records
+  label_pt: Documentos judiciais
+  category: judicial
+  sort_order: 10
+
+- slug: notarial-land
+  label_en: Notarial and land records
+  label_pt: Documentos cartoriais e fundiários
+  category: notarial
+  sort_order: 20
+
+- slug: ecclesiastical
+  label_en: Ecclesiastical records
+  label_pt: Documentos eclesiásticos
+  category: ecclesiastical
+  sort_order: 30
+
+- slug: administrative-legislative
+  label_en: Administrative and legislative records
+  label_pt: Documentos administrativos e legislativos
+  category: administrative
+  sort_order: 40
+
+- slug: demographic-census
+  label_en: Demographic and census records
+  label_pt: Documentos demográficos e censitários
+  category: demographic
+  sort_order: 50
+
+- slug: slavery-post-abolition
+  label_en: Slavery and post-abolition records
+  label_pt: Documentos sobre escravidão e pós-abolição
+  category: slavery
+  sort_order: 60
+
+- slug: press-periodicals
+  label_en: Press and periodicals
+  label_pt: Imprensa e periódicos
+  category: press
+  sort_order: 70
+
+- slug: photographic-iconographic
+  label_en: Photographic and iconographic material
+  label_pt: Material fotográfico e iconográfico
+  category: iconographic
+  sort_order: 80
+
+- slug: personal-institutional-papers
+  label_en: Personal and institutional papers
+  label_pt: Arquivos pessoais e institucionais
+  category: papers
+  sort_order: 90
+
+- slug: manuscripts-books
+  label_en: Manuscripts and books
+  label_pt: Manuscritos e livros
+  category: manuscripts
+  sort_order: 100
+
+- slug: audiovisual
+  label_en: Audiovisual material
+  label_pt: Material audiovisual
+  category: audiovisual
+  sort_order: 110

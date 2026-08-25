@@ -39,6 +39,12 @@ cp .env.example .env
 
 export FLASK_APP=wsgi.py
 .venv/bin/flask db upgrade                # create/migrate SQLite DB
+
+# Load data (order matters)
+.venv/bin/python -m scripts.load_vocabularies      # periods, record types, themes, institutional types
+.venv/bin/python -m scripts.load_survey            # 79 archives from the Nordeste survey
+.venv/bin/python -m scripts.load_upgrade_projects  # Mipibu (extend by dropping YAML in configs/upgrade_projects/)
+
 .venv/bin/flask run                       # http://127.0.0.1:5000
 .venv/bin/python -m pytest                # test suite
 ```
