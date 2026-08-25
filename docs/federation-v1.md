@@ -3,6 +3,8 @@
 **Status:** Design specification. Not yet implemented.
 **Date:** 2026-08-24
 
+> **See also:** `docs/scenario-driven-federation-model.md` for the design rationale — federation as an index (not a mirror), scenario-driven testing, and monolithic archive apps. The document below specifies *what* an upgrade project or archive app must expose over the wire; the scenario-driven document specifies *why* the shape looks like this and when we build another archive app.
+
 ## Purpose
 
 This document specifies how upgrade projects federate with `brasil-archives`. It does **not** define a bespoke `brasil-archives` API. Instead, it specifies which existing archival standards an upgrade project must speak in order to be first-class in the federation, and how `brasil-archives` consumes them.

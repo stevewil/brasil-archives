@@ -25,14 +25,34 @@
 </section>
 
 <section class="score-summary">
-  <h2>Score summary</h2>
+  <h2>Score profile</h2>
+  <div class="axis-card">
+    <div class="axis-card__axis">
+      <div class="axis-card__label" title="{{ axis_labels['pipeline']['long_en'] }}">{{ axis_labels['pipeline']['en'] }}</div>
+      <div class="axis-card__value">
+        {% if axes['pipeline'] is not none %}{{ axes['pipeline'] }}<span class="axis-card__max">/{{ axis_max }}</span>{% else %}—{% endif %}
+      </div>
+      <div class="axis-card__members text-small">{{ axis_members['pipeline'] | map('replace', '_', ' ') | join(' · ') }}</div>
+    </div>
+    <div class="axis-card__axis">
+      <div class="axis-card__label" title="{{ axis_labels['research']['long_en'] }}">{{ axis_labels['research']['en'] }}</div>
+      <div class="axis-card__value">
+        {% if axes['research'] is not none %}{{ axes['research'] }}<span class="axis-card__max">/{{ axis_max }}</span>{% else %}—{% endif %}
+      </div>
+      <div class="axis-card__members text-small">{{ axis_members['research'] | map('replace', '_', ' ') | join(' · ') }}</div>
+    </div>
+    <div class="axis-card__quadrant">
+      <div class="axis-card__label">Quadrant</div>
+      <div class="axis-card__quadrant-value">{{ quadrant }}</div>
+    </div>
+  </div>
   <dl class="summary-grid">
-    <dt>Naive sum (0–80)</dt>
+    <dt>Naive sum (0–80, legacy)</dt>
     <dd>{{ naive_sum if naive_sum is not none else '—' }}</dd>
     <dt>Dimensions scored</dt>
     <dd>{{ (scores_by_dim.values() | selectattr('active') | list | length) }}/8</dd>
   </dl>
-  <p class="disclaimer">Aggregation is a placeholder sum for now (see algorithm-v1.md §Aggregation); revisit after Pass 2.</p>
+  <p class="disclaimer">Naive sum kept for continuity; ranking uses the two-axis view. See <code>docs/adr-0001-two-axis-aggregation.md</code>.</p>
 </section>
 
 <section class="dimensions">
@@ -118,6 +138,13 @@
       {% if 'stated_roadmap' in active_facets %}
         {{ active_facets['stated_roadmap'].value }}
         {% if active_facets['stated_roadmap'].note %} — <em>{{ active_facets['stated_roadmap'].note }}</em>{% endif %}
+      {% else %}—{% endif %}
+    </dd>
+    <dt title="Whether the archive's own access surface supports scholarly workflows or whether it takes federation tooling to reach.">Scholarly access, practical</dt>
+    <dd>
+      {% if 'scholarly_access_practical' in active_facets %}
+        {{ active_facets['scholarly_access_practical'].value }}
+        {% if active_facets['scholarly_access_practical'].note %} — <em>{{ active_facets['scholarly_access_practical'].note }}</em>{% endif %}
       {% else %}—{% endif %}
     </dd>
     <dt>Periods</dt>

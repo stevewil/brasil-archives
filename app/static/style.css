@@ -384,3 +384,48 @@ button[type="submit"]:hover { filter: brightness(1.1); }
 
 .text-muted { color: var(--muted); }
 .text-small { font-size: 0.85rem; color: var(--muted); }
+
+/* Two-axis score profile card (docs/adr-0001-two-axis-aggregation.md). */
+.axis-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 1.5rem;
+  align-items: end;
+  padding: 1rem 1.25rem;
+  border: 1px solid #e0e0d5;
+  border-radius: 4px;
+  background: #fafaf5;
+  margin-bottom: 1rem;
+}
+.axis-card__axis { display: flex; flex-direction: column; gap: 0.25rem; }
+.axis-card__label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.axis-card__value {
+  font-size: 2.25rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--fg);
+}
+.axis-card__max { font-size: 1rem; font-weight: 400; color: var(--muted); }
+.axis-card__members { line-height: 1.3; }
+.axis-card__quadrant {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  justify-content: flex-end;
+  min-width: 12rem;
+}
+.axis-card__quadrant-value {
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #d5d5c8;
+  border-radius: 3px;
+  background: #fff;
+  color: var(--fg);
+}

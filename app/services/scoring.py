@@ -63,13 +63,146 @@ def score_history(archive_id: int, dimension: str) -> list[DimensionScore]:
 def naive_sum(archive_id: int) -> int | None:
     """Sum of currently-active dimension scores (0-80). ``None`` if empty.
 
-    v0 placeholder per docs/algorithm-v1.md §Aggregation; decision on a
-    real aggregation waits for Pass 2.
+    Kept alongside the two-axis view as an unweighted total. See
+    :data:`AXES` and :func:`axis_scores` for the aggregation that
+    supersedes it for ranking purposes.
     """
     rows = active_scores(archive_id)
     if not rows:
         return None
     return sum(r.score for r in rows.values())
+
+
+# --------------------------------------------------------------------------- #
+# Two-axis aggregation (docs/adr-0001-two-axis-aggregation.md)
+#
+# The eight scored dimensions split into two axes, each aggregated by
+# unweighted sum out of 40. This breaks the LABIM/INTERPI naive-sum tie
+# by making the underlying profile visible: a pipeline-strong /
+# research-thin archive and a research-strong / pipeline-thin archive
+# reach the same naive-sum total but land in different quadrants.
+#
+# Axis A - Pipeline / access readiness: how ready the archive is to
+# ingest and browse. Groups the dimensions that describe fetch and
+# discovery: reaching, listing, and enumerating documents.
+#
+# Axis B - Research value / evidentiary density: how rich the material
+# is once you have it. Groups the dimensions that describe the
+# evidentiary payload: description, coverage, novelty, connectability.
+#
+# The split is a modeling decision, not archive-data, so it lives in
+# code where it is reviewable rather than in a YAML config.
+
+
+AXES: dict[str, tuple[str, ...]] = {
+    "pipeline": (
+        "accessibility",
+        "finding_aids",
+        "pipeline_ingestion_readiness",
+        "scale",
+    ),
+    "research": (
+        "provenance_curatorial",
+        "corpus_completeness",
+        "uniqueness_non_duplication",
+        "linkage_potential",
+    ),
+}
+
+AXIS_MAX: int = 40  # 4 dimensions x 10 points
+
+# Public labels used by templates and the ADR. Kept here so the axis
+# ids, dimensions, and human labels stay in one place.
+AXIS_LABELS: dict[str, dict[str, str]] = {
+    "pipeline": {
+        "en": "Pipeline",
+        "pt": "Pipeline",
+        "long_en": "Pipeline / access readiness",
+        "long_pt": "Pipeline / prontidão de acesso",
+    },
+    "research": {
+        "en": "Research",
+        "pt": "Pesquisa",
+        "long_en": "Research value / evidentiary density",
+        "long_pt": "Valor de pesquisa / densidade probatória",
+    },
+}
+
+# Sanity check at import time: every scored dimension appears in
+# exactly one axis. Catches typos in the AXES table early instead of
+# silently under-counting an archive's score.
+_axis_members = tuple(dim for group in AXES.values() for dim in group)
+if set(_axis_members) != set(DIMENSIONS):
+    raise RuntimeError(
+        "AXES membership must exactly cover DIMENSIONS. "
+        f"Missing: {set(DIMENSIONS) - set(_axis_members)!r}; "
+        f"extra: {set(_axis_members) - set(DIMENSIONS)!r}"
+    )
+if len(_axis_members) != len(set(_axis_members)):
+    raise RuntimeError("AXES must not repeat a dimension across axes.")
+
+
+def axis_score(archive_id: int, axis: str) -> int | None:
+    """Sum of active scores in ``axis`` (0..AXIS_MAX). ``None`` if empty.
+
+    Only counts dimensions that both belong to ``axis`` and have an
+    active row; an archive with a partial score set therefore returns
+    a partial axis total rather than ``None``, matching how the
+    detail-page dimension cards render.
+    """
+    if axis not in AXES:
+        raise ValueError(f"Unknown axis: {axis!r}")
+    rows = active_scores(archive_id)
+    if not rows:
+        return None
+    members = AXES[axis]
+    return sum(row.score for dim, row in rows.items() if dim in members)
+
+
+def axis_scores(archive_id: int) -> dict[str, int | None]:
+    """Return both axis totals keyed by axis id.
+
+    Convenience wrapper for templates and the list view that needs
+    both totals per row without two DB round trips.
+    """
+    rows = active_scores(archive_id)
+    if not rows:
+        return {axis: None for axis in AXES}
+    return {
+        axis: sum(row.score for dim, row in rows.items() if dim in members)
+        for axis, members in AXES.items()
+    }
+
+
+def quadrant_label(
+    pipeline: int | None,
+    research: int | None,
+    *,
+    threshold: int = 28,
+) -> str:
+    """Human label for the four quadrants on the two-axis plane.
+
+    ``threshold`` (default 28) splits each axis into low/high halves.
+    28/40 corresponds to an average dimension score of 7, which is the
+    anchor point at which every dimension describes an archive with
+    faceted browse, ISAD(G)-adjacent description, or their equivalent
+    (see docs/algorithm-v1.md §Scored dimensions). Below 28 on an axis,
+    the archive has at least one dimension below the "uniformly good"
+    tier; at or above, all four are in that tier or better.
+
+    Returns "n.a." when either axis is unscored.
+    """
+    if pipeline is None or research is None:
+        return "n.a."
+    a_high = pipeline >= threshold
+    b_high = research >= threshold
+    if a_high and b_high:
+        return "High pipeline / High research"
+    if a_high and not b_high:
+        return "High pipeline / Low research"
+    if not a_high and b_high:
+        return "Low pipeline / High research"
+    return "Low pipeline / Low research"
 
 
 def record_score(
@@ -138,6 +271,19 @@ SINGLE_SELECT_FACETS: dict[str, tuple[str, ...]] = {
         "informal",
         "none",
         "not-applicable",
+    ),
+    # Whether the archive's own nominal access surface supports
+    # scholarly workflows (search across record types, enumeration,
+    # stable citations, bulk retrieval) or whether practical scholarly
+    # access requires our federation tooling. Not a scoring dimension
+    # — it annotates the accessibility dimension with a qualitative
+    # observation about who actually pays the ingestion cost. See
+    # docs/adr-0001-two-axis-aggregation.md §Related facet.
+    "scholarly_access_practical": (
+        "well-supported",
+        "usable-with-effort",
+        "only-via-federation",
+        "not-yet-assessed",
     ),
 }
 

@@ -339,6 +339,154 @@ def test_list_view_naive_sum_column(seeded_app, client):
     assert "10" in body  # naive sum column shows 10
 
 
+def _score_full_profile(app_, slug: str, values: dict[str, int]) -> None:
+    """Helper: score all dimensions on a given archive."""
+    with app_.app_context():
+        archive = _db.session.scalar(select(Archive).where(Archive.slug == slug))
+        for dim, value in values.items():
+            svc.record_score(
+                archive=archive,
+                dimension=dim,
+                score=value,
+                justification_en="axis test",
+                justification_pt=None,
+                scored_by=None,
+            )
+        _db.session.commit()
+
+
+def test_list_view_shows_axis_columns(seeded_app, client):
+    """List page renders Pipeline and Research column headers + axis-max."""
+    resp = client.get("/archives/")
+    body = resp.get_data(as_text=True)
+    assert ">Pipeline<" in body
+    assert ">Research<" in body
+    assert "/40" not in body  # no scored archives yet, so no axis totals
+
+
+def test_list_view_sort_by_pipeline(seeded_app, client):
+    """sort=pipeline ranks pipeline-strong archive above research-strong."""
+    # LABIM = pipeline-strong (all 4 pipeline dims high, research low)
+    _score_full_profile(
+        seeded_app,
+        "rn-labim-t1r1",
+        {
+            "accessibility": 8,
+            "finding_aids": 8,
+            "pipeline_ingestion_readiness": 8,
+            "scale": 8,
+            "provenance_curatorial": 2,
+            "corpus_completeness": 2,
+            "uniqueness_non_duplication": 2,
+            "linkage_potential": 2,
+        },
+    )
+    # TJMA = research-strong (opposite profile)
+    _score_full_profile(
+        seeded_app,
+        "ma-tjma-t1r2",
+        {
+            "accessibility": 2,
+            "finding_aids": 2,
+            "pipeline_ingestion_readiness": 2,
+            "scale": 2,
+            "provenance_curatorial": 8,
+            "corpus_completeness": 8,
+            "uniqueness_non_duplication": 8,
+            "linkage_potential": 8,
+        },
+    )
+
+    resp = client.get("/archives/?sort=pipeline")
+    body = resp.get_data(as_text=True)
+    assert body.index("LABIM/UFRN") < body.index("TJMA")
+    assert "32/40" in body  # LABIM's pipeline axis total
+
+
+def test_list_view_sort_by_research(seeded_app, client):
+    """sort=research inverts the pipeline ordering above."""
+    _score_full_profile(
+        seeded_app,
+        "rn-labim-t1r1",
+        {
+            "accessibility": 8, "finding_aids": 8,
+            "pipeline_ingestion_readiness": 8, "scale": 8,
+            "provenance_curatorial": 2, "corpus_completeness": 2,
+            "uniqueness_non_duplication": 2, "linkage_potential": 2,
+        },
+    )
+    _score_full_profile(
+        seeded_app,
+        "ma-tjma-t1r2",
+        {
+            "accessibility": 2, "finding_aids": 2,
+            "pipeline_ingestion_readiness": 2, "scale": 2,
+            "provenance_curatorial": 8, "corpus_completeness": 8,
+            "uniqueness_non_duplication": 8, "linkage_potential": 8,
+        },
+    )
+    resp = client.get("/archives/?sort=research")
+    body = resp.get_data(as_text=True)
+    assert body.index("TJMA") < body.index("LABIM/UFRN")
+
+
+def test_detail_view_shows_score_profile_card(seeded_app, client):
+    """Detail page renders both axis totals + quadrant label."""
+    _score_full_profile(
+        seeded_app,
+        "rn-labim-t1r1",
+        {
+            "accessibility": 8, "finding_aids": 7,
+            "pipeline_ingestion_readiness": 8, "scale": 8,   # pipeline = 31
+            "provenance_curatorial": 6, "corpus_completeness": 6,
+            "uniqueness_non_duplication": 8, "linkage_potential": 6,  # research = 26
+        },
+    )
+    resp = client.get("/archives/rn-labim-t1r1")
+    body = resp.get_data(as_text=True)
+    assert "Score profile" in body
+    assert "31" in body and "26" in body
+    assert "axis-card" in body  # profile card rendered
+    assert "High pipeline / Low research" in body  # quadrant at threshold 28
+
+
+def test_facets_form_exposes_scholarly_access_practical(seeded_app, client):
+    resp = client.get("/archives/rn-labim-t1r1/facets")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert 'name="scholarly_access_practical"' in body
+    assert "only-via-federation" in body
+
+
+def test_submit_facets_persists_scholarly_access_practical(seeded_app, client):
+    resp = client.post(
+        "/archives/rn-labim-t1r1/facets",
+        data={
+            "form": "facets",
+            "licensing_posture": "",
+            "licensing_posture_note": "",
+            "stated_roadmap": "",
+            "stated_roadmap_note": "",
+            "scholarly_access_practical": "only-via-federation",
+            "scholarly_access_practical_note": "Test note.",
+            "curatorial_rarity_notes": "",
+            "prior_use_note": "",
+            "fair_use_eligible": "",
+            "set_by": "tester",
+            "submit": "Save facets",
+        },
+        follow_redirects=True,
+    )
+    assert resp.status_code == 200
+
+    with seeded_app.app_context():
+        archive = _db.session.scalar(select(Archive).where(Archive.slug == "rn-labim-t1r1"))
+        active = svc.active_facet_values(archive.id)
+        assert "scholarly_access_practical" in active
+        assert active["scholarly_access_practical"].value == "only-via-federation"
+        assert active["scholarly_access_practical"].note == "Test note."
+
+
 # --------------------------------------------------------------------------- #
 # Detail view
 

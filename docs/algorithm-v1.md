@@ -192,7 +192,19 @@ Dimensions initially proposed but demoted or removed. Each carries a rationale s
 
 **v0 placeholder:** display per-dimension scores plus a naive sum (0–80). Not authoritative; a placeholder that gives us signal without pre-committing.
 
-**Aggregation options to evaluate after Pass 2:**
+**v1 (Pass 2, adopted 2026-08-24) — two-axis view.** After scoring the six-archive calibration set, we adopted a two-axis 4-4 split alongside the naive sum. See `docs/adr-0001-two-axis-aggregation.md` for the full rationale; the summary is:
+
+- **Pipeline axis** (0–40) = accessibility + finding_aids + pipeline_ingestion_readiness + scale. What it costs us to ingest.
+- **Research axis** (0–40) = provenance_curatorial + corpus_completeness + uniqueness_non_duplication + linkage_potential. What we get back once we do.
+- **Quadrant label** at threshold 28/40 (average anchor 7 per dimension = "uniformly usable" tier) using inclusive comparison: `pipeline >= 28 and research >= 28` → "High pipeline / High research", and so on. Unscored archives return `"n.a."`.
+- **Naive sum kept** as a legacy 0–80 column on both the list page (sortable) and the detail card. It remains useful when one axis is unscored and it preserves continuity with Pass 1 outputs.
+- **Sorting.** The list page offers `sort=name`, `sort=score` (naive sum), `sort=pipeline`, and `sort=research`. Each axis sort ranks NULLs last so partially-scored archives don't crowd the top.
+
+The axis membership table (`app.services.scoring.AXES`) lives in code and is guarded by an import-time sanity check that asserts every dimension in `DIMENSIONS` appears in exactly one axis. Any change to that partition is a code-review event, not a config edit.
+
+**Related facet: `scholarly_access_practical`** (added at the same time). Single-select over `well-supported`, `usable-with-effort`, `only-via-federation`, `not-yet-assessed`. This is *not* a scoring dimension — it annotates whether an archive's own access surface supports scholarly workflows or whether reaching that material practically requires our federation tooling. It complements the pipeline axis by naming *who pays the ingestion cost*.
+
+**Aggregation options still open for later evaluation:**
 
 - Equal-weighted sum, normalized to 0–10
 - Weighted sum (weights TBD from Pass 2 intuitions)
@@ -229,3 +241,4 @@ Full text lives in `LICENSING.md` when we get closer to public release.
 
 - **2026-08-24** — Pass 1 complete. Eight scored dimensions, twelve facets, aggregation deferred. First test scope confirmed as the six Mipibu-fit archives (LABIM/UFRN as anchor + the five survey-listed pipeline-viable archives: TJMA, INTERPI, BCZM/UFRN, Jornais de Sergipe, Nupem).
 - **2026-08-24** — Standards positioning added; light cross-references to `docs/standards.md` and `docs/federation-v1.md` inserted. No dimension anchors changed.
+- **2026-08-24** — Aggregation moved from v0-placeholder to v1: two-axis view (Pipeline/Research, 4-4 split) adopted alongside the naive sum. Quadrant label at threshold 28/40 (inclusive). New `scholarly_access_practical` facet added; not a scoring dimension. See `docs/adr-0001-two-axis-aggregation.md`.

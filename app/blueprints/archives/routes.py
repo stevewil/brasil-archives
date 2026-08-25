@@ -67,25 +67,42 @@ def _load_archive_or_404(slug: str) -> Archive:
 
 @bp.route("/", methods=["GET"])
 def list_archives():
-    """List archives with basic filters and a naive sum column.
+    """List archives with filters and two-axis + naive sum columns.
 
     Filters:
       * ``state`` — home state code, e.g. RN
       * ``institutional_type`` — vocabulary slug
       * ``content`` — ``with`` / ``without`` / ``all`` (default with)
-      * ``sort`` — ``name`` (default) or ``score`` (naive sum, desc)
+      * ``sort`` — one of ``name`` (default), ``score`` (naive sum),
+        ``pipeline`` (Axis A), ``research`` (Axis B). Each score sort is
+        descending; ``name`` is ascending.
     """
     state = request.args.get("state", "").strip() or None
     itype = request.args.get("institutional_type", "").strip() or None
     content = request.args.get("content", "with").strip()
     sort = request.args.get("sort", "name").strip()
 
-    # Naive-sum subquery over currently-active scores.
-    naive_sum_sq = (
+    # One subquery covers naive sum + both axis sums. The axis sums use
+    # SUM(CASE ... END) so each row's contribution goes into exactly
+    # one axis, matching the AXES table in app.services.scoring.
+    pipeline_dims = svc.AXES["pipeline"]
+    research_dims = svc.AXES["research"]
+
+    def _axis_sum(members: tuple[str, ...]):
+        return func.sum(
+            case(
+                (DimensionScore.dimension.in_(members), DimensionScore.score),
+                else_=0,
+            )
+        )
+
+    scores_sq = (
         select(
             DimensionScore.archive_id.label("aid"),
             func.sum(DimensionScore.score).label("naive_sum"),
             func.count(DimensionScore.id).label("scored_dims"),
+            _axis_sum(pipeline_dims).label("axis_pipeline"),
+            _axis_sum(research_dims).label("axis_research"),
         )
         .where(DimensionScore.superseded_at.is_(None))
         .group_by(DimensionScore.archive_id)
@@ -93,8 +110,14 @@ def list_archives():
     )
 
     query = (
-        select(Archive, naive_sum_sq.c.naive_sum, naive_sum_sq.c.scored_dims)
-        .join(naive_sum_sq, naive_sum_sq.c.aid == Archive.id, isouter=True)
+        select(
+            Archive,
+            scores_sq.c.naive_sum,
+            scores_sq.c.scored_dims,
+            scores_sq.c.axis_pipeline,
+            scores_sq.c.axis_research,
+        )
+        .join(scores_sq, scores_sq.c.aid == Archive.id, isouter=True)
         .options(selectinload(Archive.institutional_type))
     )
 
@@ -110,11 +133,14 @@ def list_archives():
         query = query.where(Archive.no_digital_content.is_(True))
     # ``all`` = no filter
 
-    if sort == "score":
-        # NULLS LAST portable pattern: coalesce to -1 for ordering only.
-        query = query.order_by(
-            func.coalesce(naive_sum_sq.c.naive_sum, -1).desc(), Archive.name.asc()
-        )
+    # NULLS LAST portable pattern: coalesce to -1 for ordering only.
+    _order_by_score = {
+        "score": func.coalesce(scores_sq.c.naive_sum, -1).desc(),
+        "pipeline": func.coalesce(scores_sq.c.axis_pipeline, -1).desc(),
+        "research": func.coalesce(scores_sq.c.axis_research, -1).desc(),
+    }
+    if sort in _order_by_score:
+        query = query.order_by(_order_by_score[sort], Archive.name.asc())
     else:
         query = query.order_by(Archive.name.asc())
 
@@ -129,6 +155,7 @@ def list_archives():
         rows=rows,
         states=_brazilian_states(),
         institutional_types=institutional_types,
+        axis_max=svc.AXIS_MAX,
         current={
             "state": state or "",
             "institutional_type": itype or "",
@@ -170,12 +197,20 @@ def detail(slug: str):
         )
     )
 
+    axes = svc.axis_scores(archive.id)
+    quadrant = svc.quadrant_label(axes["pipeline"], axes["research"])
+
     return render_template(
         "archives/detail.html",
         archive=archive,
         dimensions=DIMENSIONS,
         scores_by_dim=scores_by_dim,
         naive_sum=svc.naive_sum(archive.id),
+        axes=axes,
+        axis_labels=svc.AXIS_LABELS,
+        axis_max=svc.AXIS_MAX,
+        axis_members=svc.AXES,
+        quadrant=quadrant,
         active_facets=active_facets,
         facet_history=lambda facet: svc.facet_history(archive.id, facet),
         upgrade_projects=upgrade_projects,
@@ -242,6 +277,14 @@ def edit_facets(slug: str):
                 "stated_roadmap_note": (
                     active["stated_roadmap"].note if "stated_roadmap" in active else ""
                 ),
+                "scholarly_access_practical": (
+                    active["scholarly_access_practical"].value
+                    if "scholarly_access_practical" in active else ""
+                ),
+                "scholarly_access_practical_note": (
+                    active["scholarly_access_practical"].note
+                    if "scholarly_access_practical" in active else ""
+                ),
                 "curatorial_rarity_notes": archive.curatorial_rarity_notes or "",
                 "prior_use_note": archive.prior_use_note or "",
                 "fair_use_eligible": (
@@ -280,6 +323,13 @@ def edit_facets(slug: str):
                 facet="stated_roadmap",
                 value=form.stated_roadmap.data or "",
                 note=form.stated_roadmap_note.data or None,
+                set_by=form.set_by.data or None,
+            )
+            svc.set_facet_value(
+                archive=archive,
+                facet="scholarly_access_practical",
+                value=form.scholarly_access_practical.data or "",
+                note=form.scholarly_access_practical_note.data or None,
                 set_by=form.set_by.data or None,
             )
             archive.curatorial_rarity_notes = (

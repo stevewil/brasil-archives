@@ -77,6 +77,21 @@ class FacetForm(FlaskForm):
     stated_roadmap_note = StringField(
         "Roadmap note", validators=[Optional(), Length(max=500)]
     )
+    scholarly_access_practical = SelectField(
+        "Scholarly access, practical",
+        choices=[
+            ("", "— unset —"),
+            ("well-supported", "Well supported by archive itself"),
+            ("usable-with-effort", "Usable with scripting effort"),
+            ("only-via-federation", "Only via federation tooling"),
+            ("not-yet-assessed", "Not yet assessed"),
+        ],
+        validators=[Optional()],
+        default="",
+    )
+    scholarly_access_practical_note = StringField(
+        "Scholarly access note", validators=[Optional(), Length(max=500)]
+    )
     curatorial_rarity_notes = TextAreaField(
         "Curatorial rarity notes", validators=[Optional(), Length(max=4000)]
     )
