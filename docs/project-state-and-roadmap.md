@@ -319,7 +319,9 @@ Every decision in the roadmap defers to these, established across the sessions l
 | mipibu-corpus Wasabi bucket | `s3://mipibu-corpus/data/*` (public-read), region us-east-1 | Corpus DB hosting |
 | brasil-archives-data Wasabi bucket | private, region us-east-1 | Future asset hosting |
 | Workstation | Windows + Git Bash, Git 2.53, AWS CLI v2 | Development + push |
-| cPanel host | TBD (not yet provisioned end-to-end) | Mipibu production runtime |
+| cPanel host | Serves https://mipibu.from-bottom-to.top/ from ~/apps/mipibu-explorer | Mipibu production runtime |
+| Mipibu public URL | https://mipibu.from-bottom-to.top/ | Federation endpoints at /health, /api/federation/* |
+| Mipibu archive slug | `sao-jose-mipibu-judicial-1850-1888` (proposed) | Stable identifier used in /health responses and brasil-archives catalog |
 | GitHub Actions | Per-repo | CI verification |
 
 ---
@@ -329,7 +331,7 @@ Every decision in the roadmap defers to these, established across the sessions l
 Things we've deliberately not chosen yet, and what triggers the choice:
 
 - **brasil-archives public site substrate** (Sitecraft/MkDocs/Flask/Pages). Trigger: starting Phase 4.
-- **Custom Wasabi domain** (`corpus.mipibu.pplx.app` vs default `s3.us-east-1.wasabisys.com`). Trigger: any operational reason the default URL becomes awkward — SEO, sharing, branding.
+- **Custom Wasabi domain** (`corpus.mipibu.from-bottom-to.top` vs default `s3.us-east-1.wasabisys.com`). Trigger: any operational reason the default URL becomes awkward — SEO, sharing, branding.
 - **Federation URL prefix** (`/api/federation/*` vs sibling `/api/records`). Provisionally: `/api/federation/*` to avoid collision with existing `/api/cases`. Confirm in Phase 3.
 - **Second corpus choice** (povos-indigenas vs other). Trigger: end of Phase 4.
 - **Corpus-DB-in-Wasabi vs later migration to Git LFS**. Current answer: Wasabi. Reconsider if Wasabi cost model changes.
