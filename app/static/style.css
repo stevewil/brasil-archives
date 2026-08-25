@@ -112,3 +112,275 @@ body {
   border-top: 1px solid var(--border);
   color: var(--muted);
 }
+
+/* --- Phase 1 scoring UI --- */
+
+.primary-nav {
+  flex: 1;
+  padding-left: 1.5rem;
+}
+
+.primary-nav a {
+  color: var(--fg);
+  text-decoration: none;
+  font-weight: 500;
+  margin-right: 1rem;
+}
+
+.primary-nav a:hover { color: var(--accent); }
+
+.page-header h1 {
+  font-size: 1.75rem;
+  margin: 0.25rem 0 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.page-header__lede {
+  color: var(--muted);
+  margin: 0 0 1rem;
+}
+
+.crumbs a { color: var(--muted); text-decoration: none; }
+.crumbs a:hover { color: var(--accent); }
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: end;
+  padding: 1rem;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin: 1rem 0 1.5rem;
+}
+
+.filter-bar label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.filter-bar select,
+.filter-bar input,
+.filter-bar button {
+  padding: 0.35rem 0.5rem;
+  font-size: 0.95rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: white;
+  min-height: 2rem;
+}
+
+.filter-bar button,
+button[type="submit"] {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.filter-bar button:hover,
+button[type="submit"]:hover { filter: brightness(1.1); }
+
+.btn-secondary {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: white;
+  color: var(--fg);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.archives-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.archives-table th,
+.archives-table td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.95rem;
+  vertical-align: top;
+}
+
+.archives-table th { background: #f4f4ee; font-weight: 600; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; }
+
+.archives-table tr:last-child td { border-bottom: none; }
+
+.archives-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.archives-table td.empty { text-align: center; color: var(--muted); padding: 2rem; }
+
+.badge {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.badge--ok { background: #e0f0e5; color: #005a2b; }
+.badge--muted { background: #eee; color: var(--muted); }
+.badge--warn { background: #fbe6d6; color: #8a4a1a; }
+
+.flashes { list-style: none; padding: 0; margin: 0 0 1rem; }
+.flash { padding: 0.6rem 0.8rem; border-radius: 4px; margin-bottom: 0.4rem; font-size: 0.9rem; }
+.flash--success { background: #e0f0e5; color: #005a2b; }
+.flash--error { background: #fbe6d6; color: #8a4a1a; }
+.flash--info { background: #eef; color: #223; }
+
+.score-summary,
+.dimensions,
+.facets,
+.upgrade-projects,
+.score-form,
+.facet-form,
+.tags-form {
+  margin-top: 1.5rem;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.35rem 1rem;
+  margin: 0.5rem 0;
+}
+
+.summary-grid dt {
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.summary-grid dd { margin: 0; }
+
+.disclaimer { color: var(--muted); font-size: 0.85rem; font-style: italic; }
+
+.dimension {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  margin: 0.75rem 0;
+}
+
+.dimension__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.dimension__header h3 { margin: 0; font-size: 1.05rem; }
+
+.dimension__score {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.dimension__current summary,
+.dimension__history summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.history-list { padding-left: 1.25rem; }
+.history-list li { margin-bottom: 0.75rem; }
+.hist-score { font-weight: 600; margin-right: 0.5rem; }
+.hist-when, .hist-who { color: var(--muted); font-size: 0.85rem; margin-right: 0.5rem; }
+.hist-just { margin: 0.25rem 0 0; }
+
+.score-form,
+.facet-form,
+.tags-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+}
+
+.score-form { margin-top: 1rem; }
+
+.score-form label,
+.facet-form label,
+.tags-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.score-form input,
+.score-form textarea,
+.score-form select,
+.facet-form input,
+.facet-form textarea,
+.facet-form select {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font: inherit;
+  color: var(--fg);
+  background: white;
+}
+
+.score-form textarea,
+.facet-form textarea { font-family: inherit; resize: vertical; min-height: 2.5rem; }
+
+.score-form button,
+.facet-form button,
+.tags-form button { align-self: flex-start; padding: 0.4rem 1rem; border-radius: 4px; }
+
+.tags-form fieldset {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  margin: 0.25rem 0;
+}
+
+.tags-form fieldset legend {
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0 0.25rem;
+}
+
+.tags-form ul { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 0.25rem 0.75rem; }
+
+.tags-form ul li { display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; }
+
+.tag {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 3px;
+  background: #f4f4ee;
+  color: var(--fg);
+  font-size: 0.85rem;
+  margin: 0.1rem 0.15rem 0.1rem 0;
+}
+
+.text-muted { color: var(--muted); }
+.text-small { font-size: 0.85rem; color: var(--muted); }

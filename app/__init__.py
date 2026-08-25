@@ -16,7 +16,7 @@ from pathlib import Path
 from flask import Flask, request
 
 from .config import INSTANCE_DIR, resolve_config
-from .extensions import babel, db, migrate
+from .extensions import babel, csrf, db, migrate
 
 
 def _select_locale() -> str:
@@ -48,6 +48,7 @@ def create_app(config_name: str | None = None) -> Flask:
     db.init_app(app)
     migrate.init_app(app, db, directory=str(Path(app.root_path).parent / "migrations"))
     babel.init_app(app, locale_selector=_select_locale)
+    csrf.init_app(app)
 
     # Expose get_locale() to Jinja so templates can set <html lang="...">.
     from flask_babel import get_locale
@@ -59,7 +60,9 @@ def create_app(config_name: str | None = None) -> Flask:
 
     # Blueprints
     from .blueprints.main import bp as main_bp
+    from .blueprints.archives import bp as archives_bp
     app.register_blueprint(main_bp)
+    app.register_blueprint(archives_bp)
 
     # Simple health check for deploy monitoring
     @app.get("/healthz")

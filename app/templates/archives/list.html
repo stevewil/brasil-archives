@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Archives{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <h1>Archives</h1>
+  <p class="page-header__lede">{{ rows|length }} archives shown. Filters and naive-sum column below; aggregation methodology will be revisited after Pass 2 calibration.</p>
+</section>
+
+<form method="get" class="filter-bar">
+  <label>
+    State
+    <select name="state">
+      <option value="">All</option>
+      {% for st in states %}
+        <option value="{{ st }}" {% if current.state == st %}selected{% endif %}>{{ st }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>
+    Type
+    <select name="institutional_type">
+      <option value="">All</option>
+      {% for it in institutional_types %}
+        <option value="{{ it.slug }}" {% if current.institutional_type == it.slug %}selected{% endif %}>{{ it.label_en }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>
+    Content
+    <select name="content">
+      <option value="with" {% if current.content == 'with' %}selected{% endif %}>With digital content</option>
+      <option value="without" {% if current.content == 'without' %}selected{% endif %}>No digital content</option>
+      <option value="all" {% if current.content == 'all' %}selected{% endif %}>All</option>
+    </select>
+  </label>
+  <label>
+    Sort
+    <select name="sort">
+      <option value="name" {% if current.sort == 'name' %}selected{% endif %}>Name (A–Z)</option>
+      <option value="score" {% if current.sort == 'score' %}selected{% endif %}>Naive sum (desc)</option>
+    </select>
+  </label>
+  <button type="submit">Apply</button>
+  <a class="btn-secondary" href="{{ url_for('archives.list_archives') }}">Reset</a>
+</form>
+
+<table class="archives-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>State</th>
+      <th>Type</th>
+      <th>Content</th>
+      <th class="num">Naive sum</th>
+      <th class="num">Dims</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for archive, naive_sum, scored_dims in rows %}
+      <tr>
+        <td>
+          <a href="{{ url_for('archives.detail', slug=archive.slug) }}">{{ archive.name }}</a>
+        </td>
+        <td>{{ archive.home_state_code or '—' }}</td>
+        <td>{{ archive.institutional_type.label_en if archive.institutional_type else '—' }}</td>
+        <td>{% if archive.no_digital_content %}<span class="badge badge--muted">No content</span>{% else %}<span class="badge badge--ok">Available</span>{% endif %}</td>
+        <td class="num">{{ naive_sum if naive_sum is not none else '—' }}</td>
+        <td class="num">{{ scored_dims or 0 }}/8</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6" class="empty">No archives match these filters.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -9,6 +9,9 @@
 <body>
   <header class="site-header">
     <a class="brand" href="{{ url_for('main.index') }}">brasil-archives</a>
+    <nav class="primary-nav">
+      <a href="{{ url_for('archives.list_archives') }}">Archives</a>
+    </nav>
     <nav class="lang-switch">
       <a href="?lang=en" {% if get_locale() == 'en' %}aria-current="page"{% endif %}>EN</a>
       <span class="sep">·</span>
@@ -17,6 +20,15 @@
   </header>
 
   <main class="site-main">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for category, message in messages %}
+            <li class="flash flash--{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
     {% block content %}{% endblock %}
   </main>
 

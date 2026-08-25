@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block title %}{{ archive.name }}{% endblock %}
+
+{% macro dimension_label(dim) -%}
+  {{ dim.replace('_', ' ').title() }}
+{%- endmacro %}
+
+{% block content %}
+<section class="page-header">
+  <p class="crumbs"><a href="{{ url_for('archives.list_archives') }}">← All archives</a></p>
+  <h1>{{ archive.name }}</h1>
+  <p class="page-header__lede">
+    {{ archive.home_state_code or '—' }} ·
+    {{ archive.institutional_type.label_en if archive.institutional_type else '—' }} ·
+    {% if archive.canonical_url %}<a href="{{ archive.canonical_url }}" rel="noreferrer noopener">Canonical URL</a>{% else %}No canonical URL{% endif %}
+    {% if archive.no_digital_content %} · <span class="badge badge--muted">No digital content</span>{% endif %}
+  </p>
+  <p>
+    Fair use eligibility:
+    {% if archive.fair_use_eligible is none %}<span class="badge badge--muted">Not reviewed</span>
+    {% elif archive.fair_use_eligible %}<span class="badge badge--ok">Yes</span>
+    {% else %}<span class="badge badge--warn">No — ineligible for public site</span>{% endif %}
+    <a class="btn-secondary" href="{{ url_for('archives.edit_facets', slug=archive.slug) }}">Edit facets &amp; tags</a>
+  </p>
+</section>
+
+<section class="score-summary">
+  <h2>Score summary</h2>
+  <dl class="summary-grid">
+    <dt>Naive sum (0–80)</dt>
+    <dd>{{ naive_sum if naive_sum is not none else '—' }}</dd>
+    <dt>Dimensions scored</dt>
+    <dd>{{ (scores_by_dim.values() | selectattr('active') | list | length) }}/8</dd>
+  </dl>
+  <p class="disclaimer">Aggregation is a placeholder sum for now (see algorithm-v1.md §Aggregation); revisit after Pass 2.</p>
+</section>
+
+<section class="dimensions">
+  <h2>Dimension scores</h2>
+  {% for dim in dimensions %}
+    {% set entry = scores_by_dim[dim] %}
+    <article class="dimension" id="{{ dim }}">
+      <header class="dimension__header">
+        <h3>{{ dimension_label(dim) }}</h3>
+        <span class="dimension__score">
+          {% if entry.active %}{{ entry.active.score }}/10{% else %}<em>unscored</em>{% endif %}
+        </span>
+      </header>
+
+      {% if entry.active %}
+        <details class="dimension__current" open>
+          <summary>Current justification</summary>
+          <p>{{ entry.active.justification_en }}</p>
+          {% if entry.active.justification_pt %}
+            <p class="text-muted"><strong>PT:</strong> {{ entry.active.justification_pt }}</p>
+          {% endif %}
+          <p class="text-small">
+            Scored {{ entry.active.scored_at.strftime('%Y-%m-%d %H:%M') }}
+            {% if entry.active.scored_by %} by {{ entry.active.scored_by }}{% endif %}.
+          </p>
+        </details>
+      {% endif %}
+
+      {% if entry.history | length > (1 if entry.active else 0) %}
+        <details class="dimension__history">
+          <summary>History ({{ entry.history | length }} revisions)</summary>
+          <ol class="history-list">
+            {% for row in entry.history %}
+              <li>
+                <span class="hist-score">{{ row.score }}/10</span>
+                <span class="hist-when">{{ row.scored_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                {% if row.scored_by %}<span class="hist-who">by {{ row.scored_by }}</span>{% endif %}
+                {% if row.superseded_at %}<span class="badge badge--muted">superseded</span>{% endif %}
+                <p class="hist-just">{{ row.justification_en }}</p>
+              </li>
+            {% endfor %}
+          </ol>
+        </details>
+      {% endif %}
+
+      <form method="post" action="{{ url_for('archives.submit_score', slug=archive.slug) }}" class="score-form">
+        {{ entry.form.csrf_token }}
+        {{ entry.form.dimension(value=dim) }}
+        <label>
+          Score
+          {{ entry.form.score(min=0, max=10) }}
+        </label>
+        <label>
+          Justification (EN)
+          {{ entry.form.justification_en(rows=3, placeholder="Evidence for this score…") }}
+        </label>
+        <label>
+          Justification (PT, optional)
+          {{ entry.form.justification_pt(rows=2) }}
+        </label>
+        <label>
+          Scored by
+          {{ entry.form.scored_by(placeholder="handle or initials") }}
+        </label>
+        <button type="submit">Save score</button>
+      </form>
+    </article>
+  {% endfor %}
+</section>
+
+<section class="facets">
+  <h2>Facets &amp; tags</h2>
+  <dl class="summary-grid">
+    <dt>Licensing posture</dt>
+    <dd>
+      {% if 'licensing_posture' in active_facets %}
+        {{ active_facets['licensing_posture'].value }}
+        {% if active_facets['licensing_posture'].note %} — <em>{{ active_facets['licensing_posture'].note }}</em>{% endif %}
+      {% else %}—{% endif %}
+    </dd>
+    <dt>Stated roadmap</dt>
+    <dd>
+      {% if 'stated_roadmap' in active_facets %}
+        {{ active_facets['stated_roadmap'].value }}
+        {% if active_facets['stated_roadmap'].note %} — <em>{{ active_facets['stated_roadmap'].note }}</em>{% endif %}
+      {% else %}—{% endif %}
+    </dd>
+    <dt>Periods</dt>
+    <dd>{% for p in archive.periods %}<span class="tag">{{ p.label_en }}</span>{% else %}—{% endfor %}</dd>
+    <dt>Record types</dt>
+    <dd>{% for r in archive.record_types %}<span class="tag">{{ r.label_en }}</span>{% else %}—{% endfor %}</dd>
+    <dt>Themes</dt>
+    <dd>{% for t in archive.themes %}<span class="tag">{{ t.label_en }}</span>{% else %}—{% endfor %}</dd>
+    <dt>Curatorial rarity notes</dt>
+    <dd>{{ archive.curatorial_rarity_notes or '—' }}</dd>
+    <dt>Prior use note</dt>
+    <dd>{{ archive.prior_use_note or '—' }}</dd>
+  </dl>
+</section>
+
+{% if upgrade_projects %}
+  <section class="upgrade-projects">
+    <h2>Registered upgrade projects</h2>
+    <ul>
+      {% for proj in upgrade_projects %}
+        <li>
+          <strong>{{ proj.name }}</strong>
+          — {{ proj.delivery_status }} · {{ proj.federation_contract_version }}
+          {% if proj.primary_url %} · <a href="{{ proj.primary_url }}" rel="noreferrer noopener">{{ proj.primary_url }}</a>{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}
+{% endblock %}

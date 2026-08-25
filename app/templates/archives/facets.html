@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Edit facets — {{ archive.name }}{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <p class="crumbs">
+    <a href="{{ url_for('archives.list_archives') }}">← All archives</a>
+    ·
+    <a href="{{ url_for('archives.detail', slug=archive.slug) }}">{{ archive.name }}</a>
+  </p>
+  <h1>Edit facets &amp; tags</h1>
+</section>
+
+<form method="post" class="facet-form">
+  {{ form.csrf_token }}
+  <input type="hidden" name="form" value="facets">
+
+  <h2>Human-tagged facets</h2>
+  <label>
+    Licensing posture
+    {{ form.licensing_posture() }}
+  </label>
+  <label>
+    Licensing note
+    {{ form.licensing_posture_note(placeholder="e.g. CC-BY on metadata, images under contract") }}
+  </label>
+  <label>
+    Stated roadmap
+    {{ form.stated_roadmap() }}
+  </label>
+  <label>
+    Roadmap note
+    {{ form.stated_roadmap_note() }}
+  </label>
+  <label>
+    Curatorial rarity notes
+    {{ form.curatorial_rarity_notes(rows=3) }}
+  </label>
+  <label>
+    Prior use note
+    {{ form.prior_use_note(rows=3) }}
+  </label>
+
+  <h2>Fair use eligibility</h2>
+  <p class="disclaimer">Fair use for scholarly work is the fundamental eligibility floor for inclusion on the public site.</p>
+  <label>
+    Eligible?
+    {{ form.fair_use_eligible() }}
+  </label>
+  <label>
+    Set by
+    {{ form.set_by(placeholder="handle or initials") }}
+  </label>
+  <button type="submit">Save facets</button>
+</form>
+
+<form method="post" class="tags-form">
+  {{ tags_form.csrf_token }}
+  <input type="hidden" name="form" value="tags">
+
+  <h2>Multi-select tags</h2>
+  <fieldset>
+    <legend>Periods</legend>
+    {{ tags_form.periods() }}
+  </fieldset>
+  <fieldset>
+    <legend>Record types</legend>
+    {{ tags_form.record_types() }}
+  </fieldset>
+  <fieldset>
+    <legend>Themes</legend>
+    {{ tags_form.themes() }}
+  </fieldset>
+  <button type="submit">Save tags</button>
+</form>
+{% endblock %}
