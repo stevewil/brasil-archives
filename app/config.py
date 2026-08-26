@@ -61,7 +61,21 @@ CONFIG_MAP = {
 
 
 def resolve_config(name: str | None) -> type[BaseConfig]:
-    """Return the config class for ``name``, defaulting to development."""
+    """Return the config class for ``name``, defaulting to development.
+
+    For production, refuse to return the class unless SECRET_KEY is set
+    to a real value. A known-public session-signing key would make every
+    cookie and CSRF token forgeable, so this is a hard failure.
+    """
     if name is None:
         name = os.environ.get("BRASIL_ARCHIVES_CONFIG", "development")
-    return CONFIG_MAP.get(name, DevelopmentConfig)
+    cls = CONFIG_MAP.get(name, DevelopmentConfig)
+    if cls is ProductionConfig:
+        secret = os.environ.get("SECRET_KEY")
+        if not secret or secret == "dev-secret-change-me":
+            raise RuntimeError(
+                "SECRET_KEY environment variable must be set to a strong "
+                "random value in production. Generate one with: "
+                "python -c 'import secrets; print(secrets.token_hex(32))'"
+            )
+    return cls
