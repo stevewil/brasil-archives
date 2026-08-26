@@ -6,8 +6,11 @@ auditable without destructive updates.
 """
 from __future__ import annotations
 
+from .aggregated_record import AggregatedRecord
 from .archive import Archive
 from .federation_cache import FederationCache
+from .harvest_error import HarvestError
+from .harvest_run import HarvestRun
 from .upgrade_project import UpgradeProject
 from .scoring import DimensionScore, DimensionLift, FacetValue
 from .probe import ProbeResult
@@ -39,8 +42,11 @@ DIMENSIONS: tuple[str, ...] = (
 )
 
 __all__ = [
+    "AggregatedRecord",
     "Archive",
     "FederationCache",
+    "HarvestError",
+    "HarvestRun",
     "UpgradeProject",
     "DimensionScore",
     "DimensionLift",

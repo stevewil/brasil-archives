@@ -46,12 +46,13 @@ federation:
   json_api_base_url: https://mipibu.from-bottom-to.top/api
   # OAI-PMH endpoint deferred to Phase 3. Federation-v1 JSON contract
   # carries the weight for Scenario 1 (see docs/federation-v1.md).
-  oai_pmh_base_url: null
+  oai_pmh_base_url: https://mipibu.from-bottom-to.top/oai
   iiif_search_endpoint: null
   ead_export_url: null
   eac_cpf_export_url: null
   supported_metadata_formats:
     - oai_dc
+    - oai_ead
   supported_authorities:
     - viaf
     - geonames
