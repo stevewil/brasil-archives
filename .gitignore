@@ -35,3 +35,6 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# Operational architecture doc kept locally only
+docs/project-state-and-roadmap.md
