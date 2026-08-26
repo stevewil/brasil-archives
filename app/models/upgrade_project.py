@@ -17,6 +17,7 @@ from .mixins import TimestampMixin
 
 if TYPE_CHECKING:  # pragma: no cover
     from .archive import Archive
+    from .federation_cache import FederationCache
     from .vocabularies import Period, RecordType
 
 
@@ -49,6 +50,10 @@ class UpgradeProject(TimestampMixin, db.Model):
     federation_contract_version: Mapped[str] = mapped_column(
         String, nullable=False, default="v1"
     )
+    # Federation-v1 JSON contract endpoint (Phase 2). See mipibu
+    # /api/{health,schema,records,records/<id>}. Nullable because a
+    # project may register with OAI-PMH only (or static exports only).
+    json_api_base_url: Mapped[str | None] = mapped_column(String)
     oai_pmh_base_url: Mapped[str | None] = mapped_column(String)
     iiif_search_endpoint: Mapped[str | None] = mapped_column(String)
     ead_export_url: Mapped[str | None] = mapped_column(String)
@@ -76,6 +81,11 @@ class UpgradeProject(TimestampMixin, db.Model):
         "RecordType",
         secondary=upgrade_project_record_types,
         order_by="RecordType.sort_order",
+    )
+    cache_entries: Mapped[list["FederationCache"]] = relationship(
+        "FederationCache",
+        back_populates="upgrade_project",
+        cascade="all, delete-orphan",
     )
 
     def __repr__(self) -> str:

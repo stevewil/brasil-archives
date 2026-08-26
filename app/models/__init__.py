@@ -7,6 +7,7 @@ auditable without destructive updates.
 from __future__ import annotations
 
 from .archive import Archive
+from .federation_cache import FederationCache
 from .upgrade_project import UpgradeProject
 from .scoring import DimensionScore, DimensionLift, FacetValue
 from .probe import ProbeResult
@@ -39,6 +40,7 @@ DIMENSIONS: tuple[str, ...] = (
 
 __all__ = [
     "Archive",
+    "FederationCache",
     "UpgradeProject",
     "DimensionScore",
     "DimensionLift",

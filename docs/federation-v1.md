@@ -15,7 +15,7 @@ The federation contract is a **conformance profile**, not a new protocol. If you
 
 An **upgrade project** is a research or curation project that takes a source archive (or defined subset of a source archive) and produces a derived resource with substantially higher scoring on one or more `brasil-archives` scoring dimensions.
 
-The canonical first example is the [Mipibu Corpus Explorer](https://mipibu.pplx.app), which takes the São José de Mipibu judicial holdings from LABIM/UFRN and lifts them from Provenance 5 → 8 and Finding Aids 6 → 9 by adding structured metadata, per-case titles, defendant identification, and full-text search.
+The canonical first example is the [Mipibu Corpus Explorer](https://mipibu.from-bottom-to.top), which takes the São José de Mipibu judicial holdings from LABIM/UFRN and lifts them from Provenance 5 → 8 and Finding Aids 6 → 9 by adding structured metadata, per-case titles, defendant identification, and full-text search.
 
 An upgrade project is:
 
@@ -65,12 +65,13 @@ scope:
     page_equivalents: 10000
 
 delivery:
-  primary_url: https://mipibu.pplx.app
+  primary_url: https://mipibu.from-bottom-to.top
   source_repo: https://github.com/stevewil/mipibu
   status: stable   # in-development | beta | stable | deprecated
 
 federation:
-  oai_pmh_base_url: https://mipibu.pplx.app/oai       # required for harvest
+  oai_pmh_base_url: https://mipibu.from-bottom-to.top/oai   # required for harvest (Phase 3)
+  json_api_base_url: https://mipibu.from-bottom-to.top/api  # Phase 2 lightweight JSON contract
   iiif_search_endpoint: null                          # optional, when available
   ead_export_url: null
   eac_cpf_export_url: null
