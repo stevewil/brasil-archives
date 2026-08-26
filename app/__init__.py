@@ -61,8 +61,10 @@ def create_app(config_name: str | None = None) -> Flask:
     # Blueprints
     from .blueprints.main import bp as main_bp
     from .blueprints.archives import bp as archives_bp
+    from .blueprints.harvest import bp as harvest_bp
     app.register_blueprint(main_bp)
     app.register_blueprint(archives_bp)
+    app.register_blueprint(harvest_bp)
 
     # Simple health check for deploy monitoring
     @app.get("/healthz")

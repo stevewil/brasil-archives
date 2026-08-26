@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Harvest runs{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <h1>Harvest runs</h1>
+  <p class="page-header__lede">
+    Read-only view of the OAI-PMH aggregation store. Each row is one
+    invocation of <code>scripts/harvest.py</code>. See
+    <code>docs/harvest-design.md</code> for the pipeline.
+  </p>
+</section>
+
+{% if rollups %}
+<section class="rollup">
+  <h2>Aggregated records by project</h2>
+  <table class="data-table">
+    <thead>
+      <tr><th>Project</th><th>Prefix</th><th>Records</th></tr>
+    </thead>
+    <tbody>
+      {% for row in rollups %}
+        <tr>
+          <td><code>{{ row.slug }}</code></td>
+          <td><code>{{ row.prefix }}</code></td>
+          <td class="num">{{ row.record_count }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+
+<section class="runs">
+  <h2>Runs ({{ total }})</h2>
+  {% if runs %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Run</th>
+        <th>Project</th>
+        <th>Prefix</th>
+        <th>Status</th>
+        <th>Seen</th>
+        <th>Upserted</th>
+        <th>Unchanged</th>
+        <th>Errors</th>
+        <th>Started</th>
+        <th>Duration</th>
+        <th>Source</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for run in runs %}
+        <tr>
+          <td>
+            <a href="{{ url_for('harvest.run_detail', run_id=run.id) }}">#{{ run.id }}</a>
+          </td>
+          <td>{% if run.upgrade_project %}<code>{{ run.upgrade_project.slug }}</code>{% else %}—{% endif %}</td>
+          <td><code>{{ run.metadata_prefix }}</code></td>
+          <td>
+            <span class="status status--{{ run.status }}">{{ run.status }}</span>
+          </td>
+          <td class="num">{{ run.records_seen }}</td>
+          <td class="num">{{ run.records_upserted }}</td>
+          <td class="num">{{ run.records_unchanged }}</td>
+          <td class="num">
+            {% if run.error_count %}<strong>{{ run.error_count }}</strong>{% else %}0{% endif %}
+          </td>
+          <td>{{ run.started_at.strftime('%Y-%m-%d %H:%M') if run.started_at else '—' }}</td>
+          <td>
+            {% if run.finished_at and run.started_at %}
+              {{ (run.finished_at - run.started_at).total_seconds()|round(1) }}s
+            {% else %}—{% endif %}
+          </td>
+          <td><code>{{ run.source }}</code></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <nav class="pager">
+    {% if has_prev %}
+      <a href="{{ url_for('harvest.index', page=page - 1, page_size=page_size) }}">← previous</a>
+    {% endif %}
+    <span>page {{ page }}</span>
+    {% if has_next %}
+      <a href="{{ url_for('harvest.index', page=page + 1, page_size=page_size) }}">next →</a>
+    {% endif %}
+  </nav>
+  {% else %}
+  <p>No harvest runs recorded yet. Run <code>python scripts/harvest.py --project &lt;slug&gt;</code>.</p>
+  {% endif %}
+</section>
+{% endblock %}

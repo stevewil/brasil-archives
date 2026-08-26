@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}{{ record.oai_identifier }}{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <p>
+    <a href="{{ url_for('harvest.run_detail', run_id=record.harvest_run_id) }}">← Harvest run #{{ record.harvest_run_id }}</a>
+  </p>
+  <h1><code>{{ record.oai_identifier }}</code></h1>
+  {% if canonical.title %}<p class="page-header__lede">{{ canonical.title }}</p>{% endif %}
+</section>
+
+<section class="record-meta">
+  <dl class="kv">
+    <dt>Project</dt>
+    <dd>{% if project %}<code>{{ project.slug }}</code>{% else %}—{% endif %}</dd>
+    <dt>metadataPrefix</dt>
+    <dd><code>{{ record.metadata_prefix }}</code></dd>
+    <dt>OAI datestamp</dt>
+    <dd><code>{{ record.datestamp }}</code></dd>
+    <dt>First seen</dt>
+    <dd>{{ record.first_seen_at.isoformat() if record.first_seen_at else '—' }}</dd>
+    <dt>Last seen</dt>
+    <dd>{{ record.last_seen_at.isoformat() if record.last_seen_at else '—' }}</dd>
+    <dt>Raw SHA-256</dt>
+    <dd><code>{{ record.raw_xml_sha256 }}</code></dd>
+    <dt>setSpecs</dt>
+    <dd>
+      {% if set_specs %}
+        {% for spec in set_specs %}<code>{{ spec }}</code>{% if not loop.last %} {% endif %}{% endfor %}
+      {% else %}—{% endif %}
+    </dd>
+  </dl>
+</section>
+
+{% if canonical %}
+<section class="canonical">
+  <h2>Canonical fields</h2>
+  <dl class="kv">
+    {% for key, value in canonical.items() %}
+      <dt>{{ key }}</dt>
+      <dd>
+        {% if value is none %}—
+        {% elif value is string %}{{ value }}
+        {% elif value is mapping %}<pre>{{ value|tojson(indent=2) }}</pre>
+        {% elif value is iterable %}
+          {% if value|length == 0 %}—
+          {% else %}
+            <ul class="inline-list">
+              {% for item in value %}<li>{% if item is string and item.startswith('http') %}<a href="{{ item }}">{{ item }}</a>{% else %}{{ item }}{% endif %}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        {% else %}{{ value }}
+        {% endif %}
+      </dd>
+    {% endfor %}
+  </dl>
+</section>
+{% endif %}
+
+{% if raw_extracted %}
+<section class="raw-extracted">
+  <h2>Raw extractor output</h2>
+  <details>
+    <summary>Show extracted JSON ({{ raw_extracted|length }} top-level key{{ 's' if raw_extracted|length != 1 else '' }})</summary>
+    <pre>{{ raw_extracted|tojson(indent=2) }}</pre>
+  </details>
+</section>
+{% endif %}
+
+<section class="raw-xml">
+  <h2>Raw OAI-PMH &lt;record&gt; XML</h2>
+  <details>
+    <summary>Show raw XML ({{ record.raw_xml|length }} bytes)</summary>
+    <pre>{{ record.raw_xml }}</pre>
+  </details>
+</section>
+{% endblock %}
