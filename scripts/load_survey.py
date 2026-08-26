@@ -36,11 +36,13 @@ from app import create_app
 from app.extensions import db
 from app.models import Archive, InstitutionalType
 
+# The survey doc lives in the repo at docs/nordeste-digital-archives-survey.md.
+# An earlier default pointed at an out-of-repo project-files path that only
+# existed in a specific authoring environment; this default resolves inside
+# any checkout of brasil-archives.
 DEFAULT_SURVEY = (
-    Path(__file__).resolve().parent.parent.parent
-    / "projects"
-    / "brazilian-digital-archives-pro-Bm9njIdhS3yCnYvYuHMDVw"
-    / "files"
+    Path(__file__).resolve().parent.parent
+    / "docs"
     / "nordeste-digital-archives-survey.md"
 )
 
