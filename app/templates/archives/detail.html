@@ -162,13 +162,74 @@
 
 {% if upgrade_projects %}
   <section class="upgrade-projects">
-    <h2>Registered upgrade projects</h2>
-    <ul>
+    <h2>Registered upgrade projects <small style="font-weight:normal;">/ Projetos de melhoria registrados</small></h2>
+    <ul class="upgrade-project-list" style="list-style:none; padding:0;">
       {% for proj in upgrade_projects %}
-        <li>
-          <strong>{{ proj.name }}</strong>
-          — {{ proj.delivery_status }} · {{ proj.federation_contract_version }}
-          {% if proj.primary_url %} · <a href="{{ proj.primary_url }}" rel="noreferrer noopener">{{ proj.primary_url }}</a>{% endif %}
+        {% set preview = federation_previews.get(proj.id, {}) %}
+        <li class="upgrade-project-card" style="border:1px solid #ccc; border-radius:6px; padding:1em; margin-bottom:1em;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:0.5em;">
+            <strong>{{ proj.name }}</strong>
+            <span style="font-size:0.85em; color:#666;">
+              {{ proj.delivery_status }} · federation {{ proj.federation_contract_version }}
+            </span>
+          </div>
+
+          {% if proj.name_pt and proj.name_pt != proj.name %}
+            <div style="font-size:0.9em; color:#555;">{{ proj.name_pt }}</div>
+          {% endif %}
+
+          {% if proj.scope_description_en %}
+            <p style="margin:0.5em 0; font-size:0.95em;">{{ proj.scope_description_en }}</p>
+          {% endif %}
+
+          {% if preview.available %}
+            <div class="federation-live" style="background:#f4f9f4; padding:0.6em 0.8em; border-radius:4px; font-size:0.9em;">
+              <div>
+                <strong>Live federation preview</strong>
+                <span style="color:#4a7c4a;">•</span>
+                <span title="Fetched from {{ proj.json_api_base_url }}/health">
+                  {{ preview.record_count }} records available
+                </span>
+                {% if preview.stale %}
+                  <span style="color:#a97400;" title="Upstream unreachable; showing last cached response.">(cached, stale)</span>
+                {% elif preview.from_cache %}
+                  <span style="color:#666;" title="Served from the 15-minute local cache.">(cached)</span>
+                {% endif %}
+              </div>
+              {% if preview.corpus_version %}
+                <div style="font-family:monospace; font-size:0.8em; color:#666; word-break:break-all;">
+                  corpus_version: {{ preview.corpus_version[:16] }}…
+                </div>
+              {% endif %}
+              {% if preview.deep_link_all %}
+                <div style="margin-top:0.4em;">
+                  <a href="{{ preview.deep_link_all }}" rel="noreferrer noopener" target="_blank">
+                    Browse the corpus →
+                  </a>
+                </div>
+              {% endif %}
+            </div>
+          {% else %}
+            <div class="federation-unavailable" style="background:#faf4f4; padding:0.6em 0.8em; border-radius:4px; font-size:0.9em; color:#7c4a4a;">
+              {% if preview.reason == "not_registered" %}
+                Federation not yet configured for this upgrade project.
+              {% else %}
+                Federation preview unavailable right now.
+              {% endif %}
+              {% if proj.primary_url %}
+                <a href="{{ proj.primary_url }}" rel="noreferrer noopener" target="_blank">Visit the project site →</a>
+              {% endif %}
+            </div>
+          {% endif %}
+
+          <div style="font-size:0.85em; color:#666; margin-top:0.4em;">
+            {% if proj.primary_url %}
+              <a href="{{ proj.primary_url }}" rel="noreferrer noopener" target="_blank">{{ proj.primary_url }}</a>
+            {% endif %}
+            {% if proj.source_repo %}
+              · <a href="{{ proj.source_repo }}" rel="noreferrer noopener" target="_blank">source</a>
+            {% endif %}
+          </div>
         </li>
       {% endfor %}
     </ul>

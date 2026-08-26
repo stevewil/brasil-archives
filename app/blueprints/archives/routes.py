@@ -25,6 +25,7 @@ from ...models import (
     Theme,
     UpgradeProject,
 )
+from ...services import federation as fed
 from ...services import scoring as svc
 from .forms import FacetForm, ScoreForm, TagsForm
 
@@ -197,6 +198,13 @@ def detail(slug: str):
         )
     )
 
+    # Build federation previews per upgrade project. Each entry is either
+    # a dict with live counts + deep link, or {"available": False, ...}
+    # on any failure. Never let a federated outage break archive detail.
+    federation_previews = {}
+    for proj in upgrade_projects:
+        federation_previews[proj.id] = _federation_preview(proj)
+
     axes = svc.axis_scores(archive.id)
     quadrant = svc.quadrant_label(axes["pipeline"], axes["research"])
 
@@ -214,7 +222,31 @@ def detail(slug: str):
         active_facets=active_facets,
         facet_history=lambda facet: svc.facet_history(archive.id, facet),
         upgrade_projects=upgrade_projects,
+        federation_previews=federation_previews,
     )
+
+
+def _federation_preview(project: UpgradeProject) -> dict:
+    """Return a JSON-friendly dict summarizing a live federation-v1 handshake.
+
+    Never raises. Any error becomes an "unavailable" card so a downstream
+    outage cannot break archive detail rendering.
+    """
+    if not project.json_api_base_url:
+        return {"available": False, "reason": "not_registered"}
+    try:
+        health = fed.fetch_health(project)
+    except fed.FederationError as exc:
+        return {"available": False, "reason": str(exc)}
+    return {
+        "available": True,
+        "record_count": health.body.get("record_count"),
+        "contract_version": health.contract_version,
+        "corpus_version": health.corpus_version,
+        "from_cache": health.from_cache,
+        "stale": health.stale,
+        "deep_link_all": fed.html_deep_link(project),
+    }
 
 
 # --------------------------------------------------------------------------- #
