@@ -1,34 +1,64 @@
 # Public UI Polish — Pickup Brief
 
-**Status:** Deferred 2026-08-26. Assessment complete; no code changes landed.
+**Status:** 1 of 5 tracks landed. Continuing in focused batches.
 **Scope:** Take `brasil-archives` from "working internal tool" to "coherent public site."
+
+> **See also:** [`docs/handoff/2026-08-27-master.md`](handoff/2026-08-27-master.md) — the master handoff for the whole three-repo ecosystem. This document zooms into the five UI-polish tracks.
 
 ---
 
-## Why this was deferred
+## Progress
 
-Two-hour+ multi-file rewrite spanning five independent tracks. Deferred in
-favor of a documented pickup so the work can be done in focused batches when
-credits allow. Each track below is independently landable and independently
-useful.
+| Track | Status | Commit | Deployed |
+|-------|--------|--------|----------|
+| 1 — i18n catalog | Deferred | — | — |
+| 2 — Admin gating | Deferred | — | — |
+| 3 — Home redesign | Deferred | — | — |
+| **4 — Locale-aware vocab labels** | **✅ Landed 2026-08-27** | `a981b60` | Yes, verified via curl |
+| 5 — Metadata + inline-style cleanup | Deferred | — | — |
 
-## Current state (verified 2026-08-26)
+## Why the remaining tracks are staged, not one big push
 
-- **HEAD:** `07c97af` on `main`, clean.
+Multi-hour multi-file rewrite spanning five independent tracks. Landing Track 4 (2026-08-27) validated the pipeline: local → GitHub → cPanel pull → curl verify. Each remaining track is independently landable and independently useful. Session budget determines how many land per session.
+
+## Current state (verified 2026-08-27)
+
+- **HEAD:** `a981b60` on `main`, clean.
+- **Live URL:** `https://brasil-archives.from-bottom-to.top` (Track 4 verified via curl for both EN and PT).
 - **Server:** `http://localhost:5001` runs via
   `DATABASE_URL=sqlite:////home/user/workspace/brasil-archives/instance/brasil_archives.db FLASK_APP=wsgi.py flask run --port 5001 --no-reload`
   (system `flask`, not `.venv/bin/flask` — no venv exists).
-- **Tests:** 130 passed, 4 opt-in live skipped.
+- **Tests:** 142 passed, 4 opt-in live skipped (up from 130 pre-Track-4).
 - **Data:** 79 archives, 1 upgrade project (mipibu), 1016 aggregated records.
   All `DimensionScore`, `DimensionLift`, `FacetValue` tables empty — so
   detail pages show many `—` placeholders.
-- **Rendered pages verified via `curl`:** `/`, `/archives/`, one archive
-  detail. All return 200 with expected content.
 - **Babel:** wired (`app/__init__.py:_select_locale`), config sets
   `LANGUAGES=["en","pt"]`, default `en`. `pybabel` 2.18.0 available at
   `/home/user/.local/bin/pybabel`. **No `translations/` directory exists** —
   every `_()` call currently renders the English msgid. The PT/EN switcher
   in `base.html` sets `<html lang>` but doesn't translate any body text.
+- **Vocabulary labels (Track 4):** every `x.label_en` in `list.html` and
+  `detail.html` now goes through `vocab_label(x)` (Jinja global registered in
+  `app/__init__.py`). Falls back to EN when a PT label is missing.
+
+## Token-efficient tooling proposal (do this BEFORE Tracks 1, 2, 5)
+
+**Context:** During the 2026-08-27 session the user asked why polish tracks are so token-expensive. The answer, and a concrete proposal, are in [`docs/handoff/2026-08-27-master.md` §5](handoff/2026-08-27-master.md#5-ui-polish-token-efficient-tooling-proposal). Summary:
+
+1. **`scripts/dev/session_state.sh`** — bootstrap digest so a new session doesn't spend ~5k tokens re-discovering state. Prints git status, test count, live URL health, DB counts.
+2. **`scripts/dev/wrap_i18n.py`** — codemod that wraps bare text nodes in `{{ _() }}`. Handles the mechanical bulk of Track 1's ~100 template edits.
+3. **`tests/test_template_hygiene.py`** — grep-based linter that fails if `label_en`/`label_pt` sneak back into templates (protects Track 4) and eventually if inline styles do (protects Track 5).
+
+Estimated savings across the remaining four tracks: 40–80k tokens.
+
+**Suggested commit order for next session(s):**
+
+1. `chore(dev): tooling for token-efficient polish work` — the three scripts above.
+2. Track 5.
+3. Track 2.
+4. Track 3.
+5. Track 1 (heaviest; consider the scaffolding-only variant — agent produces `.pot` + skeleton `.po`, user fills PT translations in a text editor).
+
 
 ## What "polish the public UI" means, concretely
 
@@ -179,37 +209,36 @@ beyond nav. A new visitor can't see the point of the site.
 
 ---
 
-### Track 4 — Locale-aware vocabulary labels
+### Track 4 — Locale-aware vocabulary labels ✅ LANDED 2026-08-27
 
-**Problem:** All vocab tables (InstitutionalType, Period, RecordType,
-Theme) have `label_pt` and `label_en` columns, but every template renders
-`.label_en` unconditionally. PT users see English vocabulary.
+**Delivered:** commit `a981b60`. Live and verified via curl for both EN
+("Federal university") and PT ("Universidade federal").
 
-**Deliverable:** vocab labels follow active locale.
+**What actually shipped (may differ slightly from the plan below — the
+plan is preserved for the pattern):**
 
-**Steps:**
+- `app/i18n.py` — pure `resolve_label()` + Flask-facing `vocab_label()`
+  wrapper. Chose a module rather than an `app/__init__.py` inline function
+  so it's independently testable and the fallback chain is unit-tested.
+- `app/__init__.py` — registers `vocab_label` as a Jinja global.
+- `app/templates/archives/list.html` — 2 `.label_en` → `vocab_label()`.
+- `app/templates/archives/detail.html` — 4 `.label_en` → `vocab_label()`.
+- `tests/test_i18n_vocab_label.py` — 8 unit tests (no DB, no app context).
+- `tests/test_archives_blueprint.py` — 2 render-level EN/PT assertions.
+- No `facets.html` changes needed (it had zero direct `.label_*` refs).
 
-1. Add Jinja global `vocab_label(obj, fallback_lang="en")` in
-   `app/__init__.py`:
-   ```python
-   def _vocab_label(obj, fallback_lang="en"):
-       if obj is None:
-           return None
-       loc = str(get_locale() or fallback_lang)
-       return getattr(obj, f"label_{loc}", None) or getattr(obj, f"label_{fallback_lang}", None) or ""
-   app.jinja_env.globals["vocab_label"] = _vocab_label
-   ```
-2. Replace every `x.label_en` in templates with `vocab_label(x)`:
-   - `list.html`: institutional_type select, table row type column
-   - `detail.html`: institutional_type in page-header lede; periods,
-     record_types, themes tag clouds
-   - `facets.html`: similar
+**Fallback chain:** requested locale → English → empty string. Some vocab
+rows have `label_pt` null; those fall back to EN transparently.
+
+**Guardrail:** planned `tests/test_template_hygiene.py::test_no_direct_label_en_access` in the tooling proposal above will fail if this regresses.
+
+**Original plan (kept for reference):**
+
+1. Add Jinja global `vocab_label(obj, fallback_lang="en")` — done via module.
+2. Replace every `x.label_en` in templates — done for list.html and
+   detail.html; facets.html had no direct refs.
 3. Tests: assert PT locale renders `label_pt` where set; assert fallback
-   to EN when PT is missing (some rows may have `label_pt` null).
-
-**Files modified:** `app/__init__.py`, three templates.
-**Test additions:** `tests/test_units.py` — add `vocab_label` fallback
-tests (no DB, pure function).
+   to EN when PT is missing — done.
 
 ---
 
@@ -314,3 +343,22 @@ One commit per track. Suggested messages:
    Track 1 lands)
 4. `git status` clean of stray `.pot`/`.mo`/`__pycache__`
 5. `git push` with `api_credentials=["github"]`
+
+## Post-push checklist per track (cPanel deploy)
+
+From `docs/handoff/2026-08-27-master.md` §7:
+
+1. On cPanel terminal:
+   ```bash
+   cd ~/brasil-archives
+   git fetch origin
+   git pull origin main
+   ```
+2. Restart Passenger: `touch tmp/restart.txt` **or** cPanel UI → Setup Python App → Restart.
+3. Verify live:
+   ```bash
+   curl -s https://brasil-archives.from-bottom-to.top/healthz
+   curl -s https://brasil-archives.from-bottom-to.top/archives/ | head -30
+   curl -s 'https://brasil-archives.from-bottom-to.top/archives/?lang=pt' | head -30
+   ```
+4. If EN/PT don't switch, Passenger didn't restart — repeat step 2.
