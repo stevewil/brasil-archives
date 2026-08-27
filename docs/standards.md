@@ -65,10 +65,14 @@ We adopt these standards in phases rather than trying to be fully conformant on 
 
 ### Phase 3 — Standards-native output
 
-- Serve `brasil-archives`'s own catalog as OAI-PMH
-- Serve institution descriptions as EAG XML
-- Serve authority records as EAC-CPF where applicable
-- Register with the OAI-PMH registry so we are discoverable
+- Serve `brasil-archives`'s own catalog as OAI-PMH — **done** (`/oai`,
+  provider blueprint `app/oai/`; see `docs/oai-pmh-provider.md`)
+- Serve institution descriptions as EAG XML — **done** (`eag`
+  metadataPrefix + `/archives/<slug>/eag.xml`)
+- Serve authority records as EAC-CPF where applicable — deferred: no
+  authority records of our own yet (see `docs/oai-pmh-provider.md` §7)
+- Register with the OAI-PMH registry so we are discoverable — runbook
+  written (`docs/oai-pmh-provider.md` §6); pending a production URL
 
 ### Phase 4 — Federation
 
@@ -122,3 +126,6 @@ Authoritative specifications, in order of first mention:
 ## Change log
 
 - **2026-08-24** — Initial statement of intent. Phase 1 in progress.
+- **2026-08-27** — Phase 3 standards-native output implemented: OAI-PMH 2.0
+  provider at `/oai` (`oai_dc` + `eag` formats) and per-institution EAG
+  2012 at `/archives/<slug>/eag.xml`. See `docs/oai-pmh-provider.md`.
