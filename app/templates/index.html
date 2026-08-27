@@ -16,16 +16,101 @@
       <dd>{{ archive_count }}</dd>
     </div>
     <div>
-      <dt>{{ _("Upgrade projects registered") }}</dt>
+      <dt>{{ _("Partner projects") }}</dt>
       <dd>{{ upgrade_count }}</dd>
+    </div>
+    <div>
+      <dt>{{ _("Federated records") }}</dt>
+      <dd>{{ record_count }}</dd>
     </div>
   </dl>
 </section>
 
+{% if state_groups %}
+<section class="home-browse">
+  <h2>{{ _("Browse by state") }}</h2>
+  <div class="state-chip-cluster">
+    {% for g in state_groups %}
+      {% if g.code %}
+        <a class="state-chip" href="{{ url_for('archives.list_archives', state=g.code) }}">
+          {{ g.label }} <span class="state-chip__count">{{ g.count }}</span>
+        </a>
+      {% else %}
+        {% for st in g.states %}
+          <a class="state-chip state-chip--muted" href="{{ url_for('archives.list_archives', state=st) }}">{{ st }}</a>
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+    <a class="state-chip state-chip--all" href="{{ url_for('archives.list_archives') }}">
+      {{ _("All archives") }} →
+    </a>
+  </div>
+</section>
+{% endif %}
+
+{% if featured %}
+<section class="home-featured">
+  <h2>{{ _("Featured archives") }}</h2>
+  <p class="disclaimer">{{ _("Ranked by the two-axis evaluation; unscored archives sort last.") }}</p>
+  <ul class="home-featured__grid">
+    {% for f in featured %}
+      <li class="home-featured__card">
+        <a class="home-featured__name" href="{{ url_for('archives.detail', slug=f.archive.slug) }}">
+          {{ f.archive.name }}
+        </a>
+        <p class="home-featured__meta">
+          {{ f.archive.home_state_code or '—' }} · {{ vocab_label(f.archive.institutional_type) or _("archive") }}
+        </p>
+        <p class="home-featured__score">
+          {% if f.naive_sum is not none %}
+            <span class="badge badge--ok">{{ _("Score") }} {{ f.naive_sum }}/80</span>
+          {% else %}
+            <span class="badge badge--muted">{{ _("Not yet scored") }}</span>
+          {% endif %}
+        </p>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if partners %}
+<section class="home-federation">
+  <h2>{{ _("Live from partner projects") }}</h2>
+  <ul class="home-federation__list">
+    {% for p in partners %}
+      <li class="home-federation__card">
+        <div class="home-federation__head">
+          <strong>{{ p.project.name }}</strong>
+          <span class="upgrade-project-card__meta">{{ p.project.delivery_status }}</span>
+        </div>
+        {% if p.preview.available %}
+          <p class="federation-live">
+            {{ p.preview.record_count }} {{ _("records available") }}
+            {% if p.preview.stale %}<span class="federation-note federation-note--stale">({{ _("cached") }})</span>{% endif %}
+          </p>
+          {% if p.preview.deep_link_all %}
+            <a href="{{ p.preview.deep_link_all }}" rel="noreferrer noopener" target="_blank">{{ _("Browse the corpus") }} →</a>
+          {% endif %}
+        {% else %}
+          <p class="federation-unavailable">
+            {{ _("Preview unavailable right now.") }}
+            {% if p.project.primary_url %}
+              <a href="{{ p.project.primary_url }}" rel="noreferrer noopener" target="_blank">{{ _("Visit the project site") }} →</a>
+            {% endif %}
+          </p>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
 <section class="about">
-  <h2>{{ _("Status") }}</h2>
+  <h2>{{ _("About the method") }}</h2>
   <p>
-    {{ _("Phase 1 scaffold. Data model live; survey load and scoring UI in progress.") }}
+    {{ _("Each archive is evaluated on two axes — pipeline readiness and research value — rather than a single ranked score. Age is not treated as value.") }}
+    <a href="{{ url_for('archives.list_archives') }}">{{ _("See the full catalog") }} →</a>
   </p>
 </section>
 {% endblock %}

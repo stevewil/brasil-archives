@@ -720,3 +720,41 @@ def test_list_view_renders_portuguese_vocab_labels_when_lang_pt(seeded_app, clie
     # A safer assertion: the specific EN forms are absent from this response.
     assert "Federal university" not in body
     assert "State court / tribunal" not in body
+
+
+# --------------------------------------------------------------------------- #
+# Home page (UI Polish Track 3)
+
+
+def test_home_shows_featured_and_state_chips(seeded_app, client):
+    _score_full_profile(
+        seeded_app,
+        "rn-labim-t1r1",
+        {d: 6 for d in (
+            "accessibility", "finding_aids", "pipeline_ingestion_readiness",
+            "scale", "provenance_curatorial", "corpus_completeness",
+            "uniqueness_non_duplication", "linkage_potential",
+        )},
+    )
+    body = client.get("/").get_data(as_text=True)
+    assert "Featured archives" in body
+    assert "/archives/rn-labim-t1r1" in body
+    assert "48/80" in body  # 8 dims x 6
+    # Browse-by-state chips link into the archives filter.
+    assert "Browse by state" in body
+    assert "/archives/?state=RN" in body or "state=RN" in body
+
+
+def test_home_featured_excludes_no_content_archives(seeded_app, client):
+    body = client.get("/").get_data(as_text=True)
+    # pb-apepb-t2r1 has no_digital_content=True — never featured.
+    assert "/archives/pb-apepb-t2r1" not in body
+
+
+def test_home_renders_without_data(client):
+    """Empty DB: the optional sections just don't render, no 500."""
+    resp = client.get("/")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert "Featured archives" not in body
+    assert "Brazilian Digital Archives" in body

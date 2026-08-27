@@ -204,7 +204,7 @@ def detail(slug: str):
     # on any failure. Never let a federated outage break archive detail.
     federation_previews = {}
     for proj in upgrade_projects:
-        federation_previews[proj.id] = _federation_preview(proj)
+        federation_previews[proj.id] = fed.preview(proj)
 
     axes = svc.axis_scores(archive.id)
     quadrant = svc.quadrant_label(axes["pipeline"], axes["research"])
@@ -225,29 +225,6 @@ def detail(slug: str):
         upgrade_projects=upgrade_projects,
         federation_previews=federation_previews,
     )
-
-
-def _federation_preview(project: UpgradeProject) -> dict:
-    """Return a JSON-friendly dict summarizing a live federation-v1 handshake.
-
-    Never raises. Any error becomes an "unavailable" card so a downstream
-    outage cannot break archive detail rendering.
-    """
-    if not project.json_api_base_url:
-        return {"available": False, "reason": "not_registered"}
-    try:
-        health = fed.fetch_health(project)
-    except fed.FederationError as exc:
-        return {"available": False, "reason": str(exc)}
-    return {
-        "available": True,
-        "record_count": health.body.get("record_count"),
-        "contract_version": health.contract_version,
-        "corpus_version": health.corpus_version,
-        "from_cache": health.from_cache,
-        "stale": health.stale,
-        "deep_link_all": fed.html_deep_link(project),
-    }
 
 
 # --------------------------------------------------------------------------- #

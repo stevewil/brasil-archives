@@ -105,6 +105,30 @@ def fetch_health(project: UpgradeProject) -> FederationResponse:
     return _fetch(project, endpoint="health", path="/health", params={})
 
 
+def preview(project: UpgradeProject) -> dict[str, Any]:
+    """Return a template-friendly summary of a live federation handshake.
+
+    Never raises. Any failure yields ``{"available": False, "reason": ...}``
+    so a downstream outage can't break the page that renders it. Consumed
+    by the archive detail page and the home page's partner-projects block.
+    """
+    if not project.json_api_base_url:
+        return {"available": False, "reason": "not_registered"}
+    try:
+        health = fetch_health(project)
+    except FederationError as exc:
+        return {"available": False, "reason": str(exc)}
+    return {
+        "available": True,
+        "record_count": health.body.get("record_count"),
+        "contract_version": health.contract_version,
+        "corpus_version": health.corpus_version,
+        "from_cache": health.from_cache,
+        "stale": health.stale,
+        "deep_link_all": html_deep_link(project),
+    }
+
+
 def fetch_schema(project: UpgradeProject) -> FederationResponse:
     """Fetch or cache-serve ``GET /api/schema`` for ``project``."""
     return _fetch(project, endpoint="schema", path="/schema", params={})
