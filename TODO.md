@@ -46,16 +46,15 @@ Legend: **[S]** small (<1h) · **[M]** medium (1–3h) · **[L]** large / multi-
     `controller-api.ts` shells out to `app.bat <action>` with a timeout —
     keep the non-interactive path unpaused (the sister scripts already do).
 
-## 1. Track A — public UI polish (1 of 5 landed)
+## 1. Track A — public UI polish (5 of 5 landed) ✅
 
-Full brief: `docs/UI-POLISH-PICKUP.md`. Each sub-track is independently
-landable. Recommended order below (value-per-token).
+Full brief: `docs/UI-POLISH-PICKUP.md`. All five sub-tracks have landed.
 
 - [x] **Track 4 — locale-aware vocab labels.** Landed `a981b60`.
-- [ ] **[S] Tooling prep — `scripts/dev/wrap_i18n.py`.** The other two
-  proposed helpers already exist (`scripts/dev/session_state.sh`,
-  `tests/test_template_hygiene.py`). Only the i18n codemod is missing; it
-  pays for itself on Track 1. Rules in master handoff §5.
+- [x] **Tooling prep — `scripts/dev/wrap_i18n.py`.** Not built — Track 1's
+  string-wrapping was done by hand (the templates were smaller than the
+  ~100-string estimate). The codemod would still be useful if a future
+  track adds many templates; skip it otherwise.
 - [x] **Track 5 — metadata + favicon + inline-style cleanup.** Landed
   `ad8c7d7`. `<meta description>` (overridable block) + OG/twitter tags +
   `og:locale`, `favicon.svg`, inline `style=""` out of `detail.html` into
@@ -78,14 +77,16 @@ landable. Recommended order below (value-per-token).
   ineligible excluded), state-chip cluster (RN/PE/BA + other bucket), live
   federation preview per partner, 3-stat row. `fed.preview()` extracted
   from `archives/detail`'s inline helper (2nd caller). Not yet deployed.
-- [ ] **[L] Track 1 — PT translation catalog.** Most expensive; do last.
-  `_()` strings currently render EN (only vocab-table labels are localized).
-  Wrap ~100 strings in `list.html`/`detail.html`/`facets.html`, `pybabel
-  extract` (from repo root — the mapping misses templates otherwise),
-  `init pt`, translate `messages.po` with the domain vocabulary in the
-  brief, `compile`. **Do not start without an explicit "yes, do the
-  translations."** Consider the scaffolding-only variant (agent produces
-  `.pot` + skeleton `.po`, user fills PT in an editor).
+- [x] **Track 1 — PT translation catalog.** Landed 2026-08-27. Strings
+  wrapped across `list.html`/`detail.html`/`facets.html`/`harvest/*.html` +
+  Python flash/`page_title`. `app/translations/{pt,en}/LC_MESSAGES/messages.po`
+  (180 msgids, `pt` fully translated). `.mo` is git-ignored — deploy needs
+  `pybabel compile -d app/translations` (in `docs/DEPLOY.md`).
+  `tests/test_i18n_catalog.py` (9 tests). Not yet pulled to cPanel.
+  **Maintenance:** when UI strings change, re-run
+  `pybabel extract -F babel.cfg -k _l -o messages.pot .` then
+  `pybabel update -i messages.pot -d app/translations`, translate the new
+  `pt` msgids, `pybabel compile`.
 
 ## 2. Track B — povos-indigenas-rn OAI-PMH endpoint
 
@@ -182,7 +183,7 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
 
 ## Suggested next session
 
-1. Housekeeping §0 (commit, fold in `load_calibration`).
-2. Then either **Track 5** (quick, visible) or **Track 2** (highest
-   leverage) per `docs/UI-POLISH-PICKUP.md`.
+1. Housekeeping §0 (fold in `load_calibration`, `app.bat`).
+2. UI polish Track A is complete — deploy Track 1 + Track 3 to cPanel
+   (Track 1 needs `pybabel compile` on the host; see `docs/DEPLOY.md`).
 3. Track B/C only when the user says "get povos federating."

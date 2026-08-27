@@ -1,7 +1,7 @@
 # Public UI Polish — Pickup Brief
 
-**Status:** 4 of 5 tracks landed (2, 3, 4, 5). Only Track 1 (i18n
-catalog) remains. Continuing in focused batches.
+**Status:** All 5 tracks landed (1, 2, 3, 4, 5). UI polish complete;
+remaining i18n work is only maintaining the catalog as strings change.
 **Scope:** Take `brasil-archives` from "working internal tool" to "coherent public site."
 
 > **See also:** [`docs/handoff/2026-08-27-master.md`](handoff/2026-08-27-master.md) — the master handoff for the whole three-repo ecosystem. This document zooms into the five UI-polish tracks.
@@ -10,11 +10,11 @@ catalog) remains. Continuing in focused batches.
 
 ## Progress
 
-**4 of 5 tracks landed** (2, 3, 4, 5). Remaining: 1.
+**5 of 5 tracks landed.**
 
 | Track | Status | Commit | Deployed |
 |-------|--------|--------|----------|
-| 1 — i18n catalog | In progress | — | — |
+| **1 — i18n catalog** | **✅ Landed 2026-08-27** | (this commit) | Not yet — needs `pybabel compile` on cPanel (see `docs/DEPLOY.md`) |
 | **2 — Admin gating** | **✅ Landed 2026-08-27** | `f60dfe6` | Yes — `/harvest/` 404s live, no nav link |
 | **3 — Home redesign** | **✅ Landed 2026-08-27** | `ed381fd` | Not yet — pending cPanel pull |
 | **4 — Locale-aware vocab labels** | **✅ Landed 2026-08-27** | `a981b60` | Yes, verified via curl |
@@ -67,15 +67,40 @@ Estimated savings across the remaining four tracks: 40–80k tokens.
 
 Five independent tracks. Do them in this order; each is landable alone.
 
-### Track 1 — i18n catalog (foundational)
+### Track 1 — i18n catalog (foundational) ✅ LANDED 2026-08-27
 
-**Problem:** `_()` calls exist in `base.html` and `index.html` but no
-translation catalog exists, so PT selection does nothing. `list.html` and
-`detail.html` have zero `_()` calls — hard-coded English.
+**Delivered:** this commit. Not yet pulled to cPanel — the deploy needs a
+`pybabel compile -d app/translations` step (the `.mo` files are
+git-ignored). `docs/DEPLOY.md` has it in both the one-time prereqs and the
+routine-deploy section.
 
-**Deliverable:** working PT translations end-to-end.
+**What shipped:**
 
-**Steps:**
+- Hard-coded user-facing strings wrapped in `{{ _() }}` across
+  `archives/list.html`, `archives/detail.html`, `archives/facets.html`,
+  `harvest/{index,run_detail,record_detail}.html`, and the two nav links
+  in `base.html`. Python: `_l()` on the three archive flash messages and
+  the two harvest `page_title=` kwargs.
+- The 8 dimension display names + the 5 quadrant labels are translated via
+  small in-template `{% set %}` maps (keeps `services/scoring.py`
+  untouched). The two axis-card labels switch on locale straight off the
+  existing `AXIS_LABELS` dict (it already had `pt`/`long_pt`).
+- `messages.pot` extracted from repo root with `-k _l` (needed — `_l` is
+  not a default Babel keyword; `messages.pot` is git-ignored).
+- `app/translations/{pt,en}/LC_MESSAGES/messages.po` — 180 msgids. `pt` is
+  fully translated in Brazilian Portuguese with the brief's domain
+  vocabulary ("uso justo", "Eixo de pipeline", "Soma não-ponderada", …);
+  `en` mirrors msgid→msgstr as an anchor. Both compiled to `.mo`.
+- `tests/test_i18n_catalog.py` — 9 tests: catalog-fully-translated guard,
+  "uso justo" not "uso legítimo" guard, `.mo` compiled guard, and
+  EN/PT render assertions for `/`, `/archives/`, and an archive detail
+  (locale assertions split per the Flask-Babel per-context cache).
+
+**Original problem:** `_()` calls exist in `base.html` and `index.html`
+but no translation catalog exists, so PT selection does nothing.
+`list.html` and `detail.html` have zero `_()` calls — hard-coded English.
+
+**Original steps (kept for reference):**
 
 1. Verify `babel.cfg`:
    ```

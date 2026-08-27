@@ -197,8 +197,11 @@ app/
                          Read-only debugging surface; writes are CLI-only.
 
   templates/  base.html + index + archives/{list,detail,facets} +
-              harvest/{index,run_detail,record_detail}. Hand-authored CSS
-              with design tokens in static/style.css. No CSS framework.
+              harvest/{index,run_detail,record_detail}. All user-facing
+              strings wrapped in {{ _() }}; catalogs in app/translations/
+              (pt fully translated, en is the anchor; .mo git-ignored,
+              compiled at deploy). Hand-authored CSS with design tokens in
+              static/style.css. No CSS framework.
 
 scripts/
   load_vocabularies.py     configs/vocabularies/*.yaml → vocab tables
@@ -273,13 +276,13 @@ changed) → `touch tmp/restart.txt` → `curl .../healthz`.
 - **DB after a full local load**: 79 archives, 1 upgrade project (mipibu),
   1016 aggregated records, 2 harvest runs.
 - **Not built yet**: any real `DimensionScore` data in prod; the quarterly
-  health probe; PT translation catalog (`_()` strings render EN — only
-  vocab-table labels are localized so far); home-page redesign; IIIF
-  Content Search fanout; cron-scheduled harvest; povos federating.
-- **UI polish**: 4 of 5 tracks landed (Track 2 admin split, Track 3 home
-  redesign, Track 4 vocab labels, Track 5 metadata/favicon/CSS). Only
-  Track 1 (PT translation catalog) remains — staged in
-  `docs/UI-POLISH-PICKUP.md`.
+  health probe; IIIF Content Search fanout; cron-scheduled harvest; povos
+  federating.
+- **UI polish**: all 5 tracks landed (Track 1 PT translation catalog,
+  Track 2 admin split, Track 3 home redesign, Track 4 vocab labels,
+  Track 5 metadata/favicon/CSS). See `docs/UI-POLISH-PICKUP.md`. Track 1
+  and Track 3 not yet pulled to cPanel; Track 1's deploy needs a
+  `pybabel compile -d app/translations` step (`.mo` files are git-ignored).
 
 ## Conventions worth knowing
 

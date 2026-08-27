@@ -40,7 +40,12 @@ Verified working 2026-08-27 with commit `a981b60` (Track 4).
    python -m scripts.load_upgrade_projects
    python -m scripts.load_calibration   # Pass 2 anchor scores; without it every detail page renders "—"
    ```
-6. Restart via **Setup Python App → Restart** or `touch tmp/restart.txt`.
+6. Compile the translation catalogs (the `.mo` files are git-ignored, so
+   they must be built on the deploy host — see `app/translations/`):
+   ```bash
+   pybabel compile -d app/translations
+   ```
+7. Restart via **Setup Python App → Restart** or `touch tmp/restart.txt`.
 
 ## Routine deploy (every commit)
 
@@ -52,6 +57,19 @@ git fetch origin
 git pull origin main
 touch tmp/restart.txt
 ```
+
+**If the pull touched `app/translations/**/*.po`** (i.e. UI strings or
+translations changed — no schema change needed), recompile the catalogs
+inside the venv before restarting:
+
+```bash
+source /home/<user>/virtualenv/brasil-archives/3.11/bin/activate
+pybabel compile -d app/translations
+touch tmp/restart.txt
+```
+
+The compiled `.mo` files are git-ignored, so a plain `git pull` never
+updates them.
 
 Then verify from any shell:
 
@@ -125,7 +143,11 @@ Migration wasn't run. `FLASK_APP=wsgi.py flask db upgrade` inside the venv.
 Dependency added but venv not updated. `pip install -r requirements.txt` inside the venv.
 
 **Locale switch returns English on `?lang=pt`.**
-This is expected until Track 1 (i18n catalog) lands. Track 4 only localizes vocab table labels (institutional types, periods, record types, themes) — body copy stays English until Track 1.
+Since UI-Polish Track 1 landed, `?lang=pt` translates body copy too. If it
+doesn't, the `.mo` files weren't compiled after the pull — run
+`pybabel compile -d app/translations` inside the venv, then restart
+Passenger. (Vocab table labels — institutional types, periods, record
+types, themes — come from Track 4 and work independently of the catalog.)
 
 ## Reference
 
