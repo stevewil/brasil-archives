@@ -6,9 +6,10 @@ in ``docs/standards.md``.
 """
 from __future__ import annotations
 
+from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..extensions import db
@@ -72,6 +73,11 @@ class Archive(TimestampMixin, db.Model):
     # Provenance
     survey_source: Mapped[str | None] = mapped_column(String)
     survey_row: Mapped[int | None] = mapped_column(Integer)
+
+    # Quarterly health probe (app/services/probe.py). Timestamp of the most
+    # recent probe run against this archive; the four probe-fed facets in
+    # facet_values carry the composited values. NULL = never probed.
+    last_probed_at: Mapped[datetime | None] = mapped_column(DateTime)
 
     # Relationships
     institutional_type: Mapped["InstitutionalType"] = relationship(

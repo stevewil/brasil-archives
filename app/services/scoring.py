@@ -288,6 +288,82 @@ SINGLE_SELECT_FACETS: dict[str, tuple[str, ...]] = {
 }
 
 
+# Probe-fed single-select facets (docs/algorithm-v1.md §"Probe-updated
+# facets"). Written by app/services/probe.py from the quarterly health
+# probe, never by a human through the facet editor — hence a separate
+# vocabulary table and write path from SINGLE_SELECT_FACETS. The
+# freshness stamp lives on ``Archive.last_probed_at``.
+PROBE_FACETS: dict[str, tuple[str, ...]] = {
+    "web_ops_health": ("healthy", "degraded", "at-risk", "down"),
+    "external_preservation": ("preserved", "home-page-only", "unpreserved"),
+    "growth_signal": ("active", "slow", "stalled", "wound-down", "unknown"),
+    "prior_use_signal": ("foundational", "established", "emerging", "unused", "unknown"),
+}
+
+
+def active_probe_facet_values(archive_id: int) -> dict[str, FacetValue]:
+    """Currently-active probe-fed :class:`FacetValue` rows keyed by facet."""
+    rows = db.session.scalars(
+        select(FacetValue).where(
+            FacetValue.archive_id == archive_id,
+            FacetValue.facet.in_(tuple(PROBE_FACETS)),
+            FacetValue.superseded_at.is_(None),
+        )
+    ).all()
+    return {row.facet: row for row in rows}
+
+
+def set_probe_facet_value(
+    *,
+    archive: Archive,
+    facet: str,
+    value: str,
+    note: str | None = None,
+    set_by: str | None = "probe",
+    now: datetime | None = None,
+) -> FacetValue:
+    """Supersede the active row for a probe-fed ``facet`` and insert a new one.
+
+    Mirrors :func:`set_facet_value` (supersede-and-insert history) but
+    validates against :data:`PROBE_FACETS`. No-ops when the active row
+    already carries the same value and note, so unchanged facets don't
+    accrue identical rows each quarter. Caller holds the transaction;
+    this flushes but does not commit.
+    """
+    if facet not in PROBE_FACETS:
+        raise ValueError(f"Unknown probe facet: {facet!r}")
+    if value not in PROBE_FACETS[facet]:
+        raise ValueError(f"Invalid value {value!r} for probe facet {facet}")
+
+    prev = db.session.scalar(
+        select(FacetValue).where(
+            FacetValue.archive_id == archive.id,
+            FacetValue.facet == facet,
+            FacetValue.superseded_at.is_(None),
+        )
+    )
+    if prev is not None and prev.value == value and (prev.note or "") == (note or ""):
+        return prev
+
+    now = now or _utcnow()
+    fresh = FacetValue(
+        archive_id=archive.id,
+        facet=facet,
+        value=value,
+        note=(note or None),
+        set_by=set_by,
+        set_at=now,
+    )
+    db.session.add(fresh)
+    db.session.flush()
+
+    if prev is not None:
+        prev.superseded_at = now
+        prev.superseded_by_id = fresh.id
+
+    return fresh
+
+
 def active_facet_values(archive_id: int) -> dict[str, FacetValue]:
     rows = db.session.scalars(
         select(FacetValue).where(
