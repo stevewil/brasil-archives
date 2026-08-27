@@ -59,10 +59,11 @@ def test_load_vocabularies_updates_labels(app, tmp_path, monkeypatch):
     # Replace second-reign-imperio label
     periods_path = modified_dir / "periods.yaml"
     periods_path.write_text(
-        periods_path.read_text().replace(
+        periods_path.read_text(encoding="utf-8").replace(
             "Second Reign / Império (1840–1889)",
             "Second Reign — Império (1840–1889)",
-        )
+        ),
+        encoding="utf-8",
     )
     monkeypatch.setattr(load_vocabularies, "CONFIG_DIR", modified_dir)
 

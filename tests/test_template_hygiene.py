@@ -43,7 +43,9 @@ def test_no_direct_label_en_or_label_pt_access():
     pattern = re.compile(r"\.label_(en|pt)\b")
     offenders: list[str] = []
     for tpl in _templates():
-        for lineno, line in enumerate(tpl.read_text().splitlines(), start=1):
+        for lineno, line in enumerate(
+            tpl.read_text(encoding="utf-8").splitlines(), start=1
+        ):
             if pattern.search(line):
                 rel = tpl.relative_to(TEMPLATE_DIR)
                 offenders.append(f"  {rel}:{lineno}: {line.strip()}")
@@ -67,7 +69,9 @@ def test_no_static_inline_style_attributes():
     """
     offenders: list[str] = []
     for tpl in _templates():
-        for lineno, line in enumerate(tpl.read_text().splitlines(), start=1):
+        for lineno, line in enumerate(
+            tpl.read_text(encoding="utf-8").splitlines(), start=1
+        ):
             if 'style="' not in line:
                 continue
             # Extract the value between style=" and the next "
