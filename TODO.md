@@ -9,42 +9,24 @@ Legend: **[S]** small (<1h) · **[M]** medium (1–3h) · **[L]** large / multi-
 
 ---
 
-## 0. Housekeeping (do first, cheap)
+## 0. Housekeeping
 
-- [ ] **[S] Commit the working-tree changes.** `tests/test_loaders.py` +
-  `tests/test_template_hygiene.py` got `encoding="utf-8"` on `Path.read_text`/
-  `write_text` (Windows cp1252 was choking on UTF-8 fixtures). Plus new
-  `DESCRIPTION.md` and this `TODO.md`.
-  Suggested: `test(win): pin utf-8 encoding in file-reading test helpers` +
-  `docs: add DESCRIPTION.md and TODO.md`.
-- [ ] **[S] Fold `load_calibration` into the documented seed sequence.**
-  `README.md` and `docs/DEPLOY.md` step 5 list vocab → survey →
-  upgrade_projects but **not** `python -m scripts.load_calibration`, so a
-  fresh DB has zero scores and every detail page is `—`. Add it. (Loader is
-  idempotent; it seeds the 6 Pass-2 anchor archives.)
+- [x] **Commit the working-tree changes.** Done `891f30a` (utf-8 test fix)
+  + `f9f57ca` (`DESCRIPTION.md` / `TODO.md`).
+- [x] **Fold `load_calibration` into the documented seed sequence.** Done
+  `f9f57ca` — `README.md` + `docs/DEPLOY.md` now list it.
 - [ ] **[S] Decide `size_unit_note` facet.** `load_calibration` warns 6× that
   it has "no storage yet; carried in YAML only". Either add a column /
   `facet_values` entry for it, or note explicitly in `algorithm-v1.md` that
-  it stays YAML-only.
-- [ ] **[S] Add an `app.bat` start/stop/restart script.** Match the sister
-  apps — `mipibu/app.bat` and `povos-indigenas-rn/app.bat` are the template
-  (cd to `%~dp0`, `PORT=9000`, `LOG=dev-server.log`, netstat-LISTENING PID
-  detection for `is_running`, `start /min`, open the browser, `pause` only
-  when double-clicked / no arg). Details:
-  - The sister apps launch `.venv\Scripts\python.exe wsgi.py`; **our
-    `wsgi.py` only defines `app`, it never calls `app.run()`.** So either
-    (a) add an `if __name__ == "__main__": app.run(port=9000, debug=True)`
-    block to `wsgi.py` to match the sister-app convention, or (b) have
-    `app.bat` run `.venv\Scripts\python.exe -m flask run` (which already
-    reads `FLASK_RUN_PORT=9000` from `.env`). (a) is more consistent with
-    mipibu/povos.
-  - Add `*.log` (or `dev-server.log`) to `.gitignore` — not currently
-    ignored.
-  - `c:\DEV\ajme\app.bat` has a fancier variant (mkdir-mutex, collision
-    prompt, `wait_for_port`); adopt only if the simple version proves racy.
-  - If `c:\DEV\app-dashboard` should manage this app too, its
-    `controller-api.ts` shells out to `app.bat <action>` with a timeout —
-    keep the non-interactive path unpaused (the sister scripts already do).
+  it stays YAML-only. *(Still open.)*
+- [x] **Add an `app.bat` start/stop/restart script.** Done. `app.bat`
+  (start/stop/restart/**status**), `PORT=9000`, `LOG=dev-server.log`,
+  netstat-LISTENING PID detection, `pause` only when double-clicked.
+  `wsgi.py` gained an `if __name__ == "__main__"` block (option (a)) that
+  loads `.env` via python-dotenv and runs with `use_reloader=False` so the
+  script tracks a single PID. `dev-server.log` + `*.log` git-ignored.
+  Fancier `ajme/app.bat` variant not needed. app-dashboard's
+  `controller-api.ts` path stays unpaused (non-interactive => no `pause`).
 
 ## 1. Track A — public UI polish (5 of 5 landed) ✅
 

@@ -258,11 +258,16 @@ export FLASK_APP=wsgi.py
 .venv/Scripts/python -m scripts.harvest --project mipibu --format oai_ead
 
 .venv/Scripts/python -m flask run          # http://127.0.0.1:9000
-.venv/Scripts/python -m pytest             # 144 passed, 5 skipped (opt-in live)
+.venv/Scripts/python -m pytest             # 170 passed, 4 skipped (opt-in live)
 ```
 
+Or use **`app.bat [start|stop|restart|status]`** (matches the sister apps;
+runs `python wsgi.py` with the reloader off so stop/restart track one PID;
+double-clicking it just starts + opens the browser).
+
 Local dev port is **9000** (workstation convention: one port per app —
-mipibu 5050, povos 5051, etc.). `instance/` and `.env` are git-ignored.
+mipibu 5050, povos 5051, etc.). `instance/`, `.env`, and `dev-server.log`
+are git-ignored.
 
 **Deploy** (`docs/DEPLOY.md`): GitHub is the source of truth; cPanel
 *pulls*, never receives a push. `git pull` → `flask db upgrade` (if schema

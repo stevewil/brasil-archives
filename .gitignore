@@ -24,6 +24,10 @@ instance/
 *.sqlite
 *.sqlite3
 
+# Dev server log (app.bat)
+dev-server.log
+*.log
+
 # Flask-Babel compiled catalogs + extraction template
 app/translations/**/*.mo
 messages.pot
