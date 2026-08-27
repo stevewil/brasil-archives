@@ -73,9 +73,11 @@ landable. Recommended order below (value-per-token).
   `TestingConfig.ADMIN_UI_ENABLED = True` keeps the rest of the suite on
   the internal UI. **Deployed 2026-08-27** — `BRASIL_ARCHIVES_ADMIN` unset
   on the public host, `/harvest/` 404s live.
-- [ ] **[M] Track 3 — home page redesign.** Track 2 is now landed, so the
-  public/admin separation is clean. Featured archives, browse-by-state
-  chips, live federation preview inline on `/`.
+- [x] **Track 3 — home page redesign.** Landed `ed381fd`. Featured-archive
+  card grid (top 6 by naive sum, NULLs last, no-content + fair-use-
+  ineligible excluded), state-chip cluster (RN/PE/BA + other bucket), live
+  federation preview per partner, 3-stat row. `fed.preview()` extracted
+  from `archives/detail`'s inline helper (2nd caller). Not yet deployed.
 - [ ] **[L] Track 1 — PT translation catalog.** Most expensive; do last.
   `_()` strings currently render EN (only vocab-table labels are localized).
   Wrap ~100 strings in `list.html`/`detail.html`/`facets.html`, `pybabel

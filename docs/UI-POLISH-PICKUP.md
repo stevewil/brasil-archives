@@ -1,6 +1,7 @@
 # Public UI Polish — Pickup Brief
 
-**Status:** 3 of 5 tracks landed (2, 4, 5). Continuing in focused batches.
+**Status:** 4 of 5 tracks landed (2, 3, 4, 5). Only Track 1 (i18n
+catalog) remains. Continuing in focused batches.
 **Scope:** Take `brasil-archives` from "working internal tool" to "coherent public site."
 
 > **See also:** [`docs/handoff/2026-08-27-master.md`](handoff/2026-08-27-master.md) — the master handoff for the whole three-repo ecosystem. This document zooms into the five UI-polish tracks.
@@ -9,13 +10,13 @@
 
 ## Progress
 
-**3 of 5 tracks landed** (2, 4, 5). Remaining: 1, 3.
+**4 of 5 tracks landed** (2, 3, 4, 5). Remaining: 1.
 
 | Track | Status | Commit | Deployed |
 |-------|--------|--------|----------|
-| 1 — i18n catalog | Deferred | — | — |
+| 1 — i18n catalog | In progress | — | — |
 | **2 — Admin gating** | **✅ Landed 2026-08-27** | `f60dfe6` | Yes — `/harvest/` 404s live, no nav link |
-| 3 — Home redesign | Deferred | — | — |
+| **3 — Home redesign** | **✅ Landed 2026-08-27** | `ed381fd` | Not yet — pending cPanel pull |
 | **4 — Locale-aware vocab labels** | **✅ Landed 2026-08-27** | `a981b60` | Yes, verified via curl |
 | **5 — Metadata + inline-style cleanup** | **✅ Landed 2026-08-27** | `ad8c7d7` | Yes — pulled 2026-08-27 |
 
@@ -208,14 +209,36 @@ files, `base.html`, `detail.html`, `conftest.py`.
 
 ---
 
-### Track 3 — Home page redesign
+### Track 3 — Home page redesign ✅ LANDED 2026-08-27
 
-**Problem:** `/` is 30 lines: hero + 2 stats + status blurb. No way in
-beyond nav. A new visitor can't see the point of the site.
+**Delivered:** commit `ed381fd`. Not yet pulled to cPanel.
 
-**Deliverable:** home page that invites exploration.
+**What shipped:**
 
-**Steps:**
+- `main.py` — `index()` gathers: featured archives (top 6 by naive sum of
+  active scores, NULLs last, `no_digital_content=False` and
+  `fair_use_eligible IS NOT False`), browse-by-state groups (RN/PE/BA
+  primary + one "other" bucket of the remaining states), and a live
+  `fed.preview()` per `UpgradeProject`. Also passes an aggregated-record
+  count for the third stat tile.
+- `services/federation.py` — **extracted `fed.preview(project)`** from the
+  inline `_federation_preview` in `archives/routes.py` (the rule-of-three
+  second caller). Never raises; returns
+  `{"available": bool, "record_count", "deep_link_all", "stale", ...}`.
+- `index.html` — rebuilt: hero, 3-stat row (archives / partners /
+  federated records), `.state-chip-cluster`, `.home-featured__grid` of
+  cards, `.home-federation__list`, method blurb.
+- `style.css` — `.state-chip*`, `.home-featured*`, `.home-federation*`,
+  and single-column rules in the `@media (max-width: 40rem)` block.
+- 3 home-page tests in `tests/test_archives_blueprint.py`.
+
+**Deviation from plan:** dropped "3 recent aggregated records" and the
+"pick by record_count when unscored" fallback — aggregated_records only
+tie to mipibu's one source archive, so they're not a meaningful catalog-
+wide featured signal. Unscored archives simply sort last and show a
+"Not yet scored" badge.
+
+**Original steps (kept for reference):**
 
 1. Add to `main.py` route: fetch top-5 archives by naive sum (or by
    `axis_research` when scoring exists), 3 recent aggregated records, and

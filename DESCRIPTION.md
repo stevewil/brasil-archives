@@ -183,8 +183,9 @@ app/
                          companions that can't run a live endpoint.
 
   blueprints/
-    main.py              /  (landing: archive + upgrade-project counts),
-                        /healthz
+    main.py              /  (landing: stat tiles, featured archives,
+                        browse-by-state chips, live partner federation
+                        preview), /healthz
     archives/            /archives/ (filter by state/type/content, sort by
                          name/pipeline/research/naive-sum, NULLs last),
                          /archives/<slug> (detail: score cards, axis card,
@@ -275,9 +276,10 @@ changed) → `touch tmp/restart.txt` → `curl .../healthz`.
   health probe; PT translation catalog (`_()` strings render EN — only
   vocab-table labels are localized so far); home-page redesign; IIIF
   Content Search fanout; cron-scheduled harvest; povos federating.
-- **UI polish**: 3 of 5 tracks landed (Track 2 admin split, Track 4 vocab
-  labels, Track 5 metadata/favicon/CSS). Remaining: Track 1 (i18n
-  catalog), Track 3 (home redesign). Staged in `docs/UI-POLISH-PICKUP.md`.
+- **UI polish**: 4 of 5 tracks landed (Track 2 admin split, Track 3 home
+  redesign, Track 4 vocab labels, Track 5 metadata/favicon/CSS). Only
+  Track 1 (PT translation catalog) remains — staged in
+  `docs/UI-POLISH-PICKUP.md`.
 
 ## Conventions worth knowing
 
