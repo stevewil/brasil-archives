@@ -27,8 +27,11 @@ Two audiences, one dataset:
    in. This is the live use today (the scoring UI, the harvest debugging
    views).
 2. **Public (later)** — a read-only bilingual site where researchers filter
-   and locate archives by score and facet. Gated behind a not-yet-built
-   admin/public split (UI-Polish Track 2).
+   and locate archives by score and facet. The admin/public split shipped
+   2026-08-27 (UI-Polish Track 2): the public deployment leaves
+   `BRASIL_ARCHIVES_ADMIN` unset, which 404s the scoring forms, facet
+   editor, and `/harvest`, and swaps the detail page's score block for a
+   read-only table.
 
 **Domain frame:** national-period historian focus (roughly 1800–1900),
 Northeast Brazil (the nine states AL BA CE MA PB PE PI RN SE), ecclesiastical
@@ -268,13 +271,13 @@ changed) → `touch tmp/restart.txt` → `curl .../healthz`.
   federation preview on archive detail, locale-aware vocab labels.
 - **DB after a full local load**: 79 archives, 1 upgrade project (mipibu),
   1016 aggregated records, 2 harvest runs.
-- **Not built yet**: any real `DimensionScore` data; the quarterly health
-  probe; PT translation catalog (`_()` strings render EN — only vocab-table
-  labels are localized so far); the public/admin UI split; home-page
-  redesign; IIIF Content Search fanout; cron-scheduled harvest; povos
-  federating.
-- **UI polish**: 1 of 5 tracks landed (Track 4, vocab labels). Remaining
-  tracks staged in `docs/UI-POLISH-PICKUP.md`.
+- **Not built yet**: any real `DimensionScore` data in prod; the quarterly
+  health probe; PT translation catalog (`_()` strings render EN — only
+  vocab-table labels are localized so far); home-page redesign; IIIF
+  Content Search fanout; cron-scheduled harvest; povos federating.
+- **UI polish**: 3 of 5 tracks landed (Track 2 admin split, Track 4 vocab
+  labels, Track 5 metadata/favicon/CSS). Remaining: Track 1 (i18n
+  catalog), Track 3 (home redesign). Staged in `docs/UI-POLISH-PICKUP.md`.
 
 ## Conventions worth knowing
 

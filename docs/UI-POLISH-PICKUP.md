@@ -1,6 +1,6 @@
 # Public UI Polish — Pickup Brief
 
-**Status:** 2 of 5 tracks landed (4, 5). Continuing in focused batches.
+**Status:** 3 of 5 tracks landed (2, 4, 5). Continuing in focused batches.
 **Scope:** Take `brasil-archives` from "working internal tool" to "coherent public site."
 
 > **See also:** [`docs/handoff/2026-08-27-master.md`](handoff/2026-08-27-master.md) — the master handoff for the whole three-repo ecosystem. This document zooms into the five UI-polish tracks.
@@ -9,12 +9,12 @@
 
 ## Progress
 
-**2 of 5 tracks landed** (4, 5). Remaining: 1, 2, 3.
+**3 of 5 tracks landed** (2, 4, 5). Remaining: 1, 3.
 
 | Track | Status | Commit | Deployed |
 |-------|--------|--------|----------|
 | 1 — i18n catalog | Deferred | — | — |
-| 2 — Admin gating | Deferred | — | — |
+| **2 — Admin gating** | **✅ Landed 2026-08-27** | `f60dfe6` | Not yet — pending cPanel pull |
 | 3 — Home redesign | Deferred | — | — |
 | **4 — Locale-aware vocab labels** | **✅ Landed 2026-08-27** | `a981b60` | Yes, verified via curl |
 | **5 — Metadata + inline-style cleanup** | **✅ Landed 2026-08-27** | `ad8c7d7` | Not yet — pending cPanel pull |
@@ -128,7 +128,34 @@ compiling in tree).
 
 ---
 
-### Track 2 — Admin gating (public/internal split)
+### Track 2 — Admin gating (public/internal split) ✅ LANDED 2026-08-27
+
+**Delivered:** commit `f60dfe6`. Not yet pulled to cPanel.
+
+**What shipped (matches the plan below, with these specifics):**
+
+- `app/config.py` — `ADMIN_UI_ENABLED = os.environ.get("BRASIL_ARCHIVES_ADMIN") == "1"`;
+  `TestingConfig.ADMIN_UI_ENABLED = True` (not a conftest fixture — the
+  flag lives on the config class, and the gate tests build their own app
+  with it flipped off).
+- `app/blueprints/_admin_gate.py` — `@admin_only` → `abort(404)`.
+- `app/__init__.py` — `admin_ui_enabled()` Jinja global (closes over
+  `app.config`, no `current_app` needed).
+- `@admin_only` on `archives.submit_score`, `archives.edit_facets`,
+  `harvest.index`, `harvest.run_detail`, `harvest.record_detail`.
+- `detail.html` — scoring forms + per-dimension revision history are
+  admin-only; public gets a read-only `.dimension-summary` table
+  (dimension, score/10, locale-aware justification, date) or an
+  `.empty-note` "Not yet scored."; facet link + Harvest nav gated.
+- `tests/test_admin_gate.py` — 9 tests (flag off): routes 404, detail is
+  read-only, nav hidden; plus one sanity check that the routes 200 with
+  the flag on.
+
+**Not done (moved out of scope):** `facets.html` itself is unreachable
+publicly (route is gated) so it was left as-is; the read-only facet
+*values* already render on the public detail page.
+
+**Original plan (kept for reference):**
 
 **Problem:** Every archive detail page shows 8 blank score-submission
 forms and an "Edit facets & tags" link. `/harvest/*` shows harvest-run
