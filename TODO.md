@@ -61,9 +61,9 @@ landable. Recommended order below (value-per-token).
   `og:locale`, `favicon.svg`, inline `style=""` out of `detail.html` into
   `style.css`, `@media (max-width: 40rem)` block, empty-state note for
   unscored archives, `.table-wrap` around the archives table.
-  `test_no_static_inline_style_attributes` un-skipped. Not yet deployed to
-  cPanel. **Deferred within the track:** the "hide unscored dimensions /
-  collapsible" bit — belongs with Track 2's public/admin split.
+  `test_no_static_inline_style_attributes` un-skipped. **Deployed
+  2026-08-27.** The "hide unscored dimensions / collapsible" bit was folded
+  into Track 2's public/admin split.
 - [x] **Track 2 — admin/public split.** Landed `f60dfe6`. Env gate
   `BRASIL_ARCHIVES_ADMIN=1` + `@admin_only` (`app/blueprints/_admin_gate.py`)
   → `abort(404)` on `submit_score`, `edit_facets`, all `harvest.*`.
@@ -71,9 +71,8 @@ landable. Recommended order below (value-per-token).
   Harvest nav; public detail shows a read-only "Dimension scores" table or
   "Not yet scored." `tests/test_admin_gate.py` (9 tests, flag off).
   `TestingConfig.ADMIN_UI_ENABLED = True` keeps the rest of the suite on
-  the internal UI. **cPanel:** leave `BRASIL_ARCHIVES_ADMIN` unset on the
-  public host; the pull still needs `touch tmp/restart.txt` (config read at
-  startup). Not yet deployed.
+  the internal UI. **Deployed 2026-08-27** — `BRASIL_ARCHIVES_ADMIN` unset
+  on the public host, `/harvest/` 404s live.
 - [ ] **[M] Track 3 — home page redesign.** Track 2 is now landed, so the
   public/admin separation is clean. Featured archives, browse-by-state
   chips, live federation preview inline on `/`.

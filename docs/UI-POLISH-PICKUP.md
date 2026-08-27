@@ -14,10 +14,10 @@
 | Track | Status | Commit | Deployed |
 |-------|--------|--------|----------|
 | 1 — i18n catalog | Deferred | — | — |
-| **2 — Admin gating** | **✅ Landed 2026-08-27** | `f60dfe6` | Not yet — pending cPanel pull |
+| **2 — Admin gating** | **✅ Landed 2026-08-27** | `f60dfe6` | Yes — `/harvest/` 404s live, no nav link |
 | 3 — Home redesign | Deferred | — | — |
 | **4 — Locale-aware vocab labels** | **✅ Landed 2026-08-27** | `a981b60` | Yes, verified via curl |
-| **5 — Metadata + inline-style cleanup** | **✅ Landed 2026-08-27** | `ad8c7d7` | Not yet — pending cPanel pull |
+| **5 — Metadata + inline-style cleanup** | **✅ Landed 2026-08-27** | `ad8c7d7` | Yes — pulled 2026-08-27 |
 
 ## Why the remaining tracks are staged, not one big push
 
@@ -130,7 +130,8 @@ compiling in tree).
 
 ### Track 2 — Admin gating (public/internal split) ✅ LANDED 2026-08-27
 
-**Delivered:** commit `f60dfe6`. Not yet pulled to cPanel.
+**Delivered:** commit `f60dfe6`. Pulled to cPanel 2026-08-27 — verified
+live: `/harvest/` returns 404, the home page carries no `/harvest` link.
 
 **What shipped (matches the plan below, with these specifics):**
 
@@ -273,7 +274,7 @@ rows have `label_pt` null; those fall back to EN transparently.
 
 ### Track 5 — Metadata, empty states, inline-style cleanup ✅ LANDED 2026-08-27
 
-**Delivered:** commit `ad8c7d7`. Not yet pulled to cPanel.
+**Delivered:** commit `ad8c7d7`. Pulled to cPanel 2026-08-27.
 
 **What shipped:**
 
