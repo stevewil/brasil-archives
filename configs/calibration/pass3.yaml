@@ -1,0 +1,2051 @@
+# Pass 3 scoring — DRAFT for Steve's review. NOT loaded into any database.
+#
+# 15 pipeline-viable archives from docs/nordeste-digital-archives-survey.md
+# Table 1, excluding the six already scored in pass2.yaml (t1r1 TJMA,
+# t1r2 INTERPI, t1r3 BCZM/UFRN, t1r4 Jornais de Sergipe, t1r5 Nupem,
+# t1r8 LABIM/UFRN).
+#
+# Selection bias, per the Pass 3 brief: Nordeste first (RN, PE, BA),
+# ecclesiastical sources included, resource-poor archives NOT filtered
+# out. State spread: RN x2, PE x2, BA x4, AL x2, MA x2, CE x1, PI x2.
+#
+# Each entry scores all eight dimensions 0-10 with justification_en +
+# justification_pt citing the algorithm-v1.md anchor tier and specific
+# survey / site-visit evidence. Facets and tags follow pass2.yaml shape
+# exactly.
+#
+# Site inspections were performed 2026-08-27 (WebFetch + WebSearch).
+# Per-archive evidence URLs, dates, and uncertainty flags are in
+# docs/pass3-scoring-notes.md. Several archives could not be reached
+# from this session and are scored conservatively with a flag — see the
+# notes doc before treating any score as settled.
+#
+# Loader semantics unchanged from pass2 (scripts/load_calibration.py).
+
+scored_by: "calibration/pass3"
+
+archives:
+
+  # ================================================================
+  # 1. BA — APEB Salvador notary books, EAP703 (British Library EAP)
+  # ================================================================
+  - slug: ba-arquivo-publico-do-estado-da-bahia-salvador-notary-books-eap-t1r6
+    display_name: "APEB — Salvador notary books (EAP703, British Library)"
+    scores:
+      accessibility:
+        score: 6
+        justification_en: |
+          EAP delivers digitised files anonymously through a IIIF viewer
+          with no registration — normally algorithm anchor 8. Scored one
+          tier down because the survey recorded the BL catalogue as
+          offline since the October 2023 cyber-attack; search-engine
+          visibility of eap.bl.uk/archive-file/EAP703-* pages on
+          2026-08-27 suggests it is indexed again, but item pages
+          returned empty from this session. Flag: re-verify viewer +
+          image delivery directly.
+        justification_pt: |
+          O EAP entrega os arquivos digitalizados de forma anônima por
+          um visualizador IIIF, sem cadastro — normalmente ancoragem 8
+          do algoritmo. Reduzido em um nível porque o levantamento
+          registrou o catálogo da BL fora do ar desde o ciberataque de
+          outubro de 2023; a indexação das páginas
+          eap.bl.uk/archive-file/EAP703-* em 27/08/2026 sugere retorno,
+          mas as páginas de item vieram vazias nesta sessão. Sinalizar:
+          reconfirmar visualizador e entrega de imagens diretamente.
+      provenance_curatorial:
+        score: 6
+        justification_en: |
+          EAP catalogue records carry archival description per notary
+          book (dates, scribe, parish, reference code) but no
+          transcription — algorithm tier 6 "strong descriptive metadata
+          but missing some ISAD(G) elements" at item level.
+        justification_pt: |
+          Os registros do catálogo EAP trazem descrição arquivística por
+          livro de notas (datas, tabelião, freguesia, código de
+          referência), mas sem transcrição — faixa 6 do algoritmo:
+          "metadados descritivos fortes, com elementos ISAD(G) faltantes"
+          a nível de item.
+      corpus_completeness:
+        score: 8
+        justification_en: |
+          The project's stated scope is the surviving Salvador livros de
+          notas 1664-1889; it digitised 1,326 books / ~304,497 TIFF
+          images across that series — substantially complete (60-90%)
+          coverage of the scope it claims, algorithm tier 8.
+        justification_pt: |
+          O escopo declarado do projeto são os livros de notas de
+          Salvador de 1664-1889 remanescentes; foram digitalizados 1.326
+          livros / ~304.497 imagens TIFF dessa série — cobertura
+          substancialmente completa (60-90%) do escopo declarado, faixa
+          8 do algoritmo.
+      finding_aids:
+        score: 7
+        justification_en: |
+          EAP catalogue offers faceted browse (project / collection /
+          file) and metadata search with date filters, plus IIIF
+          manifests; no full-text of the manuscripts. Algorithm tier 7
+          "faceted browse and metadata search, no full-text".
+        justification_pt: |
+          O catálogo EAP oferece navegação facetada (projeto / coleção /
+          arquivo) e busca por metadados com filtro de data, além de
+          manifestos IIIF; sem texto completo dos manuscritos. Faixa 7
+          do algoritmo: "navegação facetada e busca por metadados, sem
+          texto completo".
+      pipeline_ingestion_readiness:
+        score: 8
+        justification_en: |
+          Properties 1 (addressable), 2 (IIIF image API returns the
+          file), 3 (TIFF masters) and 5 (IIIF manifest / OAI enumerable)
+          hold; property 4 fails because each livro bundles hundreds of
+          discrete escrituras. Four of five — algorithm anchor 8. Flag:
+          contingent on the catalogue being live.
+        justification_pt: |
+          As propriedades 1 (endereçável), 2 (a API de imagem IIIF
+          devolve o arquivo), 3 (masters TIFF) e 5 (manifesto IIIF / OAI
+          enumerável) são atendidas; a propriedade 4 falha porque cada
+          livro reúne centenas de escrituras distintas. Quatro de cinco
+          — ancoragem 8 do algoritmo. Sinalizar: depende de o catálogo
+          estar no ar.
+      uniqueness_non_duplication:
+        score: 10
+        justification_en: |
+          Survey calls this "the single richest Nordeste notarial corpus
+          digitized anywhere" — bills of sale, wills, manumission and
+          slave-sale papers, 1664-1911. Only known digital source,
+          algorithm anchor 10.
+        justification_pt: |
+          O levantamento chama isto de "o corpus notarial mais rico do
+          Nordeste digitalizado em qualquer lugar" — escrituras de
+          compra e venda, testamentos, cartas de alforria e de venda de
+          escravos, 1664-1911. Única fonte digital conhecida, ancoragem
+          10 do algoritmo.
+      scale:
+        score: 10
+        justification_en: |
+          ~304,497 TIFF images across 1,326 volumes — comfortably past
+          the 50,000+ page-equivalents anchor 10.
+        justification_pt: |
+          ~304.497 imagens TIFF em 1.326 volumes — confortavelmente
+          acima da ancoragem 10 de 50.000+ páginas equivalentes.
+      linkage_potential:
+        score: 5
+        justification_en: |
+          Notarial acts are exceptionally dense in named persons,
+          places, property and enslaved people, but delivery is
+          metadata-thin (no transcription) — algorithm tier 5
+          "high-linkage content in principle, metadata-thin delivery;
+          requires full pipeline work first".
+        justification_pt: |
+          Os atos notariais são excepcionalmente densos em pessoas,
+          lugares, propriedades e pessoas escravizadas, mas a entrega é
+          pobre em metadados (sem transcrição) — faixa 5 do algoritmo:
+          "conteúdo de alta vinculação em tese, entrega pobre em
+          metadados; exige antes um pipeline completo".
+    facets:
+      institutional_type: state-archive
+      licensing_posture: citation-only
+      stated_roadmap: informal
+      fair_use_eligible: true
+      size_unit_note: |
+        Counted in "livros de notas" (bound notary volumes) and TIFF
+        images (one image = one manuscript page). 1,326 volumes /
+        ~304,497 images. One volume bundles hundreds of discrete acts.
+      curatorial_rarity_notes: |
+        Holds the surviving Salvador livros de notas 1664-1911 including
+        cartas de alforria (manumission) and bills of sale of enslaved
+        people — the deepest single notarial series for colonial and
+        imperial Bahia. Physical originals at APEB, Salvador.
+      prior_use_note: |
+        Foundational for social/economic history of Bahia (Barickman,
+        and the Salvador slavery historiography); the EAP703 grant
+        output is widely cited even while the catalogue has been hard to
+        reach.
+    tags:
+      periods:
+        - early-colonial-1500-1700
+        - late-colonial-pombaline-1700-1808
+        - joanine-1808-1822
+        - independence-first-reign-1822-1831
+        - regency-1831-1840
+        - second-reign-imperio-1840-1889
+        - old-republic-1889-1930
+      record_types:
+        - notarial-land
+        - slavery-post-abolition
+      themes:
+        - slavery-freedom
+        - land-property
+        - commerce-trade
+        - family-kinship
+
+  # ================================================================
+  # 2. MA — APEM / SIAPEM "Acervo Digital"
+  # ================================================================
+  - slug: ma-arquivo-publico-do-estado-do-maranhao-siapem-acervo-digital-t1r7
+    display_name: "APEM — SIAPEM \"Acervo Digital\""
+    scores:
+      accessibility:
+        score: 4
+        justification_en: |
+          SIAPEM serves finding-aid PDFs and is labelled "Acervo
+          Digital", but per-item image availability could not be
+          confirmed on the pages fetched (2026-08-27) — algorithm tier 4
+          "catalog / thumbnails only; source requires request". Flag:
+          could rise to 8 if item-level scans are confirmed viewable.
+        justification_pt: |
+          O SIAPEM disponibiliza PDFs de instrumentos de pesquisa e se
+          intitula "Acervo Digital", mas a disponibilidade de imagens
+          por item não pôde ser confirmada nas páginas consultadas
+          (27/08/2026) — faixa 4 do algoritmo: "catálogo / miniaturas
+          apenas; original exige solicitação". Sinalizar: pode subir
+          para 8 se houver scans por item visíveis.
+      provenance_curatorial:
+        score: 5
+        justification_en: |
+          Named fundos with date spans (Secretaria do Governo 1728-1914,
+          Câmara Municipal de São Luís 1645-1973, DOPS 1966-1992) and an
+          inventário-analítico (RDC-Arq / NOBRADE) series; title and date
+          reliable, per-item ISAD(G) absent — algorithm tier 5.
+        justification_pt: |
+          Fundos nomeados com datas-limite (Secretaria do Governo
+          1728-1914, Câmara Municipal de São Luís 1645-1973, DOPS
+          1966-1992) e uma série de inventários analíticos (RDC-Arq /
+          NOBRADE); título e data confiáveis, sem ISAD(G) por item —
+          faixa 5 do algoritmo.
+      corpus_completeness:
+        score: 2
+        justification_en: |
+          A large described acervo (1645-1992) with only a small,
+          unquantified digital-object fraction visible online — algorithm
+          tier 2 "token coverage (<10%)" of stated scope. Flag: estimate.
+        justification_pt: |
+          Um acervo descrito extenso (1645-1992) com apenas uma pequena
+          fração de objetos digitais, não quantificada, visível on-line
+          — faixa 2 do algoritmo: "cobertura simbólica (<10%)" do escopo
+          declarado. Sinalizar: estimativa.
+      finding_aids:
+        score: 6
+        justification_en: |
+          Search facets (Inventário, Avulsos, Códices, Coleções, Fundos)
+          plus integer fundo IDs and downloadable instrument PDFs —
+          algorithm tier 6 "basic metadata search or well-organized
+          browse hierarchy".
+        justification_pt: |
+          Facetas de busca (Inventário, Avulsos, Códices, Coleções,
+          Fundos) mais IDs de fundo inteiros e PDFs de instrumentos para
+          download — faixa 6 do algoritmo: "busca básica por metadados ou
+          hierarquia de navegação bem organizada".
+      pipeline_ingestion_readiness:
+        score: 4
+        justification_en: |
+          Property 5 partly met — fundo IDs are sequential integers
+          (Secretaria do Governo = 1, Câmara Municipal = 38, DOPS = 35) —
+          and instrument PDFs are directly downloadable, but item-level
+          addressability and direct image URLs are unconfirmed. Two of
+          five, algorithm anchor 4. Flag.
+        justification_pt: |
+          Propriedade 5 parcialmente atendida — os IDs de fundo são
+          inteiros sequenciais (Secretaria do Governo = 1, Câmara
+          Municipal = 38, DOPS = 35) — e os PDFs de instrumentos são
+          baixáveis diretamente, mas a endereçabilidade por item e as
+          URLs diretas de imagem não estão confirmadas. Duas de cinco,
+          ancoragem 4 do algoritmo. Sinalizar.
+      uniqueness_non_duplication:
+        score: 8
+        justification_en: |
+          Only digital description route for the Fundo Secretaria do
+          Governo do Maranhão 1728-1914 and the Câmara Municipal de São
+          Luís fundo 1645-1973; no competing digitization — algorithm
+          tier 8.
+        justification_pt: |
+          Única via de descrição digital para o Fundo Secretaria do
+          Governo do Maranhão 1728-1914 e para o fundo Câmara Municipal
+          de São Luís 1645-1973; sem digitalização concorrente — faixa 8
+          do algoritmo.
+      scale:
+        score: 4
+        justification_en: |
+          "Thousands" of described units but the digital-object count is
+          undisclosed and appears small; conservative page-equivalent
+          estimate 100-1,000, algorithm tier 4. Flag: estimate.
+        justification_pt: |
+          "Milhares" de unidades descritas, mas a contagem de objetos
+          digitais não é divulgada e parece pequena; estimativa
+          conservadora de 100-1.000 páginas equivalentes, faixa 4 do
+          algoritmo. Sinalizar: estimativa.
+      linkage_potential:
+        score: 4
+        justification_en: |
+          Administrative and legislative series are moderately
+          name-dense; minimal item-level metadata for entity extraction
+          — algorithm tier 4.
+        justification_pt: |
+          As séries administrativas e legislativas são moderadamente
+          densas em nomes; metadados mínimos por item para extração de
+          entidades — faixa 4 do algoritmo.
+    facets:
+      institutional_type: state-archive
+      licensing_posture: citation-only
+      stated_roadmap: informal
+      fair_use_eligible: true
+      size_unit_note: |
+        Denominated in fundos / séries / instrumentos de pesquisa;
+        digital-object (image) counts not published on SIAPEM.
+      curatorial_rarity_notes: |
+        Câmara Municipal de São Luís fundo (1645-1973) is described in
+        SIAPEM though the physical records are held at the Câmara — the
+        digital route runs through APEM, not the Câmara. Coleção das
+        Leis, Decretos, Resoluções e Regulamentos do Maranhão 1835-1889.
+      prior_use_note: |
+        Used by maranhense institutional and political historians;
+        SIAPEM's Negro Cosme virtual exhibition draws on the Balaiada
+        material.
+    tags:
+      periods:
+        - late-colonial-pombaline-1700-1808
+        - joanine-1808-1822
+        - independence-first-reign-1822-1831
+        - regency-1831-1840
+        - second-reign-imperio-1840-1889
+        - old-republic-1889-1930
+        - vargas-1930-1945
+        - second-republic-1945-1964
+        - military-dictatorship-1964-1985
+      record_types:
+        - administrative-legislative
+        - judicial
+      themes:
+        - state-formation
+        - politics-power
+
+  # ================================================================
+  # 3. CE — Acervo Digital de Fortaleza (Ipplan / Prefeitura)
+  # ================================================================
+  - slug: ce-acervo-digital-de-fortaleza-ipplan-fortaleza-prefeitura-de-f-t1r9
+    display_name: "Acervo Digital de Fortaleza"
+    scores:
+      accessibility:
+        score: 8
+        justification_en: |
+          Anonymous browsing with per-record "Download" controls, no
+          registration; per-item file URLs are not printed in page text
+          (viewer-mediated) — algorithm anchor 8 "anonymous browsing
+          through a viewer".
+        justification_pt: |
+          Navegação anônima com controles de "Download" por registro,
+          sem cadastro; as URLs dos arquivos por item não aparecem no
+          texto da página (mediado por visualizador) — ancoragem 8 do
+          algoritmo: "navegação anônima por visualizador".
+      provenance_curatorial:
+        score: 5
+        justification_en: |
+          Each record carries title, author, year, document type, source
+          institution and theme; title and date reliable, no fonds-level
+          archival description, no transcription — algorithm tier 5.
+        justification_pt: |
+          Cada registro traz título, autor, ano, tipo documental,
+          instituição de origem e tema; título e data confiáveis, sem
+          descrição arquivística a nível de fundo, sem transcrição —
+          faixa 5 do algoritmo.
+      corpus_completeness:
+        score: 6
+        justification_en: |
+          A municipal aggregator across nine categories (HEMEROTECA
+          alone ~3,454 files, 1824-2022) with no single stated scope to
+          measure against; partial (30-60%) coverage of the Fortaleza
+          municipal-memory field — algorithm tier 6.
+        justification_pt: |
+          Um agregador municipal com nove categorias (só a HEMEROTECA
+          tem ~3.454 arquivos, 1824-2022) sem um escopo declarado único
+          para medir; cobertura parcial (30-60%) do campo de memória
+          municipal de Fortaleza — faixa 6 do algoritmo.
+      finding_aids:
+        score: 7
+        justification_en: |
+          Faceted search by title, author, 60+ themes, year, 20+
+          document types, 100+ source institutions and 50+ places —
+          algorithm tier 7 "faceted browse and metadata search, no
+          full-text".
+        justification_pt: |
+          Busca facetada por título, autor, 60+ temas, ano, 20+ tipos
+          documentais, 100+ instituições de origem e 50+ lugares — faixa
+          7 do algoritmo: "navegação facetada e busca por metadados, sem
+          texto completo".
+      pipeline_ingestion_readiness:
+        score: 4
+        justification_en: |
+          Viewer-locked: per-item URLs are not exposed and would need
+          reverse-engineering (property 2 broken); no documented API or
+          enumerable pattern surfaced (property 5 unclear). Downloads
+          exist. Two of five, algorithm anchor 4.
+        justification_pt: |
+          Preso ao visualizador: as URLs por item não são expostas e
+          exigiriam engenharia reversa (propriedade 2 quebrada); sem API
+          documentada ou padrão enumerável identificado (propriedade 5
+          incerta). Downloads existem. Duas de cinco, ancoragem 4 do
+          algoritmo.
+      uniqueness_non_duplication:
+        score: 6
+        justification_en: |
+          The Câmara Municipal de Fortaleza and Instituto Histórico do
+          Ceará slices and the 1824-onward hemeroteca are largely
+          unique, but some periodical content may overlap national
+          aggregators — algorithm tier 6 "partial overlap with other
+          digital sources".
+        justification_pt: |
+          Os recortes da Câmara Municipal de Fortaleza e do Instituto
+          Histórico do Ceará e a hemeroteca a partir de 1824 são em
+          grande parte únicos, mas parte do conteúdo periódico pode se
+          sobrepor a agregadores nacionais — faixa 6 do algoritmo:
+          "sobreposição parcial com outras fontes digitais".
+      scale:
+        score: 6
+        justification_en: |
+          HEMEROTECA alone holds ~3,454 files; nine categories together
+          put holdings in the 1,000-10,000 page-equivalents band,
+          algorithm tier 6.
+        justification_pt: |
+          Só a HEMEROTECA tem ~3.454 arquivos; as nove categorias juntas
+          colocam o acervo na faixa de 1.000-10.000 páginas
+          equivalentes, faixa 6 do algoritmo.
+      linkage_potential:
+        score: 4
+        justification_en: |
+          Municipal records and local press are moderately name-dense;
+          facet metadata (source, theme, place) exists but there is no
+          controlled entity vocabulary — algorithm tier 4.
+        justification_pt: |
+          Documentos municipais e imprensa local são moderadamente
+          densos em nomes; há metadados de faceta (origem, tema, lugar),
+          mas sem vocabulário controlado de entidades — faixa 4 do
+          algoritmo.
+    facets:
+      institutional_type: municipal
+      licensing_posture: citation-only
+      stated_roadmap: published-and-active
+      fair_use_eligible: true
+      size_unit_note: |
+        Denominated in "arquivos" (files) per category; HEMEROTECA
+        ~3,454, other eight categories not individually quantified on the
+        search page.
+      curatorial_rarity_notes: |
+        Aggregates the Câmara Municipal de Fortaleza and Instituto
+        Histórico do Ceará holdings plus prefeituras of Aracati, Aquiraz
+        and Caucaia; the pre-1930 hemeroteca (from 1824) is the target
+        slice.
+      prior_use_note: |
+        Used in Fortaleza urban-history and planning research (Ipplan
+        lineage); the aggregator is the practical access route to the
+        Instituto Histórico do Ceará material.
+    tags:
+      periods:
+        - independence-first-reign-1822-1831
+        - regency-1831-1840
+        - second-reign-imperio-1840-1889
+        - old-republic-1889-1930
+        - vargas-1930-1945
+        - second-republic-1945-1964
+        - military-dictatorship-1964-1985
+        - new-republic-1985-present
+      record_types:
+        - press-periodicals
+        - administrative-legislative
+        - photographic-iconographic
+        - manuscripts-books
+      themes:
+        - urban-history
+        - politics-power
+
+  # ================================================================
+  # 4. PE — APEJE "Acervo Digital" (AtoM) [unreachable this session]
+  # ================================================================
+  - slug: pe-apeje-arquivo-publico-estadual-jordao-emerenciano-acervo-dig-t1r10
+    display_name: "APEJE — Acervo Digital (AtoM)"
+    scores:
+      accessibility:
+        score: 2
+        justification_en: |
+          The AtoM host returns disallow_by_robots and did not resolve
+          from this session (2026-08-27); the hemeroteca of 19-20c
+          periodicals is consultation-by-appointment only. Effectively
+          algorithm tier 2 "finding aid or metadata only; documents
+          in-person only" for now. Flag: unreachable — score conservative.
+        justification_pt: |
+          O host AtoM retorna disallow_by_robots e não resolveu nesta
+          sessão (27/08/2026); a hemeroteca de periódicos dos séculos
+          19-20 é de consulta só com agendamento. Efetivamente faixa 2
+          do algoritmo: "instrumento de pesquisa ou metadados apenas;
+          documentos só presencialmente" por ora. Sinalizar: inacessível
+          — nota conservadora.
+      provenance_curatorial:
+        score: 5
+        justification_en: |
+          AtoM institutional description structured to NOBRADE is
+          reported, but digital-object coverage and item-level
+          description quality could not be verified — algorithm tier 5
+          "basic metadata", pending inspection.
+        justification_pt: |
+          Relata-se descrição institucional em AtoM estruturada em
+          NOBRADE, mas a cobertura de objetos digitais e a qualidade da
+          descrição por item não puderam ser verificadas — faixa 5 do
+          algoritmo: "metadados básicos", sujeito a inspeção.
+      corpus_completeness:
+        score: 1
+        justification_en: |
+          Digitization is asserted (mapas, leis, jornais, livros,
+          manuscritos) but almost nothing is browsable online —
+          algorithm tier 1 "digitization exists but almost nothing
+          published". Flag.
+        justification_pt: |
+          Afirma-se digitalização (mapas, leis, jornais, livros,
+          manuscritos), mas quase nada é navegável on-line — faixa 1 do
+          algoritmo: "digitalização existe, mas quase nada publicado".
+          Sinalizar.
+      finding_aids:
+        score: 3
+        justification_en: |
+          An AtoM catalogue exists in principle (faceted browse + slug
+          URLs) but is robots-blocked and unreachable, so it cannot be
+          confirmed to index digital objects — scored at algorithm tier 3
+          pending access. Flag.
+        justification_pt: |
+          Existe em tese um catálogo AtoM (navegação facetada + URLs com
+          slug), mas está bloqueado por robots e inacessível, então não
+          se pode confirmar que indexe objetos digitais — nota na faixa 3
+          do algoritmo até haver acesso. Sinalizar.
+      pipeline_ingestion_readiness:
+        score: 1
+        justification_en: |
+          robots.txt explicitly disallows automated access — a genuine
+          ToS barrier, not a transient error (survey method note). No
+          baseline property can be cleanly met without negotiated
+          access. Algorithm anchor 1. Flag.
+        justification_pt: |
+          O robots.txt proíbe explicitamente o acesso automatizado — uma
+          barreira real de termos de uso, não um erro transitório (nota
+          metodológica do levantamento). Nenhuma propriedade de base
+          pode ser atendida sem acesso negociado. Ancoragem 1 do
+          algoritmo. Sinalizar.
+      uniqueness_non_duplication:
+        score: 8
+        justification_en: |
+          Largest PE state archival holding; the hemeroteca of "principais
+          periódicos locais dos séculos 19 e 20" has no competing
+          digitization at comparable scope — algorithm tier 8.
+        justification_pt: |
+          Maior acervo arquivístico estadual de PE; a hemeroteca dos
+          "principais periódicos locais dos séculos 19 e 20" não tem
+          digitalização concorrente em escopo comparável — faixa 8 do
+          algoritmo.
+      scale:
+        score: 4
+        justification_en: |
+          Unknown; scored conservatively at algorithm tier 4 (100-1,000
+          page-equivalents of confirmed digital objects) because none
+          could be enumerated. Flag: likely far larger once access is
+          negotiated.
+        justification_pt: |
+          Desconhecida; nota conservadora na faixa 4 do algoritmo
+          (100-1.000 páginas equivalentes de objetos digitais
+          confirmados) porque nada pôde ser enumerado. Sinalizar:
+          provavelmente muito maior com acesso negociado.
+      linkage_potential:
+        score: 5
+        justification_en: |
+          Rich holdings (laws, press, manuscripts) name-dense in
+          principle, but metadata-thin blocked delivery requires full
+          pipeline work first — algorithm tier 5.
+        justification_pt: |
+          Acervo rico (leis, imprensa, manuscritos) denso em nomes em
+          tese, mas a entrega bloqueada e pobre em metadados exige antes
+          um pipeline completo — faixa 5 do algoritmo.
+    facets:
+      institutional_type: state-archive
+      licensing_posture: bulk-restricted
+      stated_roadmap: published-but-unmet
+      fair_use_eligible: true
+      size_unit_note: |
+        No counts published. A CEPE-APEJE cooperation agreement is
+        stated to be digitizing more of the acervo; delivery channel is
+        Acervo CEPE (see entry 11).
+      curatorial_rarity_notes: |
+        Largest PE state holding. AtoM host (acervo.arquivopublico.pe.gov.br)
+        disallows robots; access is a negotiation, not a harvest.
+      prior_use_note: |
+        Standard reference for Pernambuco political and social history
+        (Revolução de 1817, Confederação do Equador, Praieira); cited in
+        the SciELO study of Nordeste capital archives.
+    tags:
+      periods:
+        - joanine-1808-1822
+        - independence-first-reign-1822-1831
+        - regency-1831-1840
+        - second-reign-imperio-1840-1889
+        - old-republic-1889-1930
+        - vargas-1930-1945
+        - second-republic-1945-1964
+      record_types:
+        - administrative-legislative
+        - press-periodicals
+        - manuscripts-books
+      themes:
+        - state-formation
+        - politics-power
+        - urban-history
+
+  # ================================================================
+  # 5. AL — CPDHis/UFAL download page (Arquivo da Cúria de Maceió)
+  # ================================================================
+  - slug: al-cpdhis-ufal-centro-de-pesquisa-e-documentacao-historica-docu-t1r12
+    display_name: "CPDHis/UFAL — documentação disponível para download"
+    scores:
+      accessibility:
+        score: 8
+        justification_en: |
+          A handful of documents offered as direct anonymous PDF
+          downloads on the page, plus a Google Drive folder for material
+          "em processamento". Direct download would be anchor 10; scored
+          8 because the Drive folder adds a hop and the set is tiny.
+        justification_pt: |
+          Um punhado de documentos oferecidos como downloads diretos e
+          anônimos em PDF na página, mais uma pasta do Google Drive para
+          o material "em processamento". Download direto seria ancoragem
+          10; nota 8 porque a pasta do Drive acrescenta um passo e o
+          conjunto é minúsculo.
+      provenance_curatorial:
+        score: 5
+        justification_en: |
+          Each published item has a scholarly caption (a 1794 testamento;
+          an 1847 livro de provisões e visitações of the Freguesia de
+          Nossa Senhora das Brotas), but no per-item ISAD(G) and no
+          transcription — algorithm tier 5.
+        justification_pt: |
+          Cada item publicado tem uma legenda erudita (um testamento de
+          1794; um livro de provisões e visitações de 1847 da Freguesia
+          de Nossa Senhora das Brotas), mas sem ISAD(G) por item e sem
+          transcrição — faixa 5 do algoritmo.
+      corpus_completeness:
+        score: 1
+        justification_en: |
+          Over 1 TB of images digitized under the Cúria de Maceió
+          convênio; only a handful of items published online — algorithm
+          tier 1 "digitization exists but almost nothing published".
+          Flag: strong partnership opportunity.
+        justification_pt: |
+          Mais de 1 TB de imagens digitalizadas sob o convênio com a
+          Cúria de Maceió; apenas um punhado de itens publicados on-line
+          — faixa 1 do algoritmo: "digitalização existe, mas quase nada
+          publicado". Sinalizar: forte oportunidade de parceria.
+      finding_aids:
+        score: 3
+        justification_en: |
+          A flat download page listing plus a Google Drive folder; no
+          search, no catalogue — algorithm tier 3 "downloadable
+          finding-aid PDFs only" is the closest anchor.
+        justification_pt: |
+          Uma listagem plana na página de download mais uma pasta do
+          Google Drive; sem busca, sem catálogo — faixa 3 do algoritmo:
+          "apenas PDFs de instrumentos de pesquisa para download" é a
+          ancoragem mais próxima.
+      pipeline_ingestion_readiness:
+        score: 4
+        justification_en: |
+          Property 2 (direct PDF files) holds for the on-page items;
+          property 1 partial (page links, not the Drive folder); no
+          enumerable API (property 5 fails). Two of five, algorithm
+          anchor 4.
+        justification_pt: |
+          Propriedade 2 (arquivos PDF diretos) atendida para os itens na
+          página; propriedade 1 parcial (links da página, não a pasta do
+          Drive); sem API enumerável (propriedade 5 falha). Duas de
+          cinco, ancoragem 4 do algoritmo.
+      uniqueness_non_duplication:
+        score: 8
+        justification_en: |
+          Alagoas has almost no other digital primary sources; these
+          Cúria de Maceió items are effectively unique for practical
+          purposes — algorithm tier 8.
+        justification_pt: |
+          Alagoas quase não tem outras fontes primárias digitais; esses
+          itens da Cúria de Maceió são efetivamente únicos para fins
+          práticos — faixa 8 do algoritmo.
+      scale:
+        score: 2
+        justification_en: |
+          Dozens of items online now — algorithm tier 2 "10-100
+          page-equivalents". Flag: >1 TB exists offline, so Scale
+          reflects what is published, not what is digitized.
+        justification_pt: |
+          Dezenas de itens on-line hoje — faixa 2 do algoritmo: "10-100
+          páginas equivalentes". Sinalizar: >1 TB existe fora da rede,
+          então a Escala reflete o que está publicado, não o que está
+          digitalizado.
+      linkage_potential:
+        score: 5
+        justification_en: |
+          Parish, notarial and ordination records are extremely
+          name-dense; metadata-thin delivery requires full transcription
+          pipeline first — algorithm tier 5.
+        justification_pt: |
+          Registros paroquiais, notariais e de ordenação são
+          extremamente densos em nomes; a entrega pobre em metadados
+          exige antes um pipeline completo de transcrição — faixa 5 do
+          algoritmo.
+    facets:
+      institutional_type: federal-university
+      licensing_posture: citation-only
+      stated_roadmap: published-but-unmet
+      fair_use_eligible: true
+      size_unit_note: |
+        On-page: 3 manuscript PDFs + 1 periodical PDF + 1 Google Drive
+        folder. Off-page: >1 TB of images digitized under the Cúria de
+        Maceió convênio, mostly in-loco only.
+      curatorial_rarity_notes: |
+        Testamento de Estevão Lourenço, Vila das Alagoas, 1794; Livro de
+        Provisões e Visitações da Freguezia de Nossa Senhora das Brotas
+        e Santo Amaro da Vila d'Atalaia, 1847; jornal O Semeador, n.1,
+        2 March 1913. CPDHis intends an "Alagoas Histórica Digital"
+        internet database.
+      prior_use_note: |
+        CPDHis/UFAL history graduate programme; the Arquivo da
+        Arquidiocese de Maceió recovery project (UFAL, 2014-) is the
+        source of the material.
+    tags:
+      periods:
+        - late-colonial-pombaline-1700-1808
+        - joanine-1808-1822
+        - independence-first-reign-1822-1831
+        - regency-1831-1840
+        - second-reign-imperio-1840-1889
+        - old-republic-1889-1930
+        - vargas-1930-1945
+        - second-republic-1945-1964
+        - new-republic-1985-present
+      record_types:
+        - ecclesiastical
+        - notarial-land
+        - press-periodicals
+      themes:
+        - religious-life
+        - family-kinship
+
+  # ================================================================
+  # 6. AL — Arquivo da Cúria Metropolitana de Maceió [not online]
+  # ================================================================
+  - slug: al-arquivo-da-curia-metropolitana-de-maceio-via-projeto-alagoas-t1r13
+    display_name: "Arquivo da Cúria Metropolitana de Maceió"
+    scores:
+      accessibility:
+        score: 1
+        justification_en: |
+          Baptism books 19c-1960s are digitized and consultable at the
+          archive; a small sample is published via CPDHis but the archive
+          itself has no online catalogue — algorithm tier 1 "web presence
+          but no online catalog; in-person only". Site
+          (arquidiocesedemaceio.org.br) did not resolve 2026-08-27. Flag.
+        justification_pt: |
+          Livros de batismo do século 19 aos anos 1960 estão
+          digitalizados e são consultáveis no arquivo; uma pequena
+          amostra é publicada via CPDHis, mas o próprio arquivo não tem
+          catálogo on-line — faixa 1 do algoritmo: "presença web sem
+          catálogo on-line; só presencialmente". O site
+          (arquidiocesedemaceio.org.br) não resolveu em 27/08/2026.
+          Sinalizar.
+      provenance_curatorial:
+        score: 3
+        justification_en: |
+          Holdings are organized at parish-book level (livros de batismo,
+          casamento, óbito, tombo) but nothing is described online to
+          inspect — scored conservatively at algorithm tier 3 (between
+          "undescribed image bundles" and "minimal metadata"). Flag.
+        justification_pt: |
+          O acervo é organizado a nível de livro paroquial (livros de
+          batismo, casamento, óbito, tombo), mas nada está descrito
+          on-line para inspeção — nota conservadora na faixa 3 do
+          algoritmo (entre "conjuntos de imagens sem descrição" e
+          "metadados mínimos"). Sinalizar.
+      corpus_completeness:
+        score: 1
+        justification_en: |
+          Digitization covers baptism books across the 38 municipalities
+          of the archdiocese, but essentially nothing is published from
+          it — algorithm tier 1. Flag.
+        justification_pt: |
+          A digitalização cobre livros de batismo nos 38 municípios da
+          arquidiocese, mas praticamente nada disso é publicado — faixa 1
+          do algoritmo. Sinalizar.
+      finding_aids:
+        score: 1
+        justification_en: |
+          Only a general institutional description; no item-level search
+          online — algorithm tier 1.
+        justification_pt: |
+          Apenas uma descrição institucional geral; sem busca por item
+          on-line — faixa 1 do algoritmo.
+      pipeline_ingestion_readiness:
+        score: 1
+        justification_en: |
+          Content is digitized but not published; no baseline property
+          is met without an access agreement — algorithm anchor 1. Flag.
+        justification_pt: |
+          O conteúdo está digitalizado, mas não publicado; nenhuma
+          propriedade de base é atendida sem um acordo de acesso —
+          ancoragem 1 do algoritmo. Sinalizar.
+      uniqueness_non_duplication:
+        score: 6
+        justification_en: |
+          Overlaps the FamilySearch "Brazil, Alagoas, Church Records"
+          collection (survey row 41) which covers the same parish
+          universe — algorithm tier 6 "partial overlap with other
+          digital sources".
+        justification_pt: |
+          Sobrepõe-se à coleção FamilySearch "Brasil, Alagoas, Registros
+          da Igreja Católica" (linha 41 do levantamento), que cobre o
+          mesmo universo paroquial — faixa 6 do algoritmo: "sobreposição
+          parcial com outras fontes digitais".
+      scale:
+        score: 8
+        justification_en: |
+          Digitized holdings span baptism/marriage/death books for 38
+          municipalities, 19c-1960s — a large corpus in the
+          10,000-50,000+ page-equivalents range, algorithm tier 8, even
+          though it is not published (cf. how Pass 2 scored TJMA on
+          digitized-but-not-public volume). Flag.
+        justification_pt: |
+          O acervo digitalizado abrange livros de batismo/casamento/óbito
+          de 38 municípios, do século 19 aos anos 1960 — um corpus
+          grande na faixa de 10.000-50.000+ páginas equivalentes, faixa 8
+          do algoritmo, ainda que não publicado (cf. como a Pass 2
+          pontuou o TJMA por volume digitalizado e não público).
+          Sinalizar.
+      linkage_potential:
+        score: 5
+        justification_en: |
+          Parish registers are the canonical genealogical linkage source
+          — extremely name-dense — but with no metadata and no
+          transcription, delivery requires full pipeline work first,
+          algorithm tier 5.
+        justification_pt: |
+          Os registros paroquiais são a fonte canônica de vinculação
+          genealógica — extremamente densos em nomes — mas sem metadados
+          e sem transcrição, a entrega exige antes um pipeline completo,
+          faixa 5 do algoritmo.
+    facets:
+      institutional_type: diocesan
+      licensing_posture: bulk-restricted
+      stated_roadmap: published-but-unmet
+      fair_use_eligible: true
+      size_unit_note: |
+        Denominated in livros paroquiais (parish registers). Baptism
+        books 19c-1960s across 38 municipalities digitized; not
+        published online. Access negotiation, not discovery, is the
+        blocker.
+      curatorial_rarity_notes: |
+        Livros de tombo das paróquias, processos de ordenação from the
+        colonial period, bishops' correspondence, papal bulls, jornal
+        O Semeador. Covers the Arquidiocese de Maceió (38 municipalities).
+      prior_use_note: |
+        UFAL "Alagoas Histórica Digital" project (Arquidiocese de Maceió
+        recovery, 2014-); Alagoas religious and family history.
+    tags:
+      periods:
+        - late-colonial-pombaline-1700-1808
+        - joanine-1808-1822
+        - independence-first-reign-1822-1831
+        - regency-1831-1840
+        - second-reign-imperio-1840-1889
+        - old-republic-1889-1930
+        - vargas-1930-1945
+        - second-republic-1945-1964
+      record_types:
+        - ecclesiastical
+      themes:
+        - religious-life
+        - family-kinship
+        - slavery-freedom
+
+  # ================================================================
+  # 7. PI — Museu de História do Piauí (UFPI)
+  # ================================================================
+  - slug: pi-museu-de-historia-do-piaui-ufpi-t1r14
+    display_name: "Museu de História do Piauí — UFPI"
+    scores:
+      accessibility:
+        score: 8
+        justification_en: |
+          Newspaper issues offered as direct PDF downloads (hosted on
+          Google Drive) with inline preview images, no registration —
+          just short of anchor 10; scored 8 because the Drive layer
+          mediates the download.
+        justification_pt: |
+          Edições de jornal oferecidas como downloads diretos em PDF
+          (hospedados no Google Drive) com imagens de pré-visualização
+          na página, sem cadastro — quase ancoragem 10; nota 8 porque a
+          camada do Drive faz a mediação do download.
+      provenance_curatorial:
+        score: 4
+        justification_en: |
+          Metadata is month + year only; no per-issue description, no
+          fonds structure, no OCR — algorithm tier 4 "minimal metadata:
+          filenames only".
+        justification_pt: |
+          Metadados são só mês + ano; sem descrição por edição, sem
+          estrutura de fundo, sem OCR — faixa 4 do algoritmo: "metadados
+          mínimos: apenas nomes de arquivo".
+      corpus_completeness:
+        score: 4
+        justification_en: |
+          Multiple newspaper titles 1948-1988 plus revistas and academic
+          documents, but no per-title completeness figure and visible
+          gaps between years — algorithm tier 4 "sparse coverage
+          (10-30%)". Flag: estimate.
+        justification_pt: |
+          Vários títulos de jornal 1948-1988 mais revistas e documentos
+          acadêmicos, mas sem figura de completude por título e com
+          lacunas visíveis entre anos — faixa 4 do algoritmo: "cobertura
+          esparsa (10-30%)". Sinalizar: estimativa.
+      finding_aids:
+        score: 6
+        justification_en: |
+          Hierarchical path browse (/acervo/<type>/<title>/<year>) plus a
+          site search box — algorithm tier 6 "well-organized browse
+          hierarchy", no full-text.
+        justification_pt: |
+          Navegação por caminho hierárquico (/acervo/<tipo>/<título>/<ano>)
+          mais uma caixa de busca no site — faixa 6 do algoritmo:
+          "hierarquia de navegação bem organizada", sem texto completo.
+      pipeline_ingestion_readiness:
+        score: 4
+        justification_en: |
+          Property 5 met (predictable path tree); property 3 likely ok;
+          but property 1 is year-level not issue-level, property 2 is
+          Drive-mediated, and property 4 fails (one PDF bundles a whole
+          month of issues). Two of five, algorithm anchor 4.
+        justification_pt: |
+          Propriedade 5 atendida (árvore de caminhos previsível);
+          propriedade 3 provavelmente ok; mas a propriedade 1 é a nível
+          de ano e não de edição, a propriedade 2 é mediada pelo Drive e
+          a propriedade 4 falha (um PDF reúne um mês inteiro de edições).
+          Duas de cinco, ancoragem 4 do algoritmo.
+      uniqueness_non_duplication:
+        score: 6
+        justification_en: |
+          Jornal do Piauí and the other regional titles are largely
+          absent from Hemeroteca Digital Brasileira, but some material is
+          also held at APEPI — algorithm tier 6 "partial overlap".
+        justification_pt: |
+          O Jornal do Piauí e os demais títulos regionais estão em
+          grande parte ausentes da Hemeroteca Digital Brasileira, mas
+          parte do material também está no APEPI — faixa 6 do algoritmo:
+          "sobreposição parcial".
+      scale:
+        score: 4
+        justification_en: |
+          Hundreds to low thousands of newspaper pages across the
+          digitized titles; conservative page-equivalent estimate
+          100-1,000, algorithm tier 4. Flag: a 2025 FINEP grant is
+          expanding the hemerographic holdings.
+        justification_pt: |
+          Centenas a poucos milhares de páginas de jornal nos títulos
+          digitalizados; estimativa conservadora de 100-1.000 páginas
+          equivalentes, faixa 4 do algoritmo. Sinalizar: um edital FINEP
+          de 2025 está ampliando o acervo hemerográfico.
+      linkage_potential:
+        score: 3
+        justification_en: |
+          Newspaper content is name-dense but pre-OCR and metadata-thin;
+          entity extraction requires full pipeline work first — algorithm
+          tier 3.
+        justification_pt: |
+          O conteúdo de jornal é denso em nomes, mas pré-OCR e pobre em
+          metadados; a extração de entidades exige antes um pipeline
+          completo — faixa 3 do algoritmo.
+    facets:
+      institutional_type: federal-university
+      licensing_posture: citation-only
+      stated_roadmap: published-and-active
+      fair_use_eligible: true
+      size_unit_note: |
+        Denominated in newspaper issues bundled into monthly PDFs on
+        Google Drive (one PDF ~ one month of a title). Per-page counts
+        not disclosed.
+      curatorial_rarity_notes: |
+        Jornal do Piauí 1968-1978 (digitized at APEPI, hosted here);
+        Getúlio Vargas correspondence relating to Piauí; medical and law
+        faculty theses. A R$1,618,872.15 FINEP grant (2025) is expanding
+        the hemerographic holdings.
+      prior_use_note: |
+        UFPI História programme (Museu de História do Piauí, est. 2022);
+        piauiense press and political history.
+    tags:
+      periods:
+        - old-republic-1889-1930
+        - vargas-1930-1945
+        - second-republic-1945-1964
+        - military-dictatorship-1964-1985
+      record_types:
+        - press-periodicals
+        - personal-institutional-papers
+        - manuscripts-books
+      themes:
+        - politics-power
+        - urban-history
+
+  # ================================================================
+  # 8. BA — APEB AtoM + Coleção Independência do Brasil na Bahia
+  # ================================================================
+  - slug: ba-arquivo-publico-do-estado-da-bahia-apeb-atom-colecao-indepen-t1r16
+    display_name: "APEB — AtoM + Coleção Independência do Brasil na Bahia"
+    scores:
+      accessibility:
+        score: 6
+        justification_en: |
+          The Coleção Independência has digitized images published in the
+          APEB AtoM (browsable, no registration) — normally anchor 8 —
+          but the AtoM host (atom.fpc.ba.gov.br) did not resolve from
+          this session or during the original survey. Scored 6 for
+          intermittent reachability. Flag.
+        justification_pt: |
+          A Coleção Independência tem imagens digitalizadas publicadas no
+          AtoM do APEB (navegável, sem cadastro) — normalmente ancoragem
+          8 — mas o host AtoM (atom.fpc.ba.gov.br) não resolveu nesta
+          sessão nem no levantamento original. Nota 6 pela
+          acessibilidade intermitente. Sinalizar.
+      provenance_curatorial:
+        score: 6
+        justification_en: |
+          The Coleção Independência is described in AtoM to NOBRADE at
+          all levels with reference codes (e.g. BR BAAPEB CIBB COR 026
+          12); no transcription — algorithm tier 6, close to a full
+          ISAD(G) description.
+        justification_pt: |
+          A Coleção Independência é descrita no AtoM em NOBRADE em todos
+          os níveis com códigos de referência (ex. BR BAAPEB CIBB COR
+          026 12); sem transcrição — faixa 6 do algoritmo, perto de uma
+          descrição ISAD(G) completa.
+      corpus_completeness:
+        score: 2
+        justification_en: |
+          Only the Coleção Independência (32 bundles/books, 1791-1835)
+          has published images; digitized material is under 2% of APEB's
+          ~7.4 km of holdings — algorithm tier 2 "token coverage (<10%)"
+          of stated scope.
+        justification_pt: |
+          Só a Coleção Independência (32 maços/livros, 1791-1835) tem
+          imagens publicadas; o material digitalizado é menos de 2% dos
+          ~7,4 km de acervo do APEB — faixa 2 do algoritmo: "cobertura
+          simbólica (<10%)" do escopo declarado.
+      finding_aids:
+        score: 6
+        justification_en: |
+          AtoM faceted browse + metadata search + reference-code scheme,
+          but the fundo guide indexes digital objects only for the
+          Independência collection — algorithm tier 6.
+        justification_pt: |
+          Navegação facetada AtoM + busca por metadados + esquema de
+          códigos de referência, mas o guia de fundos indexa objetos
+          digitais só para a Coleção Independência — faixa 6 do
+          algoritmo.
+      pipeline_ingestion_readiness:
+        score: 4
+        justification_en: |
+          AtoM is OAI-PMH-capable with slug URLs and digital-object
+          downloads for the Independência collection (properties 1, 2, 5
+          plausible), but the host's unreachability blocks verification.
+          Two of five confirmed, algorithm anchor 4. Flag.
+        justification_pt: |
+          O AtoM é capaz de OAI-PMH com URLs de slug e downloads de
+          objeto digital para a Coleção Independência (propriedades 1, 2,
+          5 plausíveis), mas a inacessibilidade do host impede a
+          verificação. Duas de cinco confirmadas, ancoragem 4 do
+          algoritmo. Sinalizar.
+      uniqueness_non_duplication:
+        score: 8
+        justification_en: |
+          The Coleção Independência do Brasil na Bahia — Junta Provisória,
+          Conselho Interino, government of the Captaincy correspondence
+          1791-1835 — has no competing digitization, algorithm tier 8.
+        justification_pt: |
+          A Coleção Independência do Brasil na Bahia — correspondência da
+          Junta Provisória, do Conselho Interino e do governo da
+          Capitania 1791-1835 — não tem digitalização concorrente, faixa
+          8 do algoritmo.
+      scale:
+        score: 4
+        justification_en: |
+          32 bundles/books of the Independência collection published;
+          conservative page-equivalent estimate 100-1,000, algorithm
+          tier 4. Flag: estimate; the rest of APEB's AtoM is
+          finding-aid-only.
+        justification_pt: |
+          32 maços/livros da Coleção Independência publicados; estimativa
+          conservadora de 100-1.000 páginas equivalentes, faixa 4 do
+          algoritmo. Sinalizar: estimativa; o resto do AtoM do APEB é só
+          instrumento de pesquisa.
+      linkage_potential:
+        score: 5
+        justification_en: |
+          Independence-era government correspondence is dense in persons
+          and places, and the AtoM description gives structured metadata
+          for the collection, but the text itself needs transcription —
+          algorithm tier 5.
+        justification_pt: |
+          A correspondência governamental do período da Independência é
+          densa em pessoas e lugares, e a descrição AtoM dá metadados
+          estruturados para a coleção, mas o próprio texto precisa de
+          transcrição — faixa 5 do algoritmo.
+    facets:
+      institutional_type: state-archive
+      licensing_posture: citation-only
+      stated_roadmap: informal
+      fair_use_eligible: true
+      size_unit_note: |
+        Coleção Independência = 32 bundles/books of textual documents,
+        manuscripts and prints, 1791-1835. Rest of APEB (20 fundos
+        described in AtoM) is finding-aid-only. ~7.4 km total holdings.
+      curatorial_rarity_notes: |
+        Coleção Independência do Brasil na Bahia: Governo da Capitania da
+        Bahia, Junta Provisória de Governo, Conselho Interino de Governo,
+        Governo Provisório da Província. Reference-code format
+        BR BAAPEB CIBB ... A UNESCO Memory of the World related set is
+        also held.
+      prior_use_note: |
+        Central to the historiography of the Independência da Bahia
+        (2 de Julho) and the 1822-1823 war; the digitization was
+        announced by SECULT-BA in 2024.
+    tags:
+      periods:
+        - late-colonial-pombaline-1700-1808
+        - joanine-1808-1822
+        - independence-first-reign-1822-1831
+        - regency-1831-1840
+      record_types:
+        - administrative-legislative
+        - personal-institutional-papers
+      themes:
+        - state-formation
+        - politics-power
+
+  # ================================================================
+  # 9. BA — Atas da Câmara Municipal de Salvador (Internet Archive)
+  # ================================================================
+  - slug: ba-documentos-historicos-do-arquivo-municipal-de-salvador-atas-t1r17
+    display_name: "Atas da Câmara Municipal de Salvador (Internet Archive)"
+    scores:
+      accessibility:
+        score: 10
+        justification_en: |
+          Internet Archive items: anonymous open direct download of PDF,
+          full text and JP2, no registration — algorithm anchor 10
+          "anonymous open direct download".
+        justification_pt: |
+          Itens do Internet Archive: download direto, aberto e anônimo de
+          PDF, texto completo e JP2, sem cadastro — ancoragem 10 do
+          algoritmo: "download direto aberto e anônimo".
+      provenance_curatorial:
+        score: 9
+        justification_en: |
+          The underlying text is the published scholarly transcription
+          of the colonial municipal minutes (Documentos Históricos
+          series); IA layers Tesseract PT OCR over it. Print OCR of a
+          transcription with known error rates — algorithm tier 9
+          "partial or unverified transcription". Archival description at
+          IA is thin.
+        justification_pt: |
+          O texto de base é a transcrição erudita publicada das atas
+          municipais coloniais (série Documentos Históricos); o IA
+          sobrepõe OCR Tesseract em PT. OCR de impresso sobre uma
+          transcrição com taxas de erro conhecidas — faixa 9 do
+          algoritmo: "transcrição parcial ou não verificada". A descrição
+          arquivística no IA é pobre.
+      corpus_completeness:
+        score: 6
+        justification_en: |
+          The published atas series runs from 1625; IA holds at least
+          volumes I (1625-1641), II (1641-1649) and V (1669-1684) plus a
+          1915 relatório — partial (30-60%) of the series is online.
+          Algorithm tier 6. Flag: exact volume count on IA not
+          enumerated.
+        justification_pt: |
+          A série publicada de atas começa em 1625; o IA tem ao menos os
+          volumes I (1625-1641), II (1641-1649) e V (1669-1684) mais um
+          relatório de 1915 — parcial (30-60%) da série está on-line.
+          Faixa 6 do algoritmo. Sinalizar: contagem exata de volumes no
+          IA não enumerada.
+      finding_aids:
+        score: 7
+        justification_en: |
+          Per-item full-text search on IA plus IA metadata API and
+          collection browse; no unified cross-volume finding aid —
+          algorithm tier 7.
+        justification_pt: |
+          Busca em texto completo por item no IA mais a API de metadados
+          do IA e navegação por coleção; sem instrumento de pesquisa
+          unificado entre volumes — faixa 7 do algoritmo.
+      pipeline_ingestion_readiness:
+        score: 8
+        justification_en: |
+          Properties 1 (IA identifiers + ark:/13960/), 2 (djvu.txt / PDF
+          / JP2 direct), 3 (600 dpi scans) and 5 (IA API, collection
+          scrape) hold; property 4 fails — one volume bundles hundreds of
+          sessions. Four of five, algorithm anchor 8.
+        justification_pt: |
+          As propriedades 1 (identificadores IA + ark:/13960/), 2
+          (djvu.txt / PDF / JP2 diretos), 3 (scans a 600 dpi) e 5 (API do
+          IA, raspagem de coleção) são atendidas; a propriedade 4 falha —
+          um volume reúne centenas de sessões. Quatro de cinco, ancoragem
+          8 do algoritmo.
+      uniqueness_non_duplication:
+        score: 8
+        justification_en: |
+          Survey: "highest signal-to-effort ratio for colonial municipal
+          records." The print editions exist in libraries, but the
+          OCR'd, ARK-citable digital form is effectively unique —
+          algorithm tier 8.
+        justification_pt: |
+          Levantamento: "melhor relação sinal-esforço para documentos
+          municipais coloniais." As edições impressas existem em
+          bibliotecas, mas a forma digital, com OCR e citável por ARK, é
+          efetivamente única — faixa 8 do algoritmo.
+      scale:
+        score: 6
+        justification_en: |
+          Dozens of volumes of ~200-400 pages each puts holdings in the
+          1,000-10,000 page-equivalents band, algorithm tier 6.
+        justification_pt: |
+          Dezenas de volumes de ~200-400 páginas cada colocam o acervo
+          na faixa de 1.000-10.000 páginas equivalentes, faixa 6 do
+          algoritmo.
+      linkage_potential:
+        score: 6
+        justification_en: |
+          Session date -> resolutions -> named actors is a clean
+          structure and the transcription is already present, so entities
+          are extractable with modest work — algorithm tier 6.
+        justification_pt: |
+          Data da sessão -> resoluções -> atores nomeados é uma estrutura
+          limpa e a transcrição já está presente, então as entidades são
+          extraíveis com trabalho modesto — faixa 6 do algoritmo.
+    facets:
+      institutional_type: municipal
+      licensing_posture: redistribution-friendly
+      stated_roadmap: informal
+      fair_use_eligible: true
+      size_unit_note: |
+        Denominated in bound volumes of transcribed council minutes
+        (~200-400 pages each). CC0 on the IA items inspected.
+      curatorial_rarity_notes: |
+        Colonial municipal council minutes of Salvador (Brazil's colonial
+        capital), 1625 onward. Volume V (1669-1684) carries ARK
+        ark:/13960/t9j48t96h. Related IA item: Relatório ao Conselho
+        Municipal, Salvador, 1915.
+      prior_use_note: |
+        Foundational for colonial urban and administrative history of
+        Salvador; the printed Documentos Históricos series has been cited
+        since the 1940s, now re-surfaced on IA.
+    tags:
+      periods:
+        - early-colonial-1500-1700
+        - late-colonial-pombaline-1700-1808
+        - old-republic-1889-1930
+      record_types:
+        - administrative-legislative
+      themes:
+        - urban-history
+        - state-formation
+        - politics-power
+
+  # ================================================================
+  # 10. BA — APEB finding-aid indexes on Internet Archive
+  # ================================================================
+  - slug: ba-apeb-finding-aid-indexes-on-internet-archive-civeis-crime-es-t1r18
+    display_name: "APEB finding-aid indexes on Internet Archive"
+    scores:
+      accessibility:
+        score: 10
+        justification_en: |
+          Internet Archive: anonymous open direct download of the index
+          volumes (PDF, full text, EPUB), no registration — algorithm
+          anchor 10.
+        justification_pt: |
+          Internet Archive: download direto, aberto e anônimo dos volumes
+          de índice (PDF, texto completo, EPUB), sem cadastro — ancoragem
+          10 do algoritmo.
+      provenance_curatorial:
+        score: 5
+        justification_en: |
+          The digital objects are index/catalogue volumes (e.g.
+          INVENTÁRIOS, an 1890 imprint) with ABBYY OCR; IA-level
+          description is basic (title, uploader, date). Algorithm tier 5
+          "basic metadata".
+        justification_pt: |
+          Os objetos digitais são volumes de índice/catálogo (ex.
+          INVENTÁRIOS, um impresso de 1890) com OCR ABBYY; a descrição a
+          nível de IA é básica (título, quem subiu, data). Faixa 5 do
+          algoritmo: "metadados básicos".
+      corpus_completeness:
+        score: 6
+        justification_en: |
+          Nine index sets uploaded (CÍVEIS, CRIME, ESCRITURAS,
+          INVENTÁRIOS, TESTAMENTOS, NASCIMENTOS, ÓBITOS, relação
+          judiciária, documentos microfilmados) — a fairly comprehensive
+          scaffolding of APEB's judicial/notarial finding aids, partial
+          (30-60%), algorithm tier 6.
+        justification_pt: |
+          Nove conjuntos de índice subidos (CÍVEIS, CRIME, ESCRITURAS,
+          INVENTÁRIOS, TESTAMENTOS, NASCIMENTOS, ÓBITOS, relação
+          judiciária, documentos microfilmados) — um andaime bastante
+          abrangente dos instrumentos de pesquisa judiciais/notariais do
+          APEB, parcial (30-60%), faixa 6 do algoritmo.
+      finding_aids:
+        score: 3
+        justification_en: |
+          These volumes ARE the finding aids, full-text searchable on IA
+          — but they index documents that are not themselves online.
+          Algorithm tier 3 "downloadable finding-aid PDFs only" is the
+          honest anchor.
+        justification_pt: |
+          Esses volumes SÃO os instrumentos de pesquisa, com busca em
+          texto completo no IA — mas indexam documentos que não estão
+          on-line. Faixa 3 do algoritmo: "apenas PDFs de instrumentos de
+          pesquisa para download" é a ancoragem honesta.
+      pipeline_ingestion_readiness:
+        score: 8
+        justification_en: |
+          For ingesting the indexes as data: properties 1, 2, 3 (300 dpi
+          + OCR), 5 (IA API) hold; property 4 fails (one PDF = a whole
+          index book). Four of five, algorithm anchor 8.
+        justification_pt: |
+          Para ingerir os índices como dados: as propriedades 1, 2, 3
+          (300 dpi + OCR) e 5 (API do IA) são atendidas; a propriedade 4
+          falha (um PDF = um livro de índice inteiro). Quatro de cinco,
+          ancoragem 8 do algoritmo.
+      uniqueness_non_duplication:
+        score: 8
+        justification_en: |
+          Survey: "highest-value scaffolding in the survey" — the only
+          machine-readable route into APEB's inventários, testamentos,
+          escrituras and processos indexes. Algorithm tier 8.
+        justification_pt: |
+          Levantamento: "o andaime de maior valor do levantamento" — a
+          única via legível por máquina para os índices de inventários,
+          testamentos, escrituras e processos do APEB. Faixa 8 do
+          algoritmo.
+      scale:
+        score: 8
+        justification_en: |
+          Thousands of index entries across nine sets; the INVENTÁRIOS
+          volume alone is 4.9 GB of 300 dpi scans. Page-equivalents in
+          the 10,000-50,000 band, algorithm tier 8.
+        justification_pt: |
+          Milhares de entradas de índice em nove conjuntos; só o volume
+          INVENTÁRIOS tem 4,9 GB de scans a 300 dpi. Páginas equivalentes
+          na faixa de 10.000-50.000, faixa 8 do algoritmo.
+      linkage_potential:
+        score: 8
+        justification_en: |
+          The indexes are near-pure named-entity lists (person, place,
+          date, document reference) with OCR text present — content dense
+          in named entities extractable with modest work, algorithm tier
+          8. This is the whole point of the scaffolding.
+        justification_pt: |
+          Os índices são listas quase puras de entidades nomeadas
+          (pessoa, lugar, data, referência do documento) com texto OCR
+          presente — conteúdo denso em entidades nomeadas extraíveis com
+          trabalho modesto, faixa 8 do algoritmo. É essa a razão de ser
+          do andaime.
+    facets:
+      institutional_type: state-archive
+      licensing_posture: redistribution-friendly
+      stated_roadmap: informal
+      fair_use_eligible: true
+      size_unit_note: |
+        Denominated in digitized index/catalogue volumes (9 sets). Not
+        primary sources — indexes to APEB's judicial and notarial series.
+        Public Domain Mark on the IA items inspected.
+      curatorial_rarity_notes: |
+        Machine-readable indexes to APEB's CÍVEIS, CRIME, ESCRITURAS,
+        INVENTÁRIOS, TESTAMENTOS, NASCIMENTOS and ÓBITOS. Structuring
+        these positions the project to attach EAP703 images (entry 1)
+        when the BL catalogue is confirmed live. Uploaded by Urano
+        Andrade, 2020.
+      prior_use_note: |
+        Urano Andrade's "Relação de fontes disponíveis no APEB",
+        republished by UFBA PPGH; used by Bahian social-history
+        researchers to locate processos before an APEB visit.
+    tags:
+      periods:
+        - early-colonial-1500-1700
+        - late-colonial-pombaline-1700-1808
+        - joanine-1808-1822
+        - independence-first-reign-1822-1831
+        - regency-1831-1840
+        - second-reign-imperio-1840-1889
+        - old-republic-1889-1930
+      record_types:
+        - judicial
+        - notarial-land
+        - slavery-post-abolition
+        - demographic-census
+      themes:
+        - slavery-freedom
+        - family-kinship
+        - land-property
+        - crime-punishment
+
+  # ================================================================
+  # 11. PE — Acervo CEPE (Companhia Editora de Pernambuco)
+  # ================================================================
+  - slug: pe-acervo-cepe-companhia-editora-de-pernambuco-t1r20
+    display_name: "Acervo CEPE — Companhia Editora de Pernambuco"
+    scores:
+      accessibility:
+        score: 6
+        justification_en: |
+          Category browsing and a thumbnail catalogue link to individual
+          collections; online PDF viewing appears available but the
+          viewing interface and per-item behaviour were not fully
+          verified on the homepage fetch (2026-08-27). Between anchor 4
+          and 8 — scored 6. Flag.
+        justification_pt: |
+          Navegação por categoria e um catálogo com miniaturas levam a
+          coleções individuais; a leitura de PDF on-line parece
+          disponível, mas a interface de leitura e o comportamento por
+          item não foram totalmente verificados na consulta à página
+          inicial (27/08/2026). Entre a ancoragem 4 e a 8 — nota 6.
+          Sinalizar.
+      provenance_curatorial:
+        score: 5
+        justification_en: |
+          Mixed: the Jesuit property records carry transcriptions and
+          digitized pages, but the newspaper collections have basic
+          bibliographic metadata only — averaged to algorithm tier 5.
+        justification_pt: |
+          Misto: os registros de propriedades jesuíticas trazem
+          transcrições e páginas digitalizadas, mas as coleções de
+          jornais têm apenas metadados bibliográficos básicos — média na
+          faixa 5 do algoritmo.
+      corpus_completeness:
+        score: 4
+        justification_en: |
+          Several named collections (19c Recife newspapers, Diário da
+          Manhã 1927-1985, Diário Oficial, IDHeC papers) with no size
+          metrics and no stated completeness — algorithm tier 4 "sparse
+          coverage". Flag: estimate.
+        justification_pt: |
+          Várias coleções nomeadas (jornais do Recife do século 19,
+          Diário da Manhã 1927-1985, Diário Oficial, arquivos do IDHeC)
+          sem métricas de tamanho nem completude declarada — faixa 4 do
+          algoritmo: "cobertura esparsa". Sinalizar: estimativa.
+      finding_aids:
+        score: 6
+        justification_en: |
+          Category browse (personal archives, newspapers, library,
+          institutional records, scores) plus a thumbnail catalogue —
+          algorithm tier 6 "well-organized browse hierarchy", no
+          full-text.
+        justification_pt: |
+          Navegação por categoria (arquivos pessoais, jornais,
+          biblioteca, registros institucionais, partituras) mais um
+          catálogo com miniaturas — faixa 6 do algoritmo: "hierarquia de
+          navegação bem organizada", sem texto completo.
+      pipeline_ingestion_readiness:
+        score: 4
+        justification_en: |
+          PDF access exists but per-item URL structure and any
+          enumerable pattern or API were not surfaced; conservative two
+          of five, algorithm anchor 4. Flag.
+        justification_pt: |
+          Há acesso a PDF, mas a estrutura de URL por item e qualquer
+          padrão enumerável ou API não apareceram; conservador em duas de
+          cinco, ancoragem 4 do algoritmo. Sinalizar.
+      uniqueness_non_duplication:
+        score: 6
+        justification_en: |
+          The 19th-century Recife newspaper collection and the Jesuit
+          property manuscripts are largely unique; the Diário Oficial run
+          overlaps official-gazette aggregators — algorithm tier 6
+          "partial overlap".
+        justification_pt: |
+          A coleção de jornais do Recife do século 19 e os manuscritos de
+          propriedades jesuíticas são em grande parte únicos; a série do
+          Diário Oficial se sobrepõe a agregadores de diários oficiais —
+          faixa 6 do algoritmo: "sobreposição parcial".
+      scale:
+        score: 6
+        justification_en: |
+          Multiple multi-decade newspaper runs plus a Diário Oficial
+          series put holdings conservatively in the 1,000-10,000
+          page-equivalents band, algorithm tier 6. Flag: estimate.
+        justification_pt: |
+          Várias séries de jornais de décadas mais uma série do Diário
+          Oficial colocam o acervo, de forma conservadora, na faixa de
+          1.000-10.000 páginas equivalentes, faixa 6 do algoritmo.
+          Sinalizar: estimativa.
+      linkage_potential:
+        score: 5
+        justification_en: |
+          Press and manuscript content is name-dense; some transcription
+          exists (Jesuit records) but most delivery is metadata-thin —
+          algorithm tier 5.
+        justification_pt: |
+          O conteúdo de imprensa e manuscrito é denso em nomes; existe
+          alguma transcrição (registros jesuíticos), mas a maior parte da
+          entrega é pobre em metadados — faixa 5 do algoritmo.
+    facets:
+      institutional_type: special-thematic
+      licensing_posture: citation-only
+      stated_roadmap: published-and-active
+      fair_use_eligible: true
+      size_unit_note: |
+        Denominated by collection (newspapers, personal archives,
+        scores, institutional records). No item or page counts published
+        on the homepage.
+      curatorial_rarity_notes: |
+        19th-century Recife newspaper collection (small local titles
+        likely outside Hemeroteca Digital Brasileira); Jesuit property
+        records with transcriptions; IDHeC (Instituto Dom Helder Camara)
+        papers. Delivery channel for the CEPE-APEJE digitization
+        agreement, so expect growth.
+      prior_use_note: |
+        Pernambuco press and religious history; the IDHeC material is
+        used in liberation-theology and Dom Helder Camara scholarship.
+    tags:
+      periods:
+        - late-colonial-pombaline-1700-1808
+        - second-reign-imperio-1840-1889
+        - old-republic-1889-1930
+        - vargas-1930-1945
+        - second-republic-1945-1964
+        - military-dictatorship-1964-1985
+      record_types:
+        - press-periodicals
+        - administrative-legislative
+        - notarial-land
+        - manuscripts-books
+      themes:
+        - urban-history
+        - land-property
+        - religious-life
+
+  # ================================================================
+  # 12. RN — FamilySearch: Brazil, Rio Grande do Norte, Catholic
+  #     Church Records
+  # ================================================================
+  - slug: rn-familysearch-brazil-rio-grande-do-norte-catholic-church-reco-t1r37
+    display_name: "FamilySearch — RN Catholic Church Records"
+    scores:
+      accessibility:
+        score: 6
+        justification_en: |
+          Free FamilySearch account required, then full browse access —
+          algorithm anchor 6 cites FamilySearch by name.
+        justification_pt: |
+          Exige conta gratuita no FamilySearch e, então, acesso completo
+          de navegação — a ancoragem 6 do algoritmo cita o FamilySearch
+          nominalmente.
+      provenance_curatorial:
+        score: 5
+        justification_en: |
+          Partially indexed (names, dates, places, parents, godparents
+          for the indexed slice); browse images carry waypoint metadata
+          (município / paróquia / tipo / anos). Title and date reliable —
+          algorithm tier 5.
+        justification_pt: |
+          Parcialmente indexado (nomes, datas, lugares, pais, padrinhos
+          para a fatia indexada); as imagens de navegação trazem
+          metadados de waypoint (município / paróquia / tipo / anos).
+          Título e data confiáveis — faixa 5 do algoritmo.
+      corpus_completeness:
+        score: 6
+        justification_en: |
+          Over 1 million images for the Arquidiocese de Natal alone,
+          1755-2019, covering its parishes; interior RN dioceses (Mossoró,
+          Caicó) less complete — partial-to-substantial, scored algorithm
+          tier 6. Flag.
+        justification_pt: |
+          Mais de 1 milhão de imagens só para a Arquidiocese de Natal,
+          1755-2019, cobrindo suas paróquias; as dioceses do interior do
+          RN (Mossoró, Caicó) menos completas — de parcial a
+          substancial, nota na faixa 6 do algoritmo. Sinalizar.
+      finding_aids:
+        score: 6
+        justification_en: |
+          Indexed name search (partial) plus waypoint browse by
+          município / paróquia / record type and years — algorithm tier 6;
+          no full-text of the images.
+        justification_pt: |
+          Busca indexada por nome (parcial) mais navegação por waypoint
+          por município / paróquia / tipo de registro e anos — faixa 6 do
+          algoritmo; sem texto completo das imagens.
+      pipeline_ingestion_readiness:
+        score: 2
+        justification_en: |
+          Images sit behind a JS viewer (property 2 broken); the
+          waypoint/DGS hierarchy is enumerable in principle (property 5)
+          BUT FamilySearch ToS prohibits systematic downloading — the
+          binding constraint. Effectively one property, algorithm anchor
+          2. Flag: ToS.
+        justification_pt: |
+          As imagens ficam atrás de um visualizador JS (propriedade 2
+          quebrada); a hierarquia waypoint/DGS é enumerável em tese
+          (propriedade 5), MAS os termos do FamilySearch proíbem o
+          download sistemático — a restrição vinculante. Efetivamente uma
+          propriedade, ancoragem 2 do algoritmo. Sinalizar: termos de
+          uso.
+      uniqueness_non_duplication:
+        score: 6
+        justification_en: |
+          The images duplicate the Arquidiocese de Natal's own
+          consultation copy (survey row 37) and the physical originals;
+          FamilySearch and the diocesan copy are the two digital routes —
+          algorithm tier 6 "partial overlap".
+        justification_pt: |
+          As imagens duplicam a cópia de consulta da própria Arquidiocese
+          de Natal (linha 37 do levantamento) e os originais físicos;
+          FamilySearch e a cópia diocesana são as duas vias digitais —
+          faixa 6 do algoritmo: "sobreposição parcial".
+      scale:
+        score: 10
+        justification_en: |
+          Over 1,000,000 images for the Natal archdiocese alone —
+          comfortably past the 50,000+ page-equivalents anchor 10.
+        justification_pt: |
+          Mais de 1.000.000 de imagens só para a Arquidiocese de Natal —
+          confortavelmente acima da ancoragem 10 de 50.000+ páginas
+          equivalentes.
+      linkage_potential:
+        score: 6
+        justification_en: |
+          Parish registers are the canonical genealogical linkage source
+          and a partial name index already exists, but the unindexed bulk
+          is metadata-thin and needs transcription — algorithm tier 6.
+        justification_pt: |
+          Os registros paroquiais são a fonte canônica de vinculação
+          genealógica e já existe um índice parcial de nomes, mas o grosso
+          não indexado é pobre em metadados e precisa de transcrição —
+          faixa 6 do algoritmo.
+    facets:
+      institutional_type: third-party-hosted
+      licensing_posture: bulk-restricted
+      stated_roadmap: published-and-active
+      fair_use_eligible: true
+      size_unit_note: |
+        Denominated in FamilySearch images (one image ~ one register
+        page/opening). 1,000,000+ for the Arquidiocese de Natal;
+        collection date range 1755-2019, CID 2177294.
+      curatorial_rarity_notes: |
+        In February 2019 FamilySearch delivered the Arquidiocese de Natal
+        its own copy of 1M+ baptism/confirmation/marriage images for
+        local public consultation — a route around FamilySearch's ToS,
+        and the same state and record universe as the Mipibu corpus.
+      prior_use_note: |
+        RN genealogy and family history; the diocesan copy is used at the
+        Cúria Metropolitana de Natal. Same record universe as LABIM's
+        São José de Mipibu judicial series.
+    tags:
+      periods:
+        - late-colonial-pombaline-1700-1808
+        - joanine-1808-1822
+        - independence-first-reign-1822-1831
+        - regency-1831-1840
+        - second-reign-imperio-1840-1889
+        - old-republic-1889-1930
+        - vargas-1930-1945
+        - second-republic-1945-1964
+        - military-dictatorship-1964-1985
+        - new-republic-1985-present
+      record_types:
+        - ecclesiastical
+      themes:
+        - religious-life
+        - family-kinship
+        - slavery-freedom
+
+  # ================================================================
+  # 13. MA — FamilySearch: Brazil, Maranhão, Catholic Church Records
+  # ================================================================
+  - slug: ma-familysearch-brazil-maranhao-catholic-church-records-1673196-t1r39
+    display_name: "FamilySearch — Maranhão Catholic Church Records"
+    scores:
+      accessibility:
+        score: 6
+        justification_en: |
+          Free FamilySearch account then full browse access — algorithm
+          anchor 6.
+        justification_pt: |
+          Conta gratuita no FamilySearch e, então, acesso completo de
+          navegação — ancoragem 6 do algoritmo.
+      provenance_curatorial:
+        score: 5
+        justification_en: |
+          Partially indexed; browse images carry waypoint metadata
+          (município / paróquia / tipo / anos). Title and date reliable —
+          algorithm tier 5.
+        justification_pt: |
+          Parcialmente indexado; as imagens de navegação trazem metadados
+          de waypoint (município / paróquia / tipo / anos). Título e data
+          confiáveis — faixa 5 do algoritmo.
+      corpus_completeness:
+        score: 4
+        justification_en: |
+          Record and image counts are not published; "only partially
+          indexed, but have browsable images" — scored algorithm tier 4
+          "sparse coverage" pending a count. Flag.
+        justification_pt: |
+          Contagens de registros e imagens não são publicadas; "apenas
+          parcialmente indexado, mas com imagens navegáveis" — nota na
+          faixa 4 do algoritmo: "cobertura esparsa" até haver contagem.
+          Sinalizar.
+      finding_aids:
+        score: 6
+        justification_en: |
+          Partial name index plus waypoint browse by município / paróquia
+          / record type and years — algorithm tier 6, no full-text.
+        justification_pt: |
+          Índice parcial de nomes mais navegação por waypoint por
+          município / paróquia / tipo de registro e anos — faixa 6 do
+          algoritmo, sem texto completo.
+      pipeline_ingestion_readiness:
+        score: 2
+        justification_en: |
+          Same as the RN church collection: JS viewer (property 2
+          broken), enumerable in principle but FamilySearch ToS prohibits
+          systematic download. Algorithm anchor 2. Flag: ToS.
+        justification_pt: |
+          Igual à coleção da igreja no RN: visualizador JS (propriedade 2
+          quebrada), enumerável em tese, mas os termos do FamilySearch
+          proíbem o download sistemático. Ancoragem 2 do algoritmo.
+          Sinalizar: termos de uso.
+      uniqueness_non_duplication:
+        score: 8
+        justification_en: |
+          The only substantial digital source for Maranhão parish records,
+          and it starts in 1673 — the earliest start date of any Nordeste
+          parish collection. Overlap only with the physical originals —
+          algorithm tier 8.
+        justification_pt: |
+          A única fonte digital substancial para registros paroquiais do
+          Maranhão, e começa em 1673 — a data de início mais antiga de
+          qualquer coleção paroquial do Nordeste. Sobreposição só com os
+          originais físicos — faixa 8 do algoritmo.
+      scale:
+        score: 8
+        justification_en: |
+          Counts not published, but a state-wide parish collection
+          spanning 1673-1962 is almost certainly in the tens to hundreds
+          of thousands of images — scored algorithm tier 8 conservatively.
+          Flag: estimate.
+        justification_pt: |
+          Contagens não publicadas, mas uma coleção paroquial de todo o
+          estado abrangendo 1673-1962 está quase certamente na casa das
+          dezenas a centenas de milhares de imagens — nota conservadora
+          na faixa 8 do algoritmo. Sinalizar: estimativa.
+      linkage_potential:
+        score: 6
+        justification_en: |
+          Parish registers, partial name index; pairs naturally with the
+          TJMA judicial corpus (pass2) to build a linked São Luís /
+          Alcântara people-and-property dataset — algorithm tier 6.
+        justification_pt: |
+          Registros paroquiais, índice parcial de nomes; combina
+          naturalmente com o corpus judicial do TJMA (pass2) para montar
+          um conjunto vinculado de pessoas e propriedades de São Luís /
+          Alcântara — faixa 6 do algoritmo.
+    facets:
+      institutional_type: third-party-hosted
+      licensing_posture: bulk-restricted
+      stated_roadmap: published-and-active
+      fair_use_eligible: true
+      size_unit_note: |
+        Denominated in FamilySearch images. Counts not published on the
+        wiki; collection date range 1673-1962 (some parishes to 2018).
+      curatorial_rarity_notes: |
+        Earliest start date (1673) of any Nordeste FamilySearch parish
+        collection. No state-run alternative exists for MA parish
+        records. Pursue a diocesan copy (Arquidiocese de São Luís) on the
+        Arquidiocese de Natal precedent.
+      prior_use_note: |
+        Maranhão genealogy and colonial social history; complements the
+        TJMA inventários/testamentos corpus for person resolution.
+    tags:
+      periods:
+        - early-colonial-1500-1700
+        - late-colonial-pombaline-1700-1808
+        - joanine-1808-1822
+        - independence-first-reign-1822-1831
+        - regency-1831-1840
+        - second-reign-imperio-1840-1889
+        - old-republic-1889-1930
+        - vargas-1930-1945
+        - second-republic-1945-1964
+      record_types:
+        - ecclesiastical
+      themes:
+        - religious-life
+        - family-kinship
+        - slavery-freedom
+
+  # ================================================================
+  # 14. RN — FamilySearch: Brazil, Rio Grande do Norte, Civil
+  #     Registration
+  # ================================================================
+  - slug: rn-familysearch-brazil-rio-grande-do-norte-civil-registration-1-t1r43
+    display_name: "FamilySearch — RN Civil Registration"
+    scores:
+      accessibility:
+        score: 6
+        justification_en: |
+          Free FamilySearch account then full access to index and images
+          — algorithm anchor 6.
+        justification_pt: |
+          Conta gratuita no FamilySearch e, então, acesso completo ao
+          índice e às imagens — ancoragem 6 do algoritmo.
+      provenance_curatorial:
+        score: 5
+        justification_en: |
+          Both index and images; civil registration entries are
+          structured (name, date, place, filiation). Title and date
+          reliable, no fonds-level description — algorithm tier 5.
+        justification_pt: |
+          Índice e imagens; as entradas de registro civil são
+          estruturadas (nome, data, lugar, filiação). Título e data
+          confiáveis, sem descrição a nível de fundo — faixa 5 do
+          algoritmo.
+      corpus_completeness:
+        score: 6
+        justification_en: |
+          Collection dated 1803-2020, though Brazilian civil registration
+          only becomes systematic after 1889; partial (30-60%) of the RN
+          civil-registration universe — algorithm tier 6. Flag.
+        justification_pt: |
+          Coleção datada de 1803-2020, ainda que o registro civil
+          brasileiro só se torne sistemático após 1889; parcial (30-60%)
+          do universo do registro civil do RN — faixa 6 do algoritmo.
+          Sinalizar.
+      finding_aids:
+        score: 6
+        justification_en: |
+          A substantial name index plus waypoint browse — algorithm tier
+          6; civil-registration collections are more fully indexed than
+          the parish ones.
+        justification_pt: |
+          Um índice de nomes substancial mais navegação por waypoint —
+          faixa 6 do algoritmo; as coleções de registro civil são mais
+          plenamente indexadas do que as paroquiais.
+      pipeline_ingestion_readiness:
+        score: 2
+        justification_en: |
+          JS viewer (property 2 broken); enumerable in principle but
+          FamilySearch ToS prohibits systematic download. Algorithm anchor
+          2. Flag: ToS.
+        justification_pt: |
+          Visualizador JS (propriedade 2 quebrada); enumerável em tese,
+          mas os termos do FamilySearch proíbem o download sistemático.
+          Ancoragem 2 do algoritmo. Sinalizar: termos de uso.
+      uniqueness_non_duplication:
+        score: 4
+        justification_en: |
+          Civil registration is already heavily indexed and duplicated
+          across genealogy platforms — algorithm tier 4 "substantially
+          duplicated by better sources; still useful as backup / linkage".
+        justification_pt: |
+          O registro civil já é fortemente indexado e duplicado entre
+          plataformas de genealogia — faixa 4 do algoritmo:
+          "substancialmente duplicado por fontes melhores; ainda útil
+          como backup / vinculação".
+      scale:
+        score: 6
+        justification_en: |
+          RN image count not published; the comparable PE civil-
+          registration collection holds ~5.4M images, so RN is plausibly
+          in the tens of thousands — scored algorithm tier 6
+          conservatively. Flag: estimate.
+        justification_pt: |
+          Contagem de imagens do RN não publicada; a coleção comparável
+          de registro civil de PE tem ~5,4 milhões de imagens, então o RN
+          está plausivelmente nas dezenas de milhares — nota conservadora
+          na faixa 6 do algoritmo. Sinalizar: estimativa.
+      linkage_potential:
+        score: 7
+        justification_en: |
+          Survey: "highest-value linkage asset" for RN — civil
+          registration entries resolve persons named in the São José de
+          Mipibu inventários and processos. Structured entries, partial
+          index — algorithm tier 7, just short of "rich controlled
+          vocabulary".
+        justification_pt: |
+          Levantamento: "ativo de vinculação de maior valor" para o RN —
+          as entradas de registro civil resolvem pessoas citadas nos
+          inventários e processos de São José de Mipibu. Entradas
+          estruturadas, índice parcial — faixa 7 do algoritmo, logo
+          abaixo de "vocabulário controlado rico".
+    facets:
+      institutional_type: third-party-hosted
+      licensing_posture: bulk-restricted
+      stated_roadmap: published-and-active
+      fair_use_eligible: true
+      size_unit_note: |
+        Denominated in FamilySearch images with a name index. RN count
+        not published; date range 1803-2020.
+      curatorial_rarity_notes: |
+        Primary value is person linkage, not standalone corpus: resolves
+        individuals named in the LABIM/Mipibu São José de Mipibu judicial
+        records (habilitações de casamento, inventários, ações).
+      prior_use_note: |
+        RN genealogy; a natural authority layer for entity resolution
+        across the Mipibu corpus.
+    tags:
+      periods:
+        - second-reign-imperio-1840-1889
+        - old-republic-1889-1930
+        - vargas-1930-1945
+        - second-republic-1945-1964
+        - military-dictatorship-1964-1985
+        - new-republic-1985-present
+      record_types:
+        - demographic-census
+        - administrative-legislative
+      themes:
+        - family-kinship
+        - migration-diaspora
+
+  # ================================================================
+  # 15. PI — Arquivo Público do Estado do Piauí (APEPI / Casa
+  #     Anísio Brito)
+  # ================================================================
+  - slug: pi-arquivo-publico-do-estado-do-piaui-apepi-casa-anisio-brito-t1r47
+    display_name: "APEPI — Arquivo Público do Estado do Piauí (Casa Anísio Brito)"
+    scores:
+      accessibility:
+        score: 2
+        justification_en: |
+          The "Manuscritos Digitais" project makes images available
+          online with "acesso controlado"; the institutional site
+          redirected to a state portal from this session (2026-08-27).
+          Effectively algorithm tier 2 "finding aid or metadata only;
+          documents in-person only" for now. Flag: site unstable.
+        justification_pt: |
+          O projeto "Manuscritos Digitais" disponibiliza imagens on-line
+          com "acesso controlado"; o site institucional redirecionou para
+          um portal estadual nesta sessão (27/08/2026). Efetivamente
+          faixa 2 do algoritmo: "instrumento de pesquisa ou metadados
+          apenas; documentos só presencialmente" por ora. Sinalizar:
+          site instável.
+      provenance_curatorial:
+        score: 4
+        justification_en: |
+          18th-19th century judicial and legislative fundos, periodicals
+          and photographs are described; item-level description quality
+          could not be verified. Scored algorithm tier 4 "minimal
+          metadata" conservatively. Flag.
+        justification_pt: |
+          Fundos judiciais e legislativos dos séculos 18-19, periódicos e
+          fotografias são descritos; a qualidade da descrição por item
+          não pôde ser verificada. Nota conservadora na faixa 4 do
+          algoritmo: "metadados mínimos". Sinalizar.
+      corpus_completeness:
+        score: 2
+        justification_en: |
+          450,000+ pages digitized since 2022, but "only about 5% of the
+          acervo is available on the internet" — algorithm tier 2 "token
+          coverage (<10%)" of stated scope.
+        justification_pt: |
+          Mais de 450.000 páginas digitalizadas desde 2022, mas "apenas
+          cerca de 5% do acervo está disponível na internet" — faixa 2 do
+          algoritmo: "cobertura simbólica (<10%)" do escopo declarado.
+      finding_aids:
+        score: 2
+        justification_en: |
+          An acervo listing exists (arquivopublico.pi.gov.br/acervo.php,
+          now redirecting) but an online item-level search over digital
+          objects could not be confirmed — algorithm tier 2 "institutional
+          catalog exists but doesn't index digital objects". Flag.
+        justification_pt: |
+          Existe uma listagem de acervo (arquivopublico.pi.gov.br/acervo.php,
+          agora redirecionando), mas uma busca on-line por item sobre os
+          objetos digitais não pôde ser confirmada — faixa 2 do
+          algoritmo: "catálogo institucional existe, mas não indexa
+          objetos digitais". Sinalizar.
+      pipeline_ingestion_readiness:
+        score: 1
+        justification_en: |
+          "Acesso controlado" to the online images, no documented API,
+          the institutional site unstable this session — no baseline
+          property is cleanly met. Algorithm anchor 1. Flag.
+        justification_pt: |
+          "Acesso controlado" às imagens on-line, sem API documentada,
+          site institucional instável nesta sessão — nenhuma propriedade
+          de base é atendida com clareza. Ancoragem 1 do algoritmo.
+          Sinalizar.
+      uniqueness_non_duplication:
+        score: 8
+        justification_en: |
+          Only digital source for most PI state records — Balaiada,
+          Guerra do Paraguai, Independência collections; Nupem Digital
+          (pass2) covers the judicial fundo only — algorithm tier 8.
+        justification_pt: |
+          Única fonte digital para a maioria dos documentos estaduais do
+          PI — coleções da Balaiada, da Guerra do Paraguai, da
+          Independência; o Nupem Digital (pass2) cobre só o fundo
+          judiciário — faixa 8 do algoritmo.
+      scale:
+        score: 10
+        justification_en: |
+          450,000+ pages digitized — far past the 50,000+ page-
+          equivalents anchor 10. Consistent with how Pass 2 scored TJMA
+          (scale 10 on ~2.5M images digitized) despite low public access.
+          Flag: only ~5% public.
+        justification_pt: |
+          Mais de 450.000 páginas digitalizadas — muito acima da
+          ancoragem 10 de 50.000+ páginas equivalentes. Coerente com como
+          a Pass 2 pontuou o TJMA (escala 10 sobre ~2,5 milhões de
+          imagens digitalizadas) apesar do baixo acesso público.
+          Sinalizar: só ~5% público.
+      linkage_potential:
+        score: 5
+        justification_en: |
+          18th-19th century manuscripts are name-dense in principle, but
+          with no metadata, no transcription and controlled access,
+          delivery requires full pipeline work first — algorithm tier 5.
+        justification_pt: |
+          Manuscritos dos séculos 18-19 são densos em nomes em tese, mas
+          sem metadados, sem transcrição e com acesso controlado, a
+          entrega exige antes um pipeline completo — faixa 5 do
+          algoritmo.
+    facets:
+      institutional_type: state-archive
+      licensing_posture: bulk-restricted
+      stated_roadmap: published-but-unmet
+      fair_use_eligible: true
+      size_unit_note: |
+        450,000+ pages digitized since 2022 under "Manuscritos Digitais"
+        (SIEC/SECULT); ~5% published online with controlled access.
+      curatorial_rarity_notes: |
+        Balaiada (1838-1841), Guerra do Paraguai and Independência
+        collections. Both UFPI vehicles — Nupem Digital and Museu de
+        História do Piauí — already act as publication channels for
+        APEPI-digitized material, so a partnership route exists.
+      prior_use_note: |
+        Piauí state historiography (Balaiada above all); the acknowledged
+        450k-scanned / 5%-published gap makes this the strongest
+        partnership case in the survey.
+    tags:
+      periods:
+        - late-colonial-pombaline-1700-1808
+        - joanine-1808-1822
+        - independence-first-reign-1822-1831
+        - regency-1831-1840
+        - second-reign-imperio-1840-1889
+        - old-republic-1889-1930
+        - vargas-1930-1945
+      record_types:
+        - judicial
+        - administrative-legislative
+        - manuscripts-books
+        - press-periodicals
+      themes:
+        - state-formation
+        - politics-power
+        - crime-punishment
+        - slavery-freedom
