@@ -172,6 +172,24 @@ def list_archives():
 # Detail
 
 
+@bp.route("/<slug>/eag.xml", methods=["GET"])
+def eag_xml(slug: str):
+    """Institution description as EAG 2012 XML (public, machine surface).
+
+    Same content served under the OAI ``eag`` metadataPrefix; this is the
+    stable per-institution URL. 404s for unknown slugs and for archives
+    that do not clear the public bar (see app/oai/queries.py).
+    """
+    from ...oai.eag import archive_to_eag
+    from ...oai.envelope import xml_response
+    from ...oai.queries import get_public_archive
+
+    archive = get_public_archive(slug)
+    if archive is None:
+        abort(404)
+    return xml_response(archive_to_eag(archive))
+
+
 @bp.route("/<slug>", methods=["GET"])
 def detail(slug: str):
     archive = _load_archive_or_404(slug)

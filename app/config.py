@@ -35,6 +35,20 @@ class BaseConfig:
     APP_NAME = "brasil-archives"
     APP_VERSION = "0.1.0"
 
+    # OAI-PMH provider identity (docs/oai-pmh-provider.md). The
+    # repository identifier is the host name used in ``oai:<id>:archive:<slug>``
+    # identifiers and the <oai-identifier> description block; keep it stable
+    # once published to a registry.
+    OAI_REPOSITORY_NAME = os.environ.get(
+        "OAI_REPOSITORY_NAME",
+        "brasil-archives — Catálogo de arquivos digitais brasileiros",
+    )
+    OAI_REPOSITORY_IDENTIFIER = os.environ.get(
+        "OAI_REPOSITORY_IDENTIFIER", "brasil-archives.from-bottom-to.top"
+    )
+    OAI_ADMIN_EMAIL = os.environ.get("OAI_ADMIN_EMAIL", "stevewil@gmail.com")
+    OAI_PAGE_SIZE = int(os.environ.get("OAI_PAGE_SIZE", "100"))
+
     # Admin/public split. When false (the public default), the scoring
     # forms, the facet editor, and the whole /harvest surface return 404.
     # Set BRASIL_ARCHIVES_ADMIN=1 on the internal deployment only.
