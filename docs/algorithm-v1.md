@@ -158,8 +158,8 @@ Twelve fields. Some human-tagged, some probe-updated, some free text.
 
 - **Time period** — 12-tag vocabulary, multi-select: Pre-colonial | Early Colonial 1500–1700 | Late Colonial/Pombaline 1700–1808 | Joanine 1808–1822 | Independence & First Reign 1822–1831 | Regency 1831–1840 | Second Reign/Império 1840–1889 | Old Republic 1889–1930 | Vargas 1930–1945 | Second Republic 1945–1964 | Military Dictatorship 1964–1985 | New Republic 1985–present. Burns/Skidmore periodization, Colonial subdivided.
 - **Licensing posture** — single-select: `redistribution-friendly` / `citation-only` / `bulk-restricted`. Internal-only; not scored, not surfaced on public site.
-- **Record type** — multi-select from vocabulary (Judicial, Notarial and land, Ecclesiastical, Administrative and legislative, Demographic and census, Slavery and post-abolition, Press and periodicals, Photographic and iconographic, Personal and institutional papers, Manuscripts and books, Audiovisual). Full vocabulary in `docs/vocabularies.md` (TBD).
-- **Themes** — multi-select from vocabulary (provisional; refine after tagging shortlist). Full vocabulary in `docs/vocabularies.md` (TBD).
+- **Record type** — multi-select from vocabulary (Judicial, Notarial and land, Ecclesiastical, Administrative and legislative, Demographic and census, Slavery and post-abolition, Press and periodicals, Photographic and iconographic, Personal and institutional papers, Manuscripts and books, Audiovisual). Full vocabulary in `docs/vocabularies.md`.
+- **Themes** — multi-select from vocabulary (provisional; refine after tagging shortlist). Full vocabulary in `docs/vocabularies.md`.
 - **Curatorial rarity notes** — free text. Room for observations like "holds one of three known copies of the 1611 visita pastoral to Pernambuco."
 - **Institutional type** — single-select: `national` / `federal-university` / `state-university` / `state-court` / `state-archive` / `municipal` / `diocesan` / `research-project` / `individual` / `third-party-hosted`.
 - **Stated roadmap** — single-select: `published-and-active` / `published-but-unmet` / `informal` / `none` / `not-applicable`.
