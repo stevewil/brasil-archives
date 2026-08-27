@@ -35,6 +35,11 @@ class BaseConfig:
     APP_NAME = "brasil-archives"
     APP_VERSION = "0.1.0"
 
+    # Admin/public split. When false (the public default), the scoring
+    # forms, the facet editor, and the whole /harvest surface return 404.
+    # Set BRASIL_ARCHIVES_ADMIN=1 on the internal deployment only.
+    ADMIN_UI_ENABLED = os.environ.get("BRASIL_ARCHIVES_ADMIN") == "1"
+
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
@@ -47,6 +52,9 @@ class TestingConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     WTF_CSRF_ENABLED = False
     SECRET_KEY = "testing-secret"
+    # Exercise the full internal UI by default; the gate itself is
+    # covered by tests that build an app with this flipped off.
+    ADMIN_UI_ENABLED = True
 
 
 class ProductionConfig(BaseConfig):

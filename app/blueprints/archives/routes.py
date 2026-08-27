@@ -27,6 +27,7 @@ from ...models import (
 )
 from ...services import federation as fed
 from ...services import scoring as svc
+from .._admin_gate import admin_only
 from .forms import FacetForm, ScoreForm, TagsForm
 
 bp = Blueprint("archives", __name__, url_prefix="/archives")
@@ -254,6 +255,7 @@ def _federation_preview(project: UpgradeProject) -> dict:
 
 
 @bp.route("/<slug>/score", methods=["POST"])
+@admin_only
 def submit_score(slug: str):
     archive = _load_archive_or_404(slug)
     form = ScoreForm()
@@ -290,6 +292,7 @@ def submit_score(slug: str):
 
 
 @bp.route("/<slug>/facets", methods=["GET", "POST"])
+@admin_only
 def edit_facets(slug: str):
     archive = _load_archive_or_404(slug)
     active = svc.active_facet_values(archive.id)

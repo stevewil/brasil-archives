@@ -21,7 +21,9 @@
     {% if archive.fair_use_eligible is none %}<span class="badge badge--muted">Not reviewed</span>
     {% elif archive.fair_use_eligible %}<span class="badge badge--ok">Yes</span>
     {% else %}<span class="badge badge--warn">No — ineligible for public site</span>{% endif %}
-    <a class="btn-secondary" href="{{ url_for('archives.edit_facets', slug=archive.slug) }}">Edit facets &amp; tags</a>
+    {% if admin_ui_enabled() %}
+      <a class="btn-secondary" href="{{ url_for('archives.edit_facets', slug=archive.slug) }}">Edit facets &amp; tags</a>
+    {% endif %}
   </p>
 </section>
 
@@ -61,6 +63,49 @@
 
 <section class="dimensions">
   <h2>Dimension scores</h2>
+
+  {% if not admin_ui_enabled() %}
+    {# Public: read-only summary. The scoring forms + revision history
+       are internal-only (BRASIL_ARCHIVES_ADMIN=1). #}
+    {% set scored_count = scores_by_dim.values() | selectattr('active') | list | length %}
+    {% if scored_count %}
+      <table class="data-table dimension-summary">
+        <thead>
+          <tr>
+            <th>Dimension</th>
+            <th class="num">Score</th>
+            <th>Justification</th>
+            <th>Scored</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for dim in dimensions %}
+            {% set entry = scores_by_dim[dim] %}
+            <tr id="{{ dim }}">
+              <td>{{ dimension_label(dim) }}</td>
+              <td class="num">{% if entry.active %}{{ entry.active.score }}/10{% else %}—{% endif %}</td>
+              <td>
+                {% if entry.active %}
+                  {% if get_locale()|string == 'pt' and entry.active.justification_pt %}
+                    {{ entry.active.justification_pt }}
+                  {% else %}
+                    {{ entry.active.justification_en }}
+                  {% endif %}
+                {% else %}
+                  <span class="text-muted">Pending review</span>
+                {% endif %}
+              </td>
+              <td class="text-small">
+                {% if entry.active %}{{ entry.active.scored_at.strftime('%Y-%m-%d') }}{% else %}—{% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="empty-note">{{ _("Not yet scored.") }}</p>
+    {% endif %}
+  {% else %}
   {% for dim in dimensions %}
     {% set entry = scores_by_dim[dim] %}
     <article class="dimension" id="{{ dim }}">
@@ -125,6 +170,7 @@
       </form>
     </article>
   {% endfor %}
+  {% endif %}
 </section>
 
 <section class="facets">

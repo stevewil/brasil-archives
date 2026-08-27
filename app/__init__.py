@@ -60,6 +60,13 @@ def create_app(config_name: str | None = None) -> Flask:
     from .i18n import vocab_label
     app.jinja_env.globals["vocab_label"] = vocab_label
 
+    # Admin/public split — templates use ``admin_ui_enabled()`` to hide
+    # scoring forms, the facet editor, and the Harvest nav link on the
+    # public deployment. See app/blueprints/_admin_gate.py.
+    app.jinja_env.globals["admin_ui_enabled"] = lambda: bool(
+        app.config.get("ADMIN_UI_ENABLED")
+    )
+
     # Import models so SQLAlchemy metadata is populated for migrations.
     # Import here (not at module top) to avoid circular imports.
     from . import models  # noqa: F401

@@ -20,6 +20,7 @@ from ...models import (
     HarvestRun,
     UpgradeProject,
 )
+from .._admin_gate import admin_only
 
 
 bp = Blueprint("harvest", __name__, url_prefix="/harvest")
@@ -60,6 +61,7 @@ def _json_or_none(text: str | None) -> Any:
 
 
 @bp.route("/", endpoint="index")
+@admin_only
 def index():
     """List every harvest run, newest first, with per-project rollups."""
     page = _parse_int(request.args.get("page"), default=1, minimum=1)
@@ -112,6 +114,7 @@ def index():
 
 
 @bp.route("/runs/<int:run_id>", endpoint="run_detail")
+@admin_only
 def run_detail(run_id: int):
     """Single harvest run — metadata, error rows, and record page."""
     run = db.session.get(HarvestRun, run_id)
@@ -178,6 +181,7 @@ def run_detail(run_id: int):
 
 
 @bp.route("/records/<int:record_id>", endpoint="record_detail")
+@admin_only
 def record_detail(record_id: int):
     """One aggregated_record — canonical, sets, raw XML."""
     rec = db.session.get(AggregatedRecord, record_id)

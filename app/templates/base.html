@@ -20,7 +20,9 @@
     <a class="brand" href="{{ url_for('main.index') }}">brasil-archives</a>
     <nav class="primary-nav">
       <a href="{{ url_for('archives.list_archives') }}">Archives</a>
-      <a href="{{ url_for('harvest.index') }}">Harvest</a>
+      {% if admin_ui_enabled() %}
+        <a href="{{ url_for('harvest.index') }}">Harvest</a>
+      {% endif %}
     </nav>
     <nav class="lang-switch">
       <a href="?lang=en" {% if get_locale() == 'en' %}aria-current="page"{% endif %}>EN</a>

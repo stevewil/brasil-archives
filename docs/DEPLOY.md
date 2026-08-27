@@ -28,7 +28,10 @@ Verified working 2026-08-27 with commit `a981b60` (Track 4).
    - `DATABASE_URL` — SQLite absolute path, e.g. `sqlite:////home/<user>/brasil-archives/instance/brasil_archives.db`
    - `SECRET_KEY` — real random value
    - `FLASK_DEBUG=0`
-   - `BRASIL_ARCHIVES_ADMIN` — leave unset for public (once Track 2 lands)
+   - `BRASIL_ARCHIVES_ADMIN` — **leave unset** on the public deployment.
+     Set it to `1` only on an internal/operator deployment: it unlocks the
+     scoring forms, the facet editor, and the entire `/harvest` surface
+     (all 404 otherwise). See `app/blueprints/_admin_gate.py`.
 5. DB initialized and seeded:
    ```bash
    FLASK_APP=wsgi.py flask db upgrade
