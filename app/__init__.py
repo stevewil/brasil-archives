@@ -54,6 +54,12 @@ def create_app(config_name: str | None = None) -> Flask:
     from flask_babel import get_locale
     app.jinja_env.globals["get_locale"] = get_locale
 
+    # Locale-aware vocabulary label helper. Templates call
+    # ``vocab_label(obj)`` in place of ``obj.label_en`` so PT visitors
+    # see ``label_pt`` where available and fall back cleanly.
+    from .i18n import vocab_label
+    app.jinja_env.globals["vocab_label"] = vocab_label
+
     # Import models so SQLAlchemy metadata is populated for migrations.
     # Import here (not at module top) to avoid circular imports.
     from . import models  # noqa: F401

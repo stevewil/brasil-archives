@@ -22,7 +22,7 @@
     <select name="institutional_type">
       <option value="">All</option>
       {% for it in institutional_types %}
-        <option value="{{ it.slug }}" {% if current.institutional_type == it.slug %}selected{% endif %}>{{ it.label_en }}</option>
+        <option value="{{ it.slug }}" {% if current.institutional_type == it.slug %}selected{% endif %}>{{ vocab_label(it) }}</option>
       {% endfor %}
     </select>
   </label>
@@ -67,7 +67,7 @@
           <a href="{{ url_for('archives.detail', slug=archive.slug) }}">{{ archive.name }}</a>
         </td>
         <td>{{ archive.home_state_code or '—' }}</td>
-        <td>{{ archive.institutional_type.label_en if archive.institutional_type else '—' }}</td>
+        <td>{{ vocab_label(archive.institutional_type) or '—' }}</td>
         <td>{% if archive.no_digital_content %}<span class="badge badge--muted">No content</span>{% else %}<span class="badge badge--ok">Available</span>{% endif %}</td>
         <td class="num">{% if axis_pipeline is not none %}{{ axis_pipeline }}/{{ axis_max }}{% else %}—{% endif %}</td>
         <td class="num">{% if axis_research is not none %}{{ axis_research }}/{{ axis_max }}{% else %}—{% endif %}</td>

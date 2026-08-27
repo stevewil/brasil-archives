@@ -11,7 +11,7 @@
   <h1>{{ archive.name }}</h1>
   <p class="page-header__lede">
     {{ archive.home_state_code or '—' }} ·
-    {{ archive.institutional_type.label_en if archive.institutional_type else '—' }} ·
+    {{ vocab_label(archive.institutional_type) or '—' }} ·
     {% if archive.canonical_url %}<a href="{{ archive.canonical_url }}" rel="noreferrer noopener">Canonical URL</a>{% else %}No canonical URL{% endif %}
     {% if archive.no_digital_content %} · <span class="badge badge--muted">No digital content</span>{% endif %}
   </p>
@@ -148,11 +148,11 @@
       {% else %}—{% endif %}
     </dd>
     <dt>Periods</dt>
-    <dd>{% for p in archive.periods %}<span class="tag">{{ p.label_en }}</span>{% else %}—{% endfor %}</dd>
+    <dd>{% for p in archive.periods %}<span class="tag">{{ vocab_label(p) }}</span>{% else %}—{% endfor %}</dd>
     <dt>Record types</dt>
-    <dd>{% for r in archive.record_types %}<span class="tag">{{ r.label_en }}</span>{% else %}—{% endfor %}</dd>
+    <dd>{% for r in archive.record_types %}<span class="tag">{{ vocab_label(r) }}</span>{% else %}—{% endfor %}</dd>
     <dt>Themes</dt>
-    <dd>{% for t in archive.themes %}<span class="tag">{{ t.label_en }}</span>{% else %}—{% endfor %}</dd>
+    <dd>{% for t in archive.themes %}<span class="tag">{{ vocab_label(t) }}</span>{% else %}—{% endfor %}</dd>
     <dt>Curatorial rarity notes</dt>
     <dd>{{ archive.curatorial_rarity_notes or '—' }}</dd>
     <dt>Prior use note</dt>

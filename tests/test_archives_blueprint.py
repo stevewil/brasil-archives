@@ -692,3 +692,31 @@ def test_submit_tags_persists(seeded_app, client):
             "old-republic-1889-1930",
         }
         assert {r.slug for r in archive.record_types} == {"judicial"}
+
+
+# --------------------------------------------------------------------------- #
+# Locale-aware vocabulary labels (Track 4 of UI polish)
+
+
+def test_list_view_renders_english_vocab_labels_by_default(seeded_app, client):
+    """Default locale (en) shows English institutional-type labels."""
+    resp = client.get("/archives/")
+    body = resp.get_data(as_text=True)
+    # LABIM/UFRN is federal-university; label_en="Federal university"
+    assert "Federal university" in body
+    # State court label_en="State court / tribunal"
+    assert "State court" in body
+
+
+def test_list_view_renders_portuguese_vocab_labels_when_lang_pt(seeded_app, client):
+    """?lang=pt swaps institutional-type labels to label_pt values."""
+    resp = client.get("/archives/?lang=pt")
+    body = resp.get_data(as_text=True)
+    # label_pt values for federal-university and state-court
+    assert "Universidade federal" in body
+    assert "Tribunal de justiça estadual" in body
+    # And the English forms should NOT appear as the Type column
+    # (they may still appear elsewhere; we only check the table cell format)
+    # A safer assertion: the specific EN forms are absent from this response.
+    assert "Federal university" not in body
+    assert "State court / tribunal" not in body
