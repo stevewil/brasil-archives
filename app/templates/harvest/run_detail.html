@@ -1,40 +1,40 @@
 {% extends "base.html" %}
-{% block title %}Harvest run #{{ run.id }}{% endblock %}
+{% block title %}{{ _("Harvest run #%(id)s", id=run.id) }}{% endblock %}
 
 {% block content %}
 <section class="page-header">
-  <p><a href="{{ url_for('harvest.index') }}">← All harvest runs</a></p>
-  <h1>Harvest run #{{ run.id }}</h1>
+  <p><a href="{{ url_for('harvest.index') }}">{{ _("← All harvest runs") }}</a></p>
+  <h1>{{ _("Harvest run #%(id)s", id=run.id) }}</h1>
 </section>
 
 <section class="run-meta">
   <dl class="kv">
-    <dt>Project</dt>
+    <dt>{{ _("Project") }}</dt>
     <dd>{% if run.upgrade_project %}<code>{{ run.upgrade_project.slug }}</code>{% else %}—{% endif %}</dd>
     <dt>metadataPrefix</dt>
     <dd><code>{{ run.metadata_prefix }}</code></dd>
-    <dt>Status</dt>
+    <dt>{{ _("Status") }}</dt>
     <dd><span class="status status--{{ run.status }}">{{ run.status }}</span></dd>
-    <dt>Source</dt>
+    <dt>{{ _("Source") }}</dt>
     <dd><code>{{ run.source }}</code></dd>
-    <dt>Started</dt>
+    <dt>{{ _("Started") }}</dt>
     <dd>{{ run.started_at.isoformat() if run.started_at else '—' }}</dd>
-    <dt>Finished</dt>
+    <dt>{{ _("Finished") }}</dt>
     <dd>{{ run.finished_at.isoformat() if run.finished_at else '—' }}</dd>
-    <dt>Selective from</dt>
+    <dt>{{ _("Selective from") }}</dt>
     <dd>{{ run.from_ts or '—' }}</dd>
-    <dt>Selective until</dt>
+    <dt>{{ _("Selective until") }}</dt>
     <dd>{{ run.until_ts or '—' }}</dd>
-    <dt>Records seen</dt>
+    <dt>{{ _("Records seen") }}</dt>
     <dd class="num">{{ run.records_seen }}</dd>
-    <dt>Upserted</dt>
+    <dt>{{ _("Upserted") }}</dt>
     <dd class="num">{{ run.records_upserted }}</dd>
-    <dt>Unchanged</dt>
+    <dt>{{ _("Unchanged") }}</dt>
     <dd class="num">{{ run.records_unchanged }}</dd>
-    <dt>Errors</dt>
+    <dt>{{ _("Errors") }}</dt>
     <dd class="num">{{ run.error_count }}</dd>
     {% if run.notes %}
-    <dt>Notes</dt>
+    <dt>{{ _("Notes") }}</dt>
     <dd>{{ run.notes }}</dd>
     {% endif %}
   </dl>
@@ -42,10 +42,10 @@
 
 {% if errors %}
 <section class="errors">
-  <h2>Errors ({{ run.error_count }}, first 50)</h2>
+  <h2>{{ _("Errors (%(n)s, first 50)", n=run.error_count) }}</h2>
   <table class="data-table">
     <thead>
-      <tr><th>Phase</th><th>OAI identifier</th><th>Message</th></tr>
+      <tr><th>{{ _("Phase") }}</th><th>{{ _("OAI identifier") }}</th><th>{{ _("Message") }}</th></tr>
     </thead>
     <tbody>
       {% for err in errors %}
@@ -61,15 +61,15 @@
 {% endif %}
 
 <section class="records">
-  <h2>Records ({{ records_total }})</h2>
+  <h2>{{ _("Records (%(n)s)", n=records_total) }}</h2>
   {% if record_rows %}
   <table class="data-table">
     <thead>
       <tr>
-        <th>OAI identifier</th>
-        <th>Title</th>
-        <th>Year</th>
-        <th>Datestamp</th>
+        <th>{{ _("OAI identifier") }}</th>
+        <th>{{ _("Title") }}</th>
+        <th>{{ _("Year") }}</th>
+        <th>{{ _("Datestamp") }}</th>
       </tr>
     </thead>
     <tbody>
@@ -92,15 +92,15 @@
 
   <nav class="pager">
     {% if has_prev %}
-      <a href="{{ url_for('harvest.run_detail', run_id=run.id, page=page - 1, page_size=page_size) }}">← previous</a>
+      <a href="{{ url_for('harvest.run_detail', run_id=run.id, page=page - 1, page_size=page_size) }}">{{ _("← previous") }}</a>
     {% endif %}
-    <span>page {{ page }}</span>
+    <span>{{ _("page %(n)s", n=page) }}</span>
     {% if has_next %}
-      <a href="{{ url_for('harvest.run_detail', run_id=run.id, page=page + 1, page_size=page_size) }}">next →</a>
+      <a href="{{ url_for('harvest.run_detail', run_id=run.id, page=page + 1, page_size=page_size) }}">{{ _("next →") }}</a>
     {% endif %}
   </nav>
   {% else %}
-  <p>No records associated with this run.</p>
+  <p>{{ _("No records associated with this run.") }}</p>
   {% endif %}
 </section>
 {% endblock %}

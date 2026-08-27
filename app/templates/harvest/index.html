@@ -1,22 +1,22 @@
 {% extends "base.html" %}
-{% block title %}Harvest runs{% endblock %}
+{% block title %}{{ _("Harvest runs") }}{% endblock %}
 
 {% block content %}
 <section class="page-header">
-  <h1>Harvest runs</h1>
+  <h1>{{ _("Harvest runs") }}</h1>
   <p class="page-header__lede">
-    Read-only view of the OAI-PMH aggregation store. Each row is one
-    invocation of <code>scripts/harvest.py</code>. See
-    <code>docs/harvest-design.md</code> for the pipeline.
+    {{ _("Read-only view of the OAI-PMH aggregation store. Each row is one invocation of") }}
+    <code>scripts/harvest.py</code>. {{ _("See") }}
+    <code>docs/harvest-design.md</code> {{ _("for the pipeline.") }}
   </p>
 </section>
 
 {% if rollups %}
 <section class="rollup">
-  <h2>Aggregated records by project</h2>
+  <h2>{{ _("Aggregated records by project") }}</h2>
   <table class="data-table">
     <thead>
-      <tr><th>Project</th><th>Prefix</th><th>Records</th></tr>
+      <tr><th>{{ _("Project") }}</th><th>{{ _("Prefix") }}</th><th>{{ _("Records") }}</th></tr>
     </thead>
     <tbody>
       {% for row in rollups %}
@@ -32,22 +32,22 @@
 {% endif %}
 
 <section class="runs">
-  <h2>Runs ({{ total }})</h2>
+  <h2>{{ _("Runs (%(n)s)", n=total) }}</h2>
   {% if runs %}
   <table class="data-table">
     <thead>
       <tr>
-        <th>Run</th>
-        <th>Project</th>
-        <th>Prefix</th>
-        <th>Status</th>
-        <th>Seen</th>
-        <th>Upserted</th>
-        <th>Unchanged</th>
-        <th>Errors</th>
-        <th>Started</th>
-        <th>Duration</th>
-        <th>Source</th>
+        <th>{{ _("Run") }}</th>
+        <th>{{ _("Project") }}</th>
+        <th>{{ _("Prefix") }}</th>
+        <th>{{ _("Status") }}</th>
+        <th>{{ _("Seen") }}</th>
+        <th>{{ _("Upserted") }}</th>
+        <th>{{ _("Unchanged") }}</th>
+        <th>{{ _("Errors") }}</th>
+        <th>{{ _("Started") }}</th>
+        <th>{{ _("Duration") }}</th>
+        <th>{{ _("Source") }}</th>
       </tr>
     </thead>
     <tbody>
@@ -81,15 +81,15 @@
 
   <nav class="pager">
     {% if has_prev %}
-      <a href="{{ url_for('harvest.index', page=page - 1, page_size=page_size) }}">← previous</a>
+      <a href="{{ url_for('harvest.index', page=page - 1, page_size=page_size) }}">{{ _("← previous") }}</a>
     {% endif %}
-    <span>page {{ page }}</span>
+    <span>{{ _("page %(n)s", n=page) }}</span>
     {% if has_next %}
-      <a href="{{ url_for('harvest.index', page=page + 1, page_size=page_size) }}">next →</a>
+      <a href="{{ url_for('harvest.index', page=page + 1, page_size=page_size) }}">{{ _("next →") }}</a>
     {% endif %}
   </nav>
   {% else %}
-  <p>No harvest runs recorded yet. Run <code>python scripts/harvest.py --project &lt;slug&gt;</code>.</p>
+  <p>{{ _("No harvest runs recorded yet. Run") }} <code>python scripts/harvest.py --project &lt;slug&gt;</code>.</p>
   {% endif %}
 </section>
 {% endblock %}

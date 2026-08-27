@@ -1,65 +1,65 @@
 {% extends "base.html" %}
-{% block title %}Archives{% endblock %}
+{% block title %}{{ _("Archives") }}{% endblock %}
 {% block description %}{{ _("Browse and filter the surveyed Brazilian digital archives by state, institutional type, and two-axis score.") }}{% endblock %}
 
 {% block content %}
 <section class="page-header">
-  <h1>Archives</h1>
-  <p class="page-header__lede">{{ rows|length }} archives shown. Each archive gets two axis totals out of {{ axis_max }} — Pipeline (access readiness) and Research (evidentiary density) — alongside the legacy naive sum. Rationale: <code>docs/adr-0001-two-axis-aggregation.md</code>.</p>
+  <h1>{{ _("Archives") }}</h1>
+  <p class="page-header__lede">{{ _("%(count)s archives shown. Each archive gets two axis totals out of %(max)s — Pipeline (access readiness) and Research (evidentiary density) — alongside the legacy naive sum. Rationale:", count=rows|length, max=axis_max) }} <code>docs/adr-0001-two-axis-aggregation.md</code>.</p>
 </section>
 
 <form method="get" class="filter-bar">
   <label>
-    State
+    {{ _("State") }}
     <select name="state">
-      <option value="">All</option>
+      <option value="">{{ _("All") }}</option>
       {% for st in states %}
         <option value="{{ st }}" {% if current.state == st %}selected{% endif %}>{{ st }}</option>
       {% endfor %}
     </select>
   </label>
   <label>
-    Type
+    {{ _("Type") }}
     <select name="institutional_type">
-      <option value="">All</option>
+      <option value="">{{ _("All") }}</option>
       {% for it in institutional_types %}
         <option value="{{ it.slug }}" {% if current.institutional_type == it.slug %}selected{% endif %}>{{ vocab_label(it) }}</option>
       {% endfor %}
     </select>
   </label>
   <label>
-    Content
+    {{ _("Content") }}
     <select name="content">
-      <option value="with" {% if current.content == 'with' %}selected{% endif %}>With digital content</option>
-      <option value="without" {% if current.content == 'without' %}selected{% endif %}>No digital content</option>
-      <option value="all" {% if current.content == 'all' %}selected{% endif %}>All</option>
+      <option value="with" {% if current.content == 'with' %}selected{% endif %}>{{ _("With digital content") }}</option>
+      <option value="without" {% if current.content == 'without' %}selected{% endif %}>{{ _("No digital content") }}</option>
+      <option value="all" {% if current.content == 'all' %}selected{% endif %}>{{ _("All") }}</option>
     </select>
   </label>
   <label>
-    Sort
+    {{ _("Sort") }}
     <select name="sort">
-      <option value="name" {% if current.sort == 'name' %}selected{% endif %}>Name (A–Z)</option>
-      <option value="pipeline" {% if current.sort == 'pipeline' %}selected{% endif %}>Pipeline axis (desc)</option>
-      <option value="research" {% if current.sort == 'research' %}selected{% endif %}>Research axis (desc)</option>
-      <option value="score" {% if current.sort == 'score' %}selected{% endif %}>Naive sum (desc)</option>
+      <option value="name" {% if current.sort == 'name' %}selected{% endif %}>{{ _("Name (A–Z)") }}</option>
+      <option value="pipeline" {% if current.sort == 'pipeline' %}selected{% endif %}>{{ _("Pipeline axis (desc)") }}</option>
+      <option value="research" {% if current.sort == 'research' %}selected{% endif %}>{{ _("Research axis (desc)") }}</option>
+      <option value="score" {% if current.sort == 'score' %}selected{% endif %}>{{ _("Naive sum (desc)") }}</option>
     </select>
   </label>
-  <button type="submit">Apply</button>
-  <a class="btn-secondary" href="{{ url_for('archives.list_archives') }}">Reset</a>
+  <button type="submit">{{ _("Apply") }}</button>
+  <a class="btn-secondary" href="{{ url_for('archives.list_archives') }}">{{ _("Reset") }}</a>
 </form>
 
 <div class="table-wrap">
 <table class="archives-table">
   <thead>
     <tr>
-      <th>Name</th>
-      <th>State</th>
-      <th>Type</th>
-      <th>Content</th>
-      <th class="num" title="Axis A: accessibility, finding_aids, pipeline_ingestion_readiness, scale">Pipeline</th>
-      <th class="num" title="Axis B: provenance_curatorial, corpus_completeness, uniqueness_non_duplication, linkage_potential">Research</th>
-      <th class="num" title="Legacy unweighted total; kept for continuity">Naive sum</th>
-      <th class="num">Dims</th>
+      <th>{{ _("Name") }}</th>
+      <th>{{ _("State") }}</th>
+      <th>{{ _("Type") }}</th>
+      <th>{{ _("Content") }}</th>
+      <th class="num" title="Axis A: accessibility, finding_aids, pipeline_ingestion_readiness, scale">{{ _("Pipeline") }}</th>
+      <th class="num" title="Axis B: provenance_curatorial, corpus_completeness, uniqueness_non_duplication, linkage_potential">{{ _("Research") }}</th>
+      <th class="num" title="{{ _('Legacy unweighted total; kept for continuity') }}">{{ _("Naive sum") }}</th>
+      <th class="num">{{ _("Dims") }}</th>
     </tr>
   </thead>
   <tbody>
@@ -70,14 +70,14 @@
         </td>
         <td>{{ archive.home_state_code or '—' }}</td>
         <td>{{ vocab_label(archive.institutional_type) or '—' }}</td>
-        <td>{% if archive.no_digital_content %}<span class="badge badge--muted">No content</span>{% else %}<span class="badge badge--ok">Available</span>{% endif %}</td>
+        <td>{% if archive.no_digital_content %}<span class="badge badge--muted">{{ _("No content") }}</span>{% else %}<span class="badge badge--ok">{{ _("Available") }}</span>{% endif %}</td>
         <td class="num">{% if axis_pipeline is not none %}{{ axis_pipeline }}/{{ axis_max }}{% else %}—{% endif %}</td>
         <td class="num">{% if axis_research is not none %}{{ axis_research }}/{{ axis_max }}{% else %}—{% endif %}</td>
         <td class="num">{{ naive_sum if naive_sum is not none else '—' }}</td>
         <td class="num">{{ scored_dims or 0 }}/8</td>
       </tr>
     {% else %}
-      <tr><td colspan="8" class="empty">No archives match these filters.</td></tr>
+      <tr><td colspan="8" class="empty">{{ _("No archives match these filters.") }}</td></tr>
     {% endfor %}
   </tbody>
 </table>

@@ -10,6 +10,7 @@ from flask import (
     request,
     url_for,
 )
+from flask_babel import lazy_gettext as _l
 from sqlalchemy import case, func, select
 from sqlalchemy.orm import selectinload
 
@@ -260,7 +261,7 @@ def submit_score(slug: str):
         db.session.rollback()
         raise
 
-    flash(f"Recorded score for {form.dimension.data}.", "success")
+    flash(_l("Recorded score for %(dim)s.") % {"dim": form.dimension.data}, "success")
     return redirect(url_for("archives.detail", slug=slug, _anchor=form.dimension.data))
 
 
@@ -358,7 +359,7 @@ def edit_facets(slug: str):
         except Exception:
             db.session.rollback()
             raise
-        flash("Facets updated.", "success")
+        flash(_l("Facets updated."), "success")
         return redirect(url_for("archives.edit_facets", slug=slug))
 
     if which == "tags":
@@ -379,7 +380,7 @@ def edit_facets(slug: str):
         except Exception:
             db.session.rollback()
             raise
-        flash("Tags updated.", "success")
+        flash(_l("Tags updated."), "success")
         return redirect(url_for("archives.edit_facets", slug=slug))
 
     abort(400)

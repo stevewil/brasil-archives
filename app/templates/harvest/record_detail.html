@@ -4,7 +4,7 @@
 {% block content %}
 <section class="page-header">
   <p>
-    <a href="{{ url_for('harvest.run_detail', run_id=record.harvest_run_id) }}">← Harvest run #{{ record.harvest_run_id }}</a>
+    <a href="{{ url_for('harvest.run_detail', run_id=record.harvest_run_id) }}">{{ _("← Harvest run #%(id)s", id=record.harvest_run_id) }}</a>
   </p>
   <h1><code>{{ record.oai_identifier }}</code></h1>
   {% if canonical.title %}<p class="page-header__lede">{{ canonical.title }}</p>{% endif %}
@@ -12,17 +12,17 @@
 
 <section class="record-meta">
   <dl class="kv">
-    <dt>Project</dt>
+    <dt>{{ _("Project") }}</dt>
     <dd>{% if project %}<code>{{ project.slug }}</code>{% else %}—{% endif %}</dd>
     <dt>metadataPrefix</dt>
     <dd><code>{{ record.metadata_prefix }}</code></dd>
-    <dt>OAI datestamp</dt>
+    <dt>{{ _("OAI datestamp") }}</dt>
     <dd><code>{{ record.datestamp }}</code></dd>
-    <dt>First seen</dt>
+    <dt>{{ _("First seen") }}</dt>
     <dd>{{ record.first_seen_at.isoformat() if record.first_seen_at else '—' }}</dd>
-    <dt>Last seen</dt>
+    <dt>{{ _("Last seen") }}</dt>
     <dd>{{ record.last_seen_at.isoformat() if record.last_seen_at else '—' }}</dd>
-    <dt>Raw SHA-256</dt>
+    <dt>{{ _("Raw SHA-256") }}</dt>
     <dd><code>{{ record.raw_xml_sha256 }}</code></dd>
     <dt>setSpecs</dt>
     <dd>
@@ -35,7 +35,7 @@
 
 {% if canonical %}
 <section class="canonical">
-  <h2>Canonical fields</h2>
+  <h2>{{ _("Canonical fields") }}</h2>
   <dl class="kv">
     {% for key, value in canonical.items() %}
       <dt>{{ key }}</dt>
@@ -60,18 +60,18 @@
 
 {% if raw_extracted %}
 <section class="raw-extracted">
-  <h2>Raw extractor output</h2>
+  <h2>{{ _("Raw extractor output") }}</h2>
   <details>
-    <summary>Show extracted JSON ({{ raw_extracted|length }} top-level key{{ 's' if raw_extracted|length != 1 else '' }})</summary>
+    <summary>{{ ngettext("Show extracted JSON (%(num)d top-level key)", "Show extracted JSON (%(num)d top-level keys)", raw_extracted|length) }}</summary>
     <pre>{{ raw_extracted|tojson(indent=2) }}</pre>
   </details>
 </section>
 {% endif %}
 
 <section class="raw-xml">
-  <h2>Raw OAI-PMH &lt;record&gt; XML</h2>
+  <h2>{{ _("Raw OAI-PMH <record> XML") }}</h2>
   <details>
-    <summary>Show raw XML ({{ record.raw_xml|length }} bytes)</summary>
+    <summary>{{ _("Show raw XML (%(n)s bytes)", n=record.raw_xml|length) }}</summary>
     <pre>{{ record.raw_xml }}</pre>
   </details>
 </section>

@@ -3,66 +3,84 @@
 {% block description %}{{ archive.name }} — {{ vocab_label(archive.institutional_type) or _("archive") }}{% if archive.home_state_code %}, {{ archive.home_state_code }}{% endif %}. {{ _("Two-axis pipeline/research score, facets, and live partner-project federation preview.") }}{% endblock %}
 
 {% macro dimension_label(dim) -%}
-  {{ dim.replace('_', ' ').title() }}
+{%- set names = {
+  "accessibility": _("Accessibility"),
+  "provenance_curatorial": _("Provenance & curatorial quality"),
+  "corpus_completeness": _("Corpus completeness"),
+  "finding_aids": _("Finding aids & indexes"),
+  "pipeline_ingestion_readiness": _("Pipeline ingestion readiness"),
+  "uniqueness_non_duplication": _("Uniqueness / non-duplication"),
+  "scale": _("Scale"),
+  "linkage_potential": _("Linkage potential"),
+} -%}
+{{- names.get(dim, dim.replace('_', ' ').title()) -}}
 {%- endmacro %}
 
 {% block content %}
+{% set loc = get_locale()|string %}
+{% set quadrant_labels = {
+  "n.a.": _("n.a."),
+  "High pipeline / High research": _("High pipeline / High research"),
+  "High pipeline / Low research": _("High pipeline / Low research"),
+  "Low pipeline / High research": _("Low pipeline / High research"),
+  "Low pipeline / Low research": _("Low pipeline / Low research"),
+} %}
 <section class="page-header">
-  <p class="crumbs"><a href="{{ url_for('archives.list_archives') }}">← All archives</a></p>
+  <p class="crumbs"><a href="{{ url_for('archives.list_archives') }}">{{ _("← All archives") }}</a></p>
   <h1>{{ archive.name }}</h1>
   <p class="page-header__lede">
     {{ archive.home_state_code or '—' }} ·
     {{ vocab_label(archive.institutional_type) or '—' }} ·
-    {% if archive.canonical_url %}<a href="{{ archive.canonical_url }}" rel="noreferrer noopener">Canonical URL</a>{% else %}No canonical URL{% endif %}
-    {% if archive.no_digital_content %} · <span class="badge badge--muted">No digital content</span>{% endif %}
+    {% if archive.canonical_url %}<a href="{{ archive.canonical_url }}" rel="noreferrer noopener">{{ _("Canonical URL") }}</a>{% else %}{{ _("No canonical URL") }}{% endif %}
+    {% if archive.no_digital_content %} · <span class="badge badge--muted">{{ _("No digital content") }}</span>{% endif %}
   </p>
   <p>
-    Fair use eligibility:
-    {% if archive.fair_use_eligible is none %}<span class="badge badge--muted">Not reviewed</span>
-    {% elif archive.fair_use_eligible %}<span class="badge badge--ok">Yes</span>
-    {% else %}<span class="badge badge--warn">No — ineligible for public site</span>{% endif %}
+    {{ _("Fair use eligibility") }}:
+    {% if archive.fair_use_eligible is none %}<span class="badge badge--muted">{{ _("Not reviewed") }}</span>
+    {% elif archive.fair_use_eligible %}<span class="badge badge--ok">{{ _("Yes") }}</span>
+    {% else %}<span class="badge badge--warn">{{ _("No — ineligible for public site") }}</span>{% endif %}
     {% if admin_ui_enabled() %}
-      <a class="btn-secondary" href="{{ url_for('archives.edit_facets', slug=archive.slug) }}">Edit facets &amp; tags</a>
+      <a class="btn-secondary" href="{{ url_for('archives.edit_facets', slug=archive.slug) }}">{{ _("Edit facets & tags") }}</a>
     {% endif %}
   </p>
 </section>
 
 <section class="score-summary">
-  <h2>Score profile</h2>
+  <h2>{{ _("Score profile") }}</h2>
   {% if naive_sum is none %}
     <p class="empty-note">{{ _("This archive has not been scored yet. The two-axis profile appears here once it has been evaluated.") }}</p>
   {% endif %}
   <div class="axis-card">
     <div class="axis-card__axis">
-      <div class="axis-card__label" title="{{ axis_labels['pipeline']['long_en'] }}">{{ axis_labels['pipeline']['en'] }}</div>
+      <div class="axis-card__label" title="{{ axis_labels['pipeline']['long_pt' if loc == 'pt' else 'long_en'] }}">{{ axis_labels['pipeline']['pt' if loc == 'pt' else 'en'] }}</div>
       <div class="axis-card__value">
         {% if axes['pipeline'] is not none %}{{ axes['pipeline'] }}<span class="axis-card__max">/{{ axis_max }}</span>{% else %}—{% endif %}
       </div>
       <div class="axis-card__members text-small">{{ axis_members['pipeline'] | map('replace', '_', ' ') | join(' · ') }}</div>
     </div>
     <div class="axis-card__axis">
-      <div class="axis-card__label" title="{{ axis_labels['research']['long_en'] }}">{{ axis_labels['research']['en'] }}</div>
+      <div class="axis-card__label" title="{{ axis_labels['research']['long_pt' if loc == 'pt' else 'long_en'] }}">{{ axis_labels['research']['pt' if loc == 'pt' else 'en'] }}</div>
       <div class="axis-card__value">
         {% if axes['research'] is not none %}{{ axes['research'] }}<span class="axis-card__max">/{{ axis_max }}</span>{% else %}—{% endif %}
       </div>
       <div class="axis-card__members text-small">{{ axis_members['research'] | map('replace', '_', ' ') | join(' · ') }}</div>
     </div>
     <div class="axis-card__quadrant">
-      <div class="axis-card__label">Quadrant</div>
-      <div class="axis-card__quadrant-value">{{ quadrant }}</div>
+      <div class="axis-card__label">{{ _("Quadrant") }}</div>
+      <div class="axis-card__quadrant-value">{{ quadrant_labels.get(quadrant, quadrant) }}</div>
     </div>
   </div>
   <dl class="summary-grid">
-    <dt>Naive sum (0–80, legacy)</dt>
+    <dt>{{ _("Naive sum (0–80, legacy)") }}</dt>
     <dd>{{ naive_sum if naive_sum is not none else '—' }}</dd>
-    <dt>Dimensions scored</dt>
+    <dt>{{ _("Dimensions scored") }}</dt>
     <dd>{{ (scores_by_dim.values() | selectattr('active') | list | length) }}/8</dd>
   </dl>
-  <p class="disclaimer">Naive sum kept for continuity; ranking uses the two-axis view. See <code>docs/adr-0001-two-axis-aggregation.md</code>.</p>
+  <p class="disclaimer">{{ _("Naive sum kept for continuity; ranking uses the two-axis view. See") }} <code>docs/adr-0001-two-axis-aggregation.md</code>.</p>
 </section>
 
 <section class="dimensions">
-  <h2>Dimension scores</h2>
+  <h2>{{ _("Dimension scores") }}</h2>
 
   {% if not admin_ui_enabled() %}
     {# Public: read-only summary. The scoring forms + revision history
@@ -72,10 +90,10 @@
       <table class="data-table dimension-summary">
         <thead>
           <tr>
-            <th>Dimension</th>
-            <th class="num">Score</th>
-            <th>Justification</th>
-            <th>Scored</th>
+            <th>{{ _("Dimension") }}</th>
+            <th class="num">{{ _("Score") }}</th>
+            <th>{{ _("Justification") }}</th>
+            <th>{{ _("Scored") }}</th>
           </tr>
         </thead>
         <tbody>
@@ -86,13 +104,13 @@
               <td class="num">{% if entry.active %}{{ entry.active.score }}/10{% else %}—{% endif %}</td>
               <td>
                 {% if entry.active %}
-                  {% if get_locale()|string == 'pt' and entry.active.justification_pt %}
+                  {% if loc == 'pt' and entry.active.justification_pt %}
                     {{ entry.active.justification_pt }}
                   {% else %}
                     {{ entry.active.justification_en }}
                   {% endif %}
                 {% else %}
-                  <span class="text-muted">Pending review</span>
+                  <span class="text-muted">{{ _("Pending review") }}</span>
                 {% endif %}
               </td>
               <td class="text-small">
@@ -112,34 +130,34 @@
       <header class="dimension__header">
         <h3>{{ dimension_label(dim) }}</h3>
         <span class="dimension__score">
-          {% if entry.active %}{{ entry.active.score }}/10{% else %}<em>unscored</em>{% endif %}
+          {% if entry.active %}{{ entry.active.score }}/10{% else %}<em>{{ _("unscored") }}</em>{% endif %}
         </span>
       </header>
 
       {% if entry.active %}
         <details class="dimension__current" open>
-          <summary>Current justification</summary>
+          <summary>{{ _("Current justification") }}</summary>
           <p>{{ entry.active.justification_en }}</p>
           {% if entry.active.justification_pt %}
             <p class="text-muted"><strong>PT:</strong> {{ entry.active.justification_pt }}</p>
           {% endif %}
           <p class="text-small">
-            Scored {{ entry.active.scored_at.strftime('%Y-%m-%d %H:%M') }}
-            {% if entry.active.scored_by %} by {{ entry.active.scored_by }}{% endif %}.
+            {{ _("Scored") }} {{ entry.active.scored_at.strftime('%Y-%m-%d %H:%M') }}
+            {% if entry.active.scored_by %} {{ _("by") }} {{ entry.active.scored_by }}{% endif %}.
           </p>
         </details>
       {% endif %}
 
       {% if entry.history | length > (1 if entry.active else 0) %}
         <details class="dimension__history">
-          <summary>History ({{ entry.history | length }} revisions)</summary>
+          <summary>{{ _("History (%(n)s revisions)", n=entry.history | length) }}</summary>
           <ol class="history-list">
             {% for row in entry.history %}
               <li>
                 <span class="hist-score">{{ row.score }}/10</span>
                 <span class="hist-when">{{ row.scored_at.strftime('%Y-%m-%d %H:%M') }}</span>
-                {% if row.scored_by %}<span class="hist-who">by {{ row.scored_by }}</span>{% endif %}
-                {% if row.superseded_at %}<span class="badge badge--muted">superseded</span>{% endif %}
+                {% if row.scored_by %}<span class="hist-who">{{ _("by") }} {{ row.scored_by }}</span>{% endif %}
+                {% if row.superseded_at %}<span class="badge badge--muted">{{ _("superseded") }}</span>{% endif %}
                 <p class="hist-just">{{ row.justification_en }}</p>
               </li>
             {% endfor %}
@@ -151,22 +169,22 @@
         {{ entry.form.csrf_token }}
         {{ entry.form.dimension(value=dim) }}
         <label>
-          Score
+          {{ _("Score") }}
           {{ entry.form.score(min=0, max=10) }}
         </label>
         <label>
-          Justification (EN)
-          {{ entry.form.justification_en(rows=3, placeholder="Evidence for this score…") }}
+          {{ _("Justification (EN)") }}
+          {{ entry.form.justification_en(rows=3, placeholder=_("Evidence for this score…")) }}
         </label>
         <label>
-          Justification (PT, optional)
+          {{ _("Justification (PT, optional)") }}
           {{ entry.form.justification_pt(rows=2) }}
         </label>
         <label>
-          Scored by
-          {{ entry.form.scored_by(placeholder="handle or initials") }}
+          {{ _("Scored by") }}
+          {{ entry.form.scored_by(placeholder=_("handle or initials")) }}
         </label>
-        <button type="submit">Save score</button>
+        <button type="submit">{{ _("Save score") }}</button>
       </form>
     </article>
   {% endfor %}
@@ -174,45 +192,45 @@
 </section>
 
 <section class="facets">
-  <h2>Facets &amp; tags</h2>
+  <h2>{{ _("Facets & tags") }}</h2>
   <dl class="summary-grid">
-    <dt>Licensing posture</dt>
+    <dt>{{ _("Licensing posture") }}</dt>
     <dd>
       {% if 'licensing_posture' in active_facets %}
         {{ active_facets['licensing_posture'].value }}
         {% if active_facets['licensing_posture'].note %} — <em>{{ active_facets['licensing_posture'].note }}</em>{% endif %}
       {% else %}—{% endif %}
     </dd>
-    <dt>Stated roadmap</dt>
+    <dt>{{ _("Stated roadmap") }}</dt>
     <dd>
       {% if 'stated_roadmap' in active_facets %}
         {{ active_facets['stated_roadmap'].value }}
         {% if active_facets['stated_roadmap'].note %} — <em>{{ active_facets['stated_roadmap'].note }}</em>{% endif %}
       {% else %}—{% endif %}
     </dd>
-    <dt title="Whether the archive's own access surface supports scholarly workflows or whether it takes federation tooling to reach.">Scholarly access, practical</dt>
+    <dt title="{{ _('Whether the archive\'s own access surface supports scholarly workflows or whether it takes federation tooling to reach.') }}">{{ _("Scholarly access, practical") }}</dt>
     <dd>
       {% if 'scholarly_access_practical' in active_facets %}
         {{ active_facets['scholarly_access_practical'].value }}
         {% if active_facets['scholarly_access_practical'].note %} — <em>{{ active_facets['scholarly_access_practical'].note }}</em>{% endif %}
       {% else %}—{% endif %}
     </dd>
-    <dt>Periods</dt>
+    <dt>{{ _("Periods") }}</dt>
     <dd>{% for p in archive.periods %}<span class="tag">{{ vocab_label(p) }}</span>{% else %}—{% endfor %}</dd>
-    <dt>Record types</dt>
+    <dt>{{ _("Record types") }}</dt>
     <dd>{% for r in archive.record_types %}<span class="tag">{{ vocab_label(r) }}</span>{% else %}—{% endfor %}</dd>
-    <dt>Themes</dt>
+    <dt>{{ _("Themes") }}</dt>
     <dd>{% for t in archive.themes %}<span class="tag">{{ vocab_label(t) }}</span>{% else %}—{% endfor %}</dd>
-    <dt>Curatorial rarity notes</dt>
+    <dt>{{ _("Curatorial rarity notes") }}</dt>
     <dd>{{ archive.curatorial_rarity_notes or '—' }}</dd>
-    <dt>Prior use note</dt>
+    <dt>{{ _("Prior use note") }}</dt>
     <dd>{{ archive.prior_use_note or '—' }}</dd>
   </dl>
 </section>
 
 {% if upgrade_projects %}
   <section class="upgrade-projects">
-    <h2>Registered upgrade projects <small class="h2-subtitle">/ Projetos de melhoria registrados</small></h2>
+    <h2>{{ _("Registered upgrade projects") }}</h2>
     <ul class="upgrade-project-list">
       {% for proj in upgrade_projects %}
         {% set preview = federation_previews.get(proj.id, {}) %}
@@ -220,7 +238,7 @@
           <div class="upgrade-project-card__head">
             <strong>{{ proj.name }}</strong>
             <span class="upgrade-project-card__meta">
-              {{ proj.delivery_status }} · federation {{ proj.federation_contract_version }}
+              {{ proj.delivery_status }} · {{ _("federation") }} {{ proj.federation_contract_version }}
             </span>
           </div>
 
@@ -235,15 +253,15 @@
           {% if preview.available %}
             <div class="federation-live">
               <div>
-                <strong>Live federation preview</strong>
+                <strong>{{ _("Live federation preview") }}</strong>
                 <span class="federation-live__dot">•</span>
                 <span title="Fetched from {{ proj.json_api_base_url }}/health">
-                  {{ preview.record_count }} records available
+                  {{ _("%(n)s records available", n=preview.record_count) }}
                 </span>
                 {% if preview.stale %}
-                  <span class="federation-note federation-note--stale" title="Upstream unreachable; showing last cached response.">(cached, stale)</span>
+                  <span class="federation-note federation-note--stale" title="{{ _('Upstream unreachable; showing last cached response.') }}">{{ _("(cached, stale)") }}</span>
                 {% elif preview.from_cache %}
-                  <span class="federation-note" title="Served from the 15-minute local cache.">(cached)</span>
+                  <span class="federation-note" title="{{ _('Served from the 15-minute local cache.') }}">{{ _("(cached)") }}</span>
                 {% endif %}
               </div>
               {% if preview.corpus_version %}
@@ -254,7 +272,7 @@
               {% if preview.deep_link_all %}
                 <div class="federation-live__link">
                   <a href="{{ preview.deep_link_all }}" rel="noreferrer noopener" target="_blank">
-                    Browse the corpus →
+                    {{ _("Browse the corpus") }} →
                   </a>
                 </div>
               {% endif %}
@@ -262,12 +280,12 @@
           {% else %}
             <div class="federation-unavailable">
               {% if preview.reason == "not_registered" %}
-                Federation not yet configured for this upgrade project.
+                {{ _("Federation not yet configured for this upgrade project.") }}
               {% else %}
-                Federation preview unavailable right now.
+                {{ _("Federation preview unavailable right now.") }}
               {% endif %}
               {% if proj.primary_url %}
-                <a href="{{ proj.primary_url }}" rel="noreferrer noopener" target="_blank">Visit the project site →</a>
+                <a href="{{ proj.primary_url }}" rel="noreferrer noopener" target="_blank">{{ _("Visit the project site") }} →</a>
               {% endif %}
             </div>
           {% endif %}
@@ -277,7 +295,7 @@
               <a href="{{ proj.primary_url }}" rel="noreferrer noopener" target="_blank">{{ proj.primary_url }}</a>
             {% endif %}
             {% if proj.source_repo %}
-              · <a href="{{ proj.source_repo }}" rel="noreferrer noopener" target="_blank">source</a>
+              · <a href="{{ proj.source_repo }}" rel="noreferrer noopener" target="_blank">{{ _("source") }}</a>
             {% endif %}
           </div>
         </li>

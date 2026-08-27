@@ -1,84 +1,84 @@
 {% extends "base.html" %}
-{% block title %}Edit facets — {{ archive.name }}{% endblock %}
+{% block title %}{{ _("Edit facets") }} — {{ archive.name }}{% endblock %}
 
 {% block content %}
 <section class="page-header">
   <p class="crumbs">
-    <a href="{{ url_for('archives.list_archives') }}">← All archives</a>
+    <a href="{{ url_for('archives.list_archives') }}">{{ _("← All archives") }}</a>
     ·
     <a href="{{ url_for('archives.detail', slug=archive.slug) }}">{{ archive.name }}</a>
   </p>
-  <h1>Edit facets &amp; tags</h1>
+  <h1>{{ _("Edit facets & tags") }}</h1>
 </section>
 
 <form method="post" class="facet-form">
   {{ form.csrf_token }}
   <input type="hidden" name="form" value="facets">
 
-  <h2>Human-tagged facets</h2>
+  <h2>{{ _("Human-tagged facets") }}</h2>
   <label>
-    Licensing posture
+    {{ _("Licensing posture") }}
     {{ form.licensing_posture() }}
   </label>
   <label>
-    Licensing note
-    {{ form.licensing_posture_note(placeholder="e.g. CC-BY on metadata, images under contract") }}
+    {{ _("Licensing note") }}
+    {{ form.licensing_posture_note(placeholder=_("e.g. CC-BY on metadata, images under contract")) }}
   </label>
   <label>
-    Stated roadmap
+    {{ _("Stated roadmap") }}
     {{ form.stated_roadmap() }}
   </label>
   <label>
-    Roadmap note
+    {{ _("Roadmap note") }}
     {{ form.stated_roadmap_note() }}
   </label>
   <label>
-    Scholarly access, practical
+    {{ _("Scholarly access, practical") }}
     {{ form.scholarly_access_practical() }}
   </label>
   <label>
-    Scholarly access note
-    {{ form.scholarly_access_practical_note(placeholder="e.g. federation runs a Mipibu-style companion app") }}
+    {{ _("Scholarly access note") }}
+    {{ form.scholarly_access_practical_note(placeholder=_("e.g. federation runs a Mipibu-style companion app")) }}
   </label>
   <label>
-    Curatorial rarity notes
+    {{ _("Curatorial rarity notes") }}
     {{ form.curatorial_rarity_notes(rows=3) }}
   </label>
   <label>
-    Prior use note
+    {{ _("Prior use note") }}
     {{ form.prior_use_note(rows=3) }}
   </label>
 
-  <h2>Fair use eligibility</h2>
-  <p class="disclaimer">Fair use for scholarly work is the fundamental eligibility floor for inclusion on the public site.</p>
+  <h2>{{ _("Fair use eligibility") }}</h2>
+  <p class="disclaimer">{{ _("Fair use for scholarly work is the fundamental eligibility floor for inclusion on the public site.") }}</p>
   <label>
-    Eligible?
+    {{ _("Eligible?") }}
     {{ form.fair_use_eligible() }}
   </label>
   <label>
-    Set by
-    {{ form.set_by(placeholder="handle or initials") }}
+    {{ _("Set by") }}
+    {{ form.set_by(placeholder=_("handle or initials")) }}
   </label>
-  <button type="submit">Save facets</button>
+  <button type="submit">{{ _("Save facets") }}</button>
 </form>
 
 <form method="post" class="tags-form">
   {{ tags_form.csrf_token }}
   <input type="hidden" name="form" value="tags">
 
-  <h2>Multi-select tags</h2>
+  <h2>{{ _("Multi-select tags") }}</h2>
   <fieldset>
-    <legend>Periods</legend>
+    <legend>{{ _("Periods") }}</legend>
     {{ tags_form.periods() }}
   </fieldset>
   <fieldset>
-    <legend>Record types</legend>
+    <legend>{{ _("Record types") }}</legend>
     {{ tags_form.record_types() }}
   </fieldset>
   <fieldset>
-    <legend>Themes</legend>
+    <legend>{{ _("Themes") }}</legend>
     {{ tags_form.themes() }}
   </fieldset>
-  <button type="submit">Save tags</button>
+  <button type="submit">{{ _("Save tags") }}</button>
 </form>
 {% endblock %}

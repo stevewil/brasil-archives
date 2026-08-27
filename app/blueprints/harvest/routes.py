@@ -10,6 +10,7 @@ import json
 from typing import Any
 
 from flask import Blueprint, abort, render_template, request
+from flask_babel import lazy_gettext as _l
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
@@ -102,7 +103,7 @@ def index():
 
     return render_template(
         "harvest/index.html",
-        page_title="Harvest runs",
+        page_title=_l("Harvest runs"),
         runs=runs,
         rollups=rollups,
         page=page,
@@ -168,7 +169,7 @@ def run_detail(run_id: int):
 
     return render_template(
         "harvest/run_detail.html",
-        page_title=f"Harvest run #{run.id}",
+        page_title=_l("Harvest run #%(id)s") % {"id": run.id},
         run=run,
         record_rows=record_rows,
         errors=errors,
