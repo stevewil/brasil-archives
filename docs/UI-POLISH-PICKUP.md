@@ -1,6 +1,6 @@
 # Public UI Polish — Pickup Brief
 
-**Status:** 1 of 5 tracks landed. Continuing in focused batches.
+**Status:** 2 of 5 tracks landed (4, 5). Continuing in focused batches.
 **Scope:** Take `brasil-archives` from "working internal tool" to "coherent public site."
 
 > **See also:** [`docs/handoff/2026-08-27-master.md`](handoff/2026-08-27-master.md) — the master handoff for the whole three-repo ecosystem. This document zooms into the five UI-polish tracks.
@@ -9,13 +9,15 @@
 
 ## Progress
 
+**2 of 5 tracks landed** (4, 5). Remaining: 1, 2, 3.
+
 | Track | Status | Commit | Deployed |
 |-------|--------|--------|----------|
 | 1 — i18n catalog | Deferred | — | — |
 | 2 — Admin gating | Deferred | — | — |
 | 3 — Home redesign | Deferred | — | — |
 | **4 — Locale-aware vocab labels** | **✅ Landed 2026-08-27** | `a981b60` | Yes, verified via curl |
-| 5 — Metadata + inline-style cleanup | Deferred | — | — |
+| **5 — Metadata + inline-style cleanup** | **✅ Landed 2026-08-27** | `ad8c7d7` | Not yet — pending cPanel pull |
 
 ## Why the remaining tracks are staged, not one big push
 
@@ -242,15 +244,39 @@ rows have `label_pt` null; those fall back to EN transparently.
 
 ---
 
-### Track 5 — Metadata, empty states, inline-style cleanup
+### Track 5 — Metadata, empty states, inline-style cleanup ✅ LANDED 2026-08-27
 
-**Problem:** Thin `<title>`, no meta description, no OG tags, no favicon.
-`detail.html` upgrade-projects section has ~60 lines of inline
-`style="…"`. Detail pages show many `—` placeholders without framing.
+**Delivered:** commit `ad8c7d7`. Not yet pulled to cPanel.
 
-**Deliverable:** polished production feel.
+**What shipped:**
 
-**Steps:**
+- `base.html` — `<meta name="description">` fed by an overridable
+  `{% block description %}`; `og:type/site_name/title/description/locale`
+  (locale is `pt_BR`/`en_US` off `get_locale()`); `twitter:card`;
+  `<link rel="icon" href=".../favicon.svg">`.
+- `app/static/favicon.svg` — verde-brasil rounded square, "bA" monogram.
+- Per-page `{% block description %}` on `index.html`, `list.html`,
+  `detail.html` (detail interpolates archive name + type + state).
+- `detail.html` — every inline `style=""` in the upgrade-projects /
+  federation-preview block replaced by named classes; new `.empty-note`
+  above the score profile when `naive_sum is none`.
+- `list.html` — archives table wrapped in `.table-wrap`.
+- `style.css` — extracted `.upgrade-project-card*`, `.federation-live*`,
+  `.federation-unavailable`, `.corpus-version`, `.empty-note`,
+  `.table-wrap`; a `@media (max-width: 40rem)` block (header wrap, stacked
+  filter bar, single-column axis card + summary grid).
+- `tests/test_app.py` — 4 head-metadata / og:locale / description-override
+  assertions. Note: Flask-Babel caches the resolved locale for the app
+  context's lifetime and the `app` fixture holds one open per test, so the
+  EN and PT og:locale checks must be separate test functions.
+- `tests/test_template_hygiene.py::test_no_static_inline_style_attributes`
+  un-skipped (149 passed / 4 skipped).
+
+**Deferred within the track:** hiding unscored dimensions behind a
+collapsible `<details>` — that's a public-vs-admin view decision, so it
+moves to Track 2.
+
+**Original steps (kept for reference):**
 
 1. `base.html` head block:
    - Add `{% block description %}A federated catalog of Brazilian digital archives.{% endblock %}` and render as `<meta name="description">`

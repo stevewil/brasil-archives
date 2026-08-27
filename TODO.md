@@ -56,12 +56,14 @@ landable. Recommended order below (value-per-token).
   proposed helpers already exist (`scripts/dev/session_state.sh`,
   `tests/test_template_hygiene.py`). Only the i18n codemod is missing; it
   pays for itself on Track 1. Rules in master handoff §5.
-- [ ] **[M] Track 5 — metadata + favicon + inline-style cleanup.** Small,
-  visible, low-risk. `<meta description>`, OG tags, `favicon.svg`, extract
-  ~60 lines of inline `style="…"` from `detail.html`'s upgrade-projects
-  section into `style.css`, mobile `@media` rules, empty-state framing for
-  unscored archives. **After it lands:** un-skip
-  `test_template_hygiene.py::test_no_static_inline_style_attributes`.
+- [x] **Track 5 — metadata + favicon + inline-style cleanup.** Landed
+  `ad8c7d7`. `<meta description>` (overridable block) + OG/twitter tags +
+  `og:locale`, `favicon.svg`, inline `style=""` out of `detail.html` into
+  `style.css`, `@media (max-width: 40rem)` block, empty-state note for
+  unscored archives, `.table-wrap` around the archives table.
+  `test_no_static_inline_style_attributes` un-skipped. Not yet deployed to
+  cPanel. **Deferred within the track:** the "hide unscored dimensions /
+  collapsible" bit — belongs with Track 2's public/admin split.
 - [ ] **[M] Track 2 — admin/public split.** Highest-leverage remaining work:
   gets the 8 blank score forms, the facet-edit link, and the whole
   `/harvest/*` surface off public URLs. Env gate
