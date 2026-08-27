@@ -34,3 +34,31 @@ def test_lang_switch_present(client):
     r = client.get("/")
     assert b"lang=en" in r.data
     assert b"lang=pt" in r.data
+
+
+def test_head_metadata_present(client):
+    """Track 5: every page carries a description, OG tags, and a favicon."""
+    r = client.get("/")
+    assert b'<meta name="description"' in r.data
+    assert b'property="og:title"' in r.data
+    assert b'property="og:description"' in r.data
+    assert b'rel="icon"' in r.data and b"favicon.svg" in r.data
+
+
+def test_og_locale_en(client):
+    assert b'property="og:locale" content="en_US"' in client.get("/?lang=en").data
+
+
+def test_og_locale_pt(client):
+    # Separate test: Flask-Babel caches the resolved locale for the life of
+    # the app context, and the `app` fixture holds one open per test — so a
+    # single test can't exercise both locales.
+    assert b'property="og:locale" content="pt_BR"' in client.get("/?lang=pt").data
+
+
+def test_page_description_is_overridable(client):
+    """Per-page {% block description %} overrides the base default."""
+    generic = b"A federated catalog of Brazilian digital archives"
+    r = client.get("/archives/")
+    assert generic not in r.data
+    assert b"Browse and filter the surveyed Brazilian digital archives" in r.data

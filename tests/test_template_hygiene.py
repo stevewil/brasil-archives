@@ -14,8 +14,6 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-import pytest
-
 TEMPLATE_DIR = Path(__file__).parent.parent / "app" / "templates"
 
 
@@ -56,13 +54,8 @@ def test_no_direct_label_en_or_label_pt_access():
     )
 
 
-@pytest.mark.skip(
-    reason="Enable after UI Polish Track 5 lands (inline styles moved to "
-    "style.css). Currently detail.html upgrade-projects section has ~60 "
-    "lines of intentional inline styles awaiting Track 5."
-)
 def test_no_static_inline_style_attributes():
-    """Guardrail for Track 5.
+    """Guardrail for Track 5 (inline styles moved to style.css, 2026-08-27).
 
     Inline ``style="..."`` attributes with a static value belong in
     ``style.css``. Dynamic ones (``style="width: {{ pct }}%"``) are fine.

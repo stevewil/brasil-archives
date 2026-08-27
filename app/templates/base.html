@@ -4,6 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ page_title }}{% endblock %} — brasil-archives</title>
+  {% set page_description %}{% block description %}{{ _("A federated catalog of Brazilian digital archives — standards-aware, bilingual, and built for scholarship on the northeastern historical record.") }}{% endblock %}{% endset %}
+  <meta name="description" content="{{ page_description | trim }}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="brasil-archives">
+  <meta property="og:title" content="{{ self.title() | trim }}">
+  <meta property="og:description" content="{{ page_description | trim }}">
+  <meta property="og:locale" content="{{ 'pt_BR' if get_locale()|string == 'pt' else 'en_US' }}">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>

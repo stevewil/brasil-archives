@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}{{ archive.name }}{% endblock %}
+{% block description %}{{ archive.name }} — {{ vocab_label(archive.institutional_type) or _("archive") }}{% if archive.home_state_code %}, {{ archive.home_state_code }}{% endif %}. {{ _("Two-axis pipeline/research score, facets, and live partner-project federation preview.") }}{% endblock %}
 
 {% macro dimension_label(dim) -%}
   {{ dim.replace('_', ' ').title() }}
@@ -26,6 +27,9 @@
 
 <section class="score-summary">
   <h2>Score profile</h2>
+  {% if naive_sum is none %}
+    <p class="empty-note">{{ _("This archive has not been scored yet. The two-axis profile appears here once it has been evaluated.") }}</p>
+  {% endif %}
   <div class="axis-card">
     <div class="axis-card__axis">
       <div class="axis-card__label" title="{{ axis_labels['pipeline']['long_en'] }}">{{ axis_labels['pipeline']['en'] }}</div>
@@ -162,47 +166,47 @@
 
 {% if upgrade_projects %}
   <section class="upgrade-projects">
-    <h2>Registered upgrade projects <small style="font-weight:normal;">/ Projetos de melhoria registrados</small></h2>
-    <ul class="upgrade-project-list" style="list-style:none; padding:0;">
+    <h2>Registered upgrade projects <small class="h2-subtitle">/ Projetos de melhoria registrados</small></h2>
+    <ul class="upgrade-project-list">
       {% for proj in upgrade_projects %}
         {% set preview = federation_previews.get(proj.id, {}) %}
-        <li class="upgrade-project-card" style="border:1px solid #ccc; border-radius:6px; padding:1em; margin-bottom:1em;">
-          <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:0.5em;">
+        <li class="upgrade-project-card">
+          <div class="upgrade-project-card__head">
             <strong>{{ proj.name }}</strong>
-            <span style="font-size:0.85em; color:#666;">
+            <span class="upgrade-project-card__meta">
               {{ proj.delivery_status }} · federation {{ proj.federation_contract_version }}
             </span>
           </div>
 
           {% if proj.name_pt and proj.name_pt != proj.name %}
-            <div style="font-size:0.9em; color:#555;">{{ proj.name_pt }}</div>
+            <div class="upgrade-project-card__name-pt">{{ proj.name_pt }}</div>
           {% endif %}
 
           {% if proj.scope_description_en %}
-            <p style="margin:0.5em 0; font-size:0.95em;">{{ proj.scope_description_en }}</p>
+            <p class="upgrade-project-card__scope">{{ proj.scope_description_en }}</p>
           {% endif %}
 
           {% if preview.available %}
-            <div class="federation-live" style="background:#f4f9f4; padding:0.6em 0.8em; border-radius:4px; font-size:0.9em;">
+            <div class="federation-live">
               <div>
                 <strong>Live federation preview</strong>
-                <span style="color:#4a7c4a;">•</span>
+                <span class="federation-live__dot">•</span>
                 <span title="Fetched from {{ proj.json_api_base_url }}/health">
                   {{ preview.record_count }} records available
                 </span>
                 {% if preview.stale %}
-                  <span style="color:#a97400;" title="Upstream unreachable; showing last cached response.">(cached, stale)</span>
+                  <span class="federation-note federation-note--stale" title="Upstream unreachable; showing last cached response.">(cached, stale)</span>
                 {% elif preview.from_cache %}
-                  <span style="color:#666;" title="Served from the 15-minute local cache.">(cached)</span>
+                  <span class="federation-note" title="Served from the 15-minute local cache.">(cached)</span>
                 {% endif %}
               </div>
               {% if preview.corpus_version %}
-                <div style="font-family:monospace; font-size:0.8em; color:#666; word-break:break-all;">
+                <div class="corpus-version">
                   corpus_version: {{ preview.corpus_version[:16] }}…
                 </div>
               {% endif %}
               {% if preview.deep_link_all %}
-                <div style="margin-top:0.4em;">
+                <div class="federation-live__link">
                   <a href="{{ preview.deep_link_all }}" rel="noreferrer noopener" target="_blank">
                     Browse the corpus →
                   </a>
@@ -210,7 +214,7 @@
               {% endif %}
             </div>
           {% else %}
-            <div class="federation-unavailable" style="background:#faf4f4; padding:0.6em 0.8em; border-radius:4px; font-size:0.9em; color:#7c4a4a;">
+            <div class="federation-unavailable">
               {% if preview.reason == "not_registered" %}
                 Federation not yet configured for this upgrade project.
               {% else %}
@@ -222,7 +226,7 @@
             </div>
           {% endif %}
 
-          <div style="font-size:0.85em; color:#666; margin-top:0.4em;">
+          <div class="upgrade-project-card__links">
             {% if proj.primary_url %}
               <a href="{{ proj.primary_url }}" rel="noreferrer noopener" target="_blank">{{ proj.primary_url }}</a>
             {% endif %}

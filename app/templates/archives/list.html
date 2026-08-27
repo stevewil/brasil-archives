@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Archives{% endblock %}
+{% block description %}{{ _("Browse and filter the surveyed Brazilian digital archives by state, institutional type, and two-axis score.") }}{% endblock %}
 
 {% block content %}
 <section class="page-header">
@@ -47,6 +48,7 @@
   <a class="btn-secondary" href="{{ url_for('archives.list_archives') }}">Reset</a>
 </form>
 
+<div class="table-wrap">
 <table class="archives-table">
   <thead>
     <tr>
@@ -79,4 +81,5 @@
     {% endfor %}
   </tbody>
 </table>
+</div>
 {% endblock %}

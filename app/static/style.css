@@ -468,3 +468,116 @@ section.canonical pre, section.raw-extracted pre, section.raw-xml pre {
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+
+/* -------- Upgrade-projects / federation preview (detail.html) --------
+ * Extracted from inline style="" attributes (UI Polish Track 5). */
+.h2-subtitle { font-weight: normal; color: var(--muted); }
+
+.upgrade-project-list { list-style: none; padding: 0; margin: 0; }
+
+.upgrade-project-card {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: white;
+}
+
+.upgrade-project-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.upgrade-project-card__meta { font-size: 0.85rem; color: var(--muted); }
+.upgrade-project-card__name-pt { font-size: 0.9rem; color: #555; }
+.upgrade-project-card__scope { margin: 0.5rem 0; font-size: 0.95rem; }
+
+.federation-live {
+  background: #f4f9f4;
+  padding: 0.6rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.federation-live__dot { color: #4a7c4a; }
+.federation-live__link { margin-top: 0.4rem; }
+
+.federation-note { color: var(--muted); }
+.federation-note--stale { color: #a97400; }
+
+.corpus-version {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  color: var(--muted);
+  word-break: break-all;
+}
+
+.federation-unavailable {
+  background: #faf4f4;
+  padding: 0.6rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #7c4a4a;
+}
+
+.upgrade-project-card__links {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 0.4rem;
+  word-break: break-word;
+}
+
+/* Empty-state framing for unscored archives (detail.html). */
+.empty-note {
+  color: var(--muted);
+  font-size: 0.9rem;
+  background: #f4f4ee;
+  border-left: 3px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0 4px 4px 0;
+  margin: 0.5rem 0 1rem;
+}
+
+/* Horizontal scroll container for wide tables on small viewports. */
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* -------- Small viewports -------- */
+@media (max-width: 40rem) {
+  .site-header {
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .primary-nav {
+    order: 3;
+    flex-basis: 100%;
+    padding-left: 0;
+  }
+
+  .site-main { padding: 1.25rem 1rem; }
+
+  .hero h1 { font-size: 1.6rem; }
+  .hero .lede { font-size: 1rem; }
+
+  .filter-bar { flex-direction: column; align-items: stretch; }
+  .filter-bar label { width: 100%; }
+  .filter-bar select,
+  .filter-bar input { width: 100%; }
+
+  .archives-table { min-width: 34rem; }
+
+  .axis-card {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .axis-card__quadrant { min-width: 0; }
+
+  .summary-grid { grid-template-columns: 1fr; gap: 0.15rem 0; }
+  .summary-grid dt { margin-top: 0.5rem; }
+
+  .upgrade-project-card__head { flex-direction: column; gap: 0.15rem; }
+}
