@@ -35,6 +35,7 @@ Verified working 2026-08-27 with commit `a981b60` (Track 4).
    python -m scripts.load_vocabularies
    python -m scripts.load_survey
    python -m scripts.load_upgrade_projects
+   python -m scripts.load_calibration   # Pass 2 anchor scores; without it every detail page renders "—"
    ```
 6. Restart via **Setup Python App → Restart** or `touch tmp/restart.txt`.
 

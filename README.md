@@ -44,6 +44,7 @@ export FLASK_APP=wsgi.py
 .venv/bin/python -m scripts.load_vocabularies      # periods, record types, themes, institutional types
 .venv/bin/python -m scripts.load_survey            # 79 archives from the Nordeste survey
 .venv/bin/python -m scripts.load_upgrade_projects  # Mipibu (extend by dropping YAML in configs/upgrade_projects/)
+.venv/bin/python -m scripts.load_calibration       # Pass 2 paper scores for the 6 anchor archives (idempotent)
 
 .venv/bin/flask run                       # http://127.0.0.1:5000
 .venv/bin/python -m pytest                # test suite
