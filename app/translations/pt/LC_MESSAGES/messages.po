@@ -1,0 +1,819 @@
+# Portuguese translations for brasil-archives.
+# Copyright (C) 2026 brasil-archives
+# This file is distributed under the same license as the brasil-archives
+# project.
+# brasil-archives contributors, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: brasil-archives 0.1.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-08-27 13:41-0700\n"
+"PO-Revision-Date: 2026-08-27 14:00-0700\n"
+"Last-Translator: brasil-archives contributors\n"
+"Language: pt\n"
+"Language-Team: Portuguese (Brazil)\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: app/blueprints/archives/routes.py:264
+#, python-format
+msgid "Recorded score for %(dim)s."
+msgstr "Pontuação registrada para %(dim)s."
+
+#: app/blueprints/archives/routes.py:362
+msgid "Facets updated."
+msgstr "Facetas atualizadas."
+
+#: app/blueprints/archives/routes.py:383
+msgid "Tags updated."
+msgstr "Etiquetas atualizadas."
+
+#: app/blueprints/harvest/routes.py:106 app/templates/harvest/index.html:2
+#: app/templates/harvest/index.html:6
+msgid "Harvest runs"
+msgstr "Execuções de coleta"
+
+#: app/blueprints/harvest/routes.py:172 app/templates/harvest/run_detail.html:2
+#: app/templates/harvest/run_detail.html:7
+#, python-format
+msgid "Harvest run #%(id)s"
+msgstr "Execução de coleta #%(id)s"
+
+#: app/blueprints/main.py:30 app/templates/index.html:6
+msgid "Brazilian Digital Archives"
+msgstr "Arquivos Digitais Brasileiros"
+
+#: app/templates/archives/detail.html:3
+msgid ""
+"Two-axis pipeline/research score, facets, and live partner-project "
+"federation preview."
+msgstr ""
+"Pontuação de dois eixos (pipeline/pesquisa), facetas e pré-visualização "
+"ao vivo da federação de projetos parceiros."
+
+#: app/templates/archives/detail.html:3 app/templates/index.html:62
+msgid "archive"
+msgstr "arquivo"
+
+#: app/templates/archives/detail.html:7
+msgid "Accessibility"
+msgstr "Acessibilidade"
+
+#: app/templates/archives/detail.html:8
+msgid "Provenance & curatorial quality"
+msgstr "Proveniência e curadoria"
+
+#: app/templates/archives/detail.html:9
+msgid "Corpus completeness"
+msgstr "Completude do corpus"
+
+#: app/templates/archives/detail.html:10
+msgid "Finding aids & indexes"
+msgstr "Instrumentos de pesquisa e índices"
+
+#: app/templates/archives/detail.html:11
+msgid "Pipeline ingestion readiness"
+msgstr "Prontidão de ingestão no pipeline"
+
+#: app/templates/archives/detail.html:12
+msgid "Uniqueness / non-duplication"
+msgstr "Unicidade / não duplicação"
+
+#: app/templates/archives/detail.html:13
+msgid "Scale"
+msgstr "Escala"
+
+#: app/templates/archives/detail.html:14
+msgid "Linkage potential"
+msgstr "Potencial de vinculação"
+
+#: app/templates/archives/detail.html:22
+msgid "n.a."
+msgstr "n/d"
+
+#: app/templates/archives/detail.html:23
+msgid "High pipeline / High research"
+msgstr "Pipeline alto / Pesquisa alta"
+
+#: app/templates/archives/detail.html:24
+msgid "High pipeline / Low research"
+msgstr "Pipeline alto / Pesquisa baixa"
+
+#: app/templates/archives/detail.html:25
+msgid "Low pipeline / High research"
+msgstr "Pipeline baixo / Pesquisa alta"
+
+#: app/templates/archives/detail.html:26
+msgid "Low pipeline / Low research"
+msgstr "Pipeline baixo / Pesquisa baixa"
+
+#: app/templates/archives/detail.html:29 app/templates/archives/facets.html:7
+msgid "← All archives"
+msgstr "← Todos os arquivos"
+
+#: app/templates/archives/detail.html:34
+msgid "Canonical URL"
+msgstr "URL canônica"
+
+#: app/templates/archives/detail.html:34
+msgid "No canonical URL"
+msgstr "Sem URL canônica"
+
+#: app/templates/archives/detail.html:35 app/templates/archives/list.html:34
+msgid "No digital content"
+msgstr "Sem conteúdo digital"
+
+#: app/templates/archives/detail.html:38 app/templates/archives/facets.html:52
+msgid "Fair use eligibility"
+msgstr "Elegibilidade para uso justo"
+
+#: app/templates/archives/detail.html:39
+msgid "Not reviewed"
+msgstr "Não revisado"
+
+#: app/templates/archives/detail.html:40
+msgid "Yes"
+msgstr "Sim"
+
+#: app/templates/archives/detail.html:41
+msgid "No — ineligible for public site"
+msgstr "Não — inelegível para o site público"
+
+#: app/templates/archives/detail.html:43 app/templates/archives/facets.html:11
+msgid "Edit facets & tags"
+msgstr "Editar facetas e etiquetas"
+
+#: app/templates/archives/detail.html:49
+msgid "Score profile"
+msgstr "Perfil de pontuação"
+
+#: app/templates/archives/detail.html:51
+msgid ""
+"This archive has not been scored yet. The two-axis profile appears here "
+"once it has been evaluated."
+msgstr ""
+"Este arquivo ainda não foi avaliado. O perfil de dois eixos aparece aqui "
+"após a avaliação."
+
+#: app/templates/archives/detail.html:69
+msgid "Quadrant"
+msgstr "Quadrante"
+
+#: app/templates/archives/detail.html:74
+msgid "Naive sum (0–80, legacy)"
+msgstr "Soma não-ponderada (0–80, legada)"
+
+#: app/templates/archives/detail.html:76
+msgid "Dimensions scored"
+msgstr "Dimensões avaliadas"
+
+#: app/templates/archives/detail.html:79
+msgid "Naive sum kept for continuity; ranking uses the two-axis view. See"
+msgstr ""
+"A soma não-ponderada é mantida por continuidade; a ordenação usa a visão "
+"de dois eixos. Ver"
+
+#: app/templates/archives/detail.html:83
+msgid "Dimension scores"
+msgstr "Pontuações por dimensão"
+
+#: app/templates/archives/detail.html:93
+msgid "Dimension"
+msgstr "Dimensão"
+
+#: app/templates/archives/detail.html:94 app/templates/archives/detail.html:172
+#: app/templates/index.html:66
+msgid "Score"
+msgstr "Pontuação"
+
+#: app/templates/archives/detail.html:95
+msgid "Justification"
+msgstr "Justificativa"
+
+#: app/templates/archives/detail.html:96 app/templates/archives/detail.html:145
+msgid "Scored"
+msgstr "Avaliado em"
+
+#: app/templates/archives/detail.html:113
+msgid "Pending review"
+msgstr "Revisão pendente"
+
+#: app/templates/archives/detail.html:124
+msgid "Not yet scored."
+msgstr "Ainda não avaliado."
+
+#: app/templates/archives/detail.html:133
+msgid "unscored"
+msgstr "sem avaliação"
+
+#: app/templates/archives/detail.html:139
+msgid "Current justification"
+msgstr "Justificativa atual"
+
+#: app/templates/archives/detail.html:146
+#: app/templates/archives/detail.html:159
+msgid "by"
+msgstr "por"
+
+#: app/templates/archives/detail.html:153
+#, python-format
+msgid "History (%(n)s revisions)"
+msgstr "Histórico (%(n)s revisões)"
+
+#: app/templates/archives/detail.html:160
+msgid "superseded"
+msgstr "substituída"
+
+#: app/templates/archives/detail.html:176
+msgid "Justification (EN)"
+msgstr "Justificativa (EN)"
+
+#: app/templates/archives/detail.html:177
+msgid "Evidence for this score…"
+msgstr "Evidências para esta pontuação…"
+
+#: app/templates/archives/detail.html:180
+msgid "Justification (PT, optional)"
+msgstr "Justificativa (PT, opcional)"
+
+#: app/templates/archives/detail.html:184
+msgid "Scored by"
+msgstr "Avaliado por"
+
+#: app/templates/archives/detail.html:185 app/templates/archives/facets.html:60
+msgid "handle or initials"
+msgstr "identificador ou iniciais"
+
+#: app/templates/archives/detail.html:187
+msgid "Save score"
+msgstr "Salvar pontuação"
+
+#: app/templates/archives/detail.html:195
+msgid "Facets & tags"
+msgstr "Facetas e etiquetas"
+
+#: app/templates/archives/detail.html:197 app/templates/archives/facets.html:20
+msgid "Licensing posture"
+msgstr "Postura de licenciamento"
+
+#: app/templates/archives/detail.html:204 app/templates/archives/facets.html:28
+msgid "Stated roadmap"
+msgstr "Roteiro declarado"
+
+#: app/templates/archives/detail.html:211
+msgid ""
+"Whether the archive's own access surface supports scholarly workflows or "
+"whether it takes federation tooling to reach."
+msgstr ""
+"Se a própria interface de acesso do arquivo suporta fluxos de trabalho "
+"acadêmicos ou se é preciso ferramental de federação para alcançá-lo."
+
+#: app/templates/archives/detail.html:211 app/templates/archives/facets.html:36
+msgid "Scholarly access, practical"
+msgstr "Acesso acadêmico, na prática"
+
+#: app/templates/archives/detail.html:218 app/templates/archives/facets.html:71
+msgid "Periods"
+msgstr "Períodos"
+
+#: app/templates/archives/detail.html:220 app/templates/archives/facets.html:75
+msgid "Record types"
+msgstr "Tipos de documento"
+
+#: app/templates/archives/detail.html:222 app/templates/archives/facets.html:79
+msgid "Themes"
+msgstr "Temas"
+
+#: app/templates/archives/detail.html:224 app/templates/archives/facets.html:44
+msgid "Curatorial rarity notes"
+msgstr "Notas de raridade curatorial"
+
+#: app/templates/archives/detail.html:226 app/templates/archives/facets.html:48
+msgid "Prior use note"
+msgstr "Nota de uso anterior"
+
+#: app/templates/archives/detail.html:233
+msgid "Registered upgrade projects"
+msgstr "Projetos de melhoria registrados"
+
+#: app/templates/archives/detail.html:241
+msgid "federation"
+msgstr "federação"
+
+#: app/templates/archives/detail.html:256
+msgid "Live federation preview"
+msgstr "Pré-visualização de federação ao vivo"
+
+#: app/templates/archives/detail.html:259
+#, python-format
+msgid "%(n)s records available"
+msgstr "%(n)s registros disponíveis"
+
+#: app/templates/archives/detail.html:262
+msgid "Upstream unreachable; showing last cached response."
+msgstr "Origem inacessível; exibindo a última resposta em cache."
+
+#: app/templates/archives/detail.html:262
+msgid "(cached, stale)"
+msgstr "(em cache, desatualizado)"
+
+#: app/templates/archives/detail.html:264
+msgid "Served from the 15-minute local cache."
+msgstr "Servido a partir do cache local de 15 minutos."
+
+#: app/templates/archives/detail.html:264
+msgid "(cached)"
+msgstr "(em cache)"
+
+#: app/templates/archives/detail.html:275 app/templates/index.html:93
+msgid "Browse the corpus"
+msgstr "Explorar o corpus"
+
+#: app/templates/archives/detail.html:283
+msgid "Federation not yet configured for this upgrade project."
+msgstr "Federação ainda não configurada para este projeto de melhoria."
+
+#: app/templates/archives/detail.html:285
+msgid "Federation preview unavailable right now."
+msgstr "Pré-visualização de federação indisponível no momento."
+
+#: app/templates/archives/detail.html:288 app/templates/index.html:99
+msgid "Visit the project site"
+msgstr "Visitar o site do projeto"
+
+#: app/templates/archives/detail.html:298
+msgid "source"
+msgstr "código-fonte"
+
+#: app/templates/archives/facets.html:2
+msgid "Edit facets"
+msgstr "Editar facetas"
+
+#: app/templates/archives/facets.html:18
+msgid "Human-tagged facets"
+msgstr "Facetas atribuídas manualmente"
+
+#: app/templates/archives/facets.html:24
+msgid "Licensing note"
+msgstr "Nota de licenciamento"
+
+#: app/templates/archives/facets.html:25
+msgid "e.g. CC-BY on metadata, images under contract"
+msgstr "ex.: CC-BY nos metadados, imagens sob contrato"
+
+#: app/templates/archives/facets.html:32
+msgid "Roadmap note"
+msgstr "Nota do roteiro"
+
+#: app/templates/archives/facets.html:40
+msgid "Scholarly access note"
+msgstr "Nota de acesso acadêmico"
+
+#: app/templates/archives/facets.html:41
+msgid "e.g. federation runs a Mipibu-style companion app"
+msgstr "ex.: a federação executa um aplicativo complementar no estilo Mipibu"
+
+#: app/templates/archives/facets.html:53
+msgid ""
+"Fair use for scholarly work is the fundamental eligibility floor for "
+"inclusion on the public site."
+msgstr ""
+"O uso justo para trabalho acadêmico é o piso fundamental de elegibilidade"
+" para inclusão no site público."
+
+#: app/templates/archives/facets.html:55
+msgid "Eligible?"
+msgstr "Elegível?"
+
+#: app/templates/archives/facets.html:59
+msgid "Set by"
+msgstr "Definido por"
+
+#: app/templates/archives/facets.html:62
+msgid "Save facets"
+msgstr "Salvar facetas"
+
+#: app/templates/archives/facets.html:69
+msgid "Multi-select tags"
+msgstr "Etiquetas de múltipla escolha"
+
+#: app/templates/archives/facets.html:82
+msgid "Save tags"
+msgstr "Salvar etiquetas"
+
+#: app/templates/archives/list.html:2 app/templates/archives/list.html:7
+#: app/templates/base.html:22
+msgid "Archives"
+msgstr "Arquivos"
+
+#: app/templates/archives/list.html:3
+msgid ""
+"Browse and filter the surveyed Brazilian digital archives by state, "
+"institutional type, and two-axis score."
+msgstr ""
+"Explore e filtre os arquivos digitais brasileiros pesquisados por estado,"
+" tipo institucional e pontuação de dois eixos."
+
+#: app/templates/archives/list.html:8
+#, python-format
+msgid ""
+"%(count)s archives shown. Each archive gets two axis totals out of "
+"%(max)s — Pipeline (access readiness) and Research (evidentiary density) "
+"— alongside the legacy naive sum. Rationale:"
+msgstr ""
+"%(count)s arquivos exibidos. Cada arquivo recebe dois totais de eixo de "
+"%(max)s — Pipeline (prontidão de acesso) e Pesquisa (densidade "
+"probatória) — ao lado da soma não-ponderada legada. Fundamentação:"
+
+#: app/templates/archives/list.html:13 app/templates/archives/list.html:56
+msgid "State"
+msgstr "Estado"
+
+#: app/templates/archives/list.html:15 app/templates/archives/list.html:24
+#: app/templates/archives/list.html:35
+msgid "All"
+msgstr "Todos"
+
+#: app/templates/archives/list.html:22 app/templates/archives/list.html:57
+msgid "Type"
+msgstr "Tipo"
+
+#: app/templates/archives/list.html:31 app/templates/archives/list.html:58
+msgid "Content"
+msgstr "Conteúdo"
+
+#: app/templates/archives/list.html:33
+msgid "With digital content"
+msgstr "Com conteúdo digital"
+
+#: app/templates/archives/list.html:39
+msgid "Sort"
+msgstr "Ordenar"
+
+#: app/templates/archives/list.html:41
+msgid "Name (A–Z)"
+msgstr "Nome (A–Z)"
+
+#: app/templates/archives/list.html:42
+msgid "Pipeline axis (desc)"
+msgstr "Eixo de pipeline (decr.)"
+
+#: app/templates/archives/list.html:43
+msgid "Research axis (desc)"
+msgstr "Eixo de pesquisa (decr.)"
+
+#: app/templates/archives/list.html:44
+msgid "Naive sum (desc)"
+msgstr "Soma não-ponderada (decr.)"
+
+#: app/templates/archives/list.html:47
+msgid "Apply"
+msgstr "Aplicar"
+
+#: app/templates/archives/list.html:48
+msgid "Reset"
+msgstr "Redefinir"
+
+#: app/templates/archives/list.html:55
+msgid "Name"
+msgstr "Nome"
+
+#: app/templates/archives/list.html:59
+msgid "Pipeline"
+msgstr "Pipeline"
+
+#: app/templates/archives/list.html:60
+msgid "Research"
+msgstr "Pesquisa"
+
+#: app/templates/archives/list.html:61
+msgid "Legacy unweighted total; kept for continuity"
+msgstr "Total não-ponderado legado; mantido por continuidade"
+
+#: app/templates/archives/list.html:61
+msgid "Naive sum"
+msgstr "Soma não-ponderada"
+
+#: app/templates/archives/list.html:62
+msgid "Dims"
+msgstr "Dims"
+
+#: app/templates/archives/list.html:73
+msgid "No content"
+msgstr "Sem conteúdo"
+
+#: app/templates/archives/list.html:73
+msgid "Available"
+msgstr "Disponível"
+
+#: app/templates/archives/list.html:80
+msgid "No archives match these filters."
+msgstr "Nenhum arquivo corresponde a esses filtros."
+
+#: app/templates/base.html:7
+msgid ""
+"A federated catalog of Brazilian digital archives — standards-aware, "
+"bilingual, and built for scholarship on the northeastern historical "
+"record."
+msgstr ""
+"Um catálogo federado de arquivos digitais brasileiros — atento a padrões,"
+" bilíngue e voltado à pesquisa sobre o registro histórico nordestino."
+
+#: app/templates/base.html:24
+msgid "Harvest"
+msgstr "Coleta"
+
+#: app/templates/base.html:48
+msgid "Federated open metadata for Brazilian digital archives."
+msgstr "Metadados abertos e federados de arquivos digitais brasileiros."
+
+#: app/templates/harvest/index.html:8
+msgid ""
+"Read-only view of the OAI-PMH aggregation store. Each row is one "
+"invocation of"
+msgstr ""
+"Visão somente leitura do repositório de agregação OAI-PMH. Cada linha é "
+"uma invocação de"
+
+#: app/templates/harvest/index.html:9
+msgid "See"
+msgstr "Ver"
+
+#: app/templates/harvest/index.html:10
+msgid "for the pipeline."
+msgstr "para o pipeline."
+
+#: app/templates/harvest/index.html:16
+msgid "Aggregated records by project"
+msgstr "Registros agregados por projeto"
+
+#: app/templates/harvest/index.html:19
+msgid "Records"
+msgstr "Registros"
+
+#: app/templates/harvest/index.html:19 app/templates/harvest/index.html:41
+#: app/templates/harvest/record_detail.html:15
+#: app/templates/harvest/run_detail.html:12
+msgid "Project"
+msgstr "Projeto"
+
+#: app/templates/harvest/index.html:19 app/templates/harvest/index.html:42
+msgid "Prefix"
+msgstr "Prefixo"
+
+#: app/templates/harvest/index.html:35
+#, python-format
+msgid "Runs (%(n)s)"
+msgstr "Execuções (%(n)s)"
+
+#: app/templates/harvest/index.html:40
+msgid "Run"
+msgstr "Execução"
+
+#: app/templates/harvest/index.html:43 app/templates/harvest/run_detail.html:16
+msgid "Status"
+msgstr "Situação"
+
+#: app/templates/harvest/index.html:44
+msgid "Seen"
+msgstr "Vistos"
+
+#: app/templates/harvest/index.html:45 app/templates/harvest/run_detail.html:30
+msgid "Upserted"
+msgstr "Inseridos/atualizados"
+
+#: app/templates/harvest/index.html:46 app/templates/harvest/run_detail.html:32
+msgid "Unchanged"
+msgstr "Inalterados"
+
+#: app/templates/harvest/index.html:47 app/templates/harvest/run_detail.html:34
+msgid "Errors"
+msgstr "Erros"
+
+#: app/templates/harvest/index.html:48 app/templates/harvest/run_detail.html:20
+msgid "Started"
+msgstr "Iniciado"
+
+#: app/templates/harvest/index.html:49
+msgid "Duration"
+msgstr "Duração"
+
+#: app/templates/harvest/index.html:50 app/templates/harvest/run_detail.html:18
+msgid "Source"
+msgstr "Origem"
+
+#: app/templates/harvest/index.html:84 app/templates/harvest/run_detail.html:95
+msgid "← previous"
+msgstr "← anterior"
+
+#: app/templates/harvest/index.html:86 app/templates/harvest/run_detail.html:97
+#, python-format
+msgid "page %(n)s"
+msgstr "página %(n)s"
+
+#: app/templates/harvest/index.html:88 app/templates/harvest/run_detail.html:99
+msgid "next →"
+msgstr "próxima →"
+
+#: app/templates/harvest/index.html:92
+msgid "No harvest runs recorded yet. Run"
+msgstr "Nenhuma execução de coleta registrada ainda. Execute"
+
+#: app/templates/harvest/record_detail.html:7
+#, python-format
+msgid "← Harvest run #%(id)s"
+msgstr "← Execução de coleta #%(id)s"
+
+#: app/templates/harvest/record_detail.html:19
+msgid "OAI datestamp"
+msgstr "Datestamp OAI"
+
+#: app/templates/harvest/record_detail.html:21
+msgid "First seen"
+msgstr "Visto pela primeira vez"
+
+#: app/templates/harvest/record_detail.html:23
+msgid "Last seen"
+msgstr "Visto pela última vez"
+
+#: app/templates/harvest/record_detail.html:25
+msgid "Raw SHA-256"
+msgstr "SHA-256 bruto"
+
+#: app/templates/harvest/record_detail.html:38
+msgid "Canonical fields"
+msgstr "Campos canônicos"
+
+#: app/templates/harvest/record_detail.html:63
+msgid "Raw extractor output"
+msgstr "Saída bruta do extrator"
+
+#: app/templates/harvest/record_detail.html:65
+#, python-format
+msgid "Show extracted JSON (%(num)d top-level key)"
+msgid_plural "Show extracted JSON (%(num)d top-level keys)"
+msgstr[0] "Mostrar JSON extraído (%(num)d chave de nível superior)"
+msgstr[1] "Mostrar JSON extraído (%(num)d chaves de nível superior)"
+
+#: app/templates/harvest/record_detail.html:72
+msgid "Raw OAI-PMH <record> XML"
+msgstr "XML bruto <record> OAI-PMH"
+
+#: app/templates/harvest/record_detail.html:74
+#, python-format
+msgid "Show raw XML (%(n)s bytes)"
+msgstr "Mostrar XML bruto (%(n)s bytes)"
+
+#: app/templates/harvest/run_detail.html:6
+msgid "← All harvest runs"
+msgstr "← Todas as execuções de coleta"
+
+#: app/templates/harvest/run_detail.html:22
+msgid "Finished"
+msgstr "Concluído"
+
+#: app/templates/harvest/run_detail.html:24
+msgid "Selective from"
+msgstr "Seletivo a partir de"
+
+#: app/templates/harvest/run_detail.html:26
+msgid "Selective until"
+msgstr "Seletivo até"
+
+#: app/templates/harvest/run_detail.html:28
+msgid "Records seen"
+msgstr "Registros vistos"
+
+#: app/templates/harvest/run_detail.html:37
+msgid "Notes"
+msgstr "Notas"
+
+#: app/templates/harvest/run_detail.html:45
+#, python-format
+msgid "Errors (%(n)s, first 50)"
+msgstr "Erros (%(n)s, primeiros 50)"
+
+#: app/templates/harvest/run_detail.html:48
+msgid "Phase"
+msgstr "Fase"
+
+#: app/templates/harvest/run_detail.html:48
+msgid "Message"
+msgstr "Mensagem"
+
+#: app/templates/harvest/run_detail.html:48
+#: app/templates/harvest/run_detail.html:69
+msgid "OAI identifier"
+msgstr "Identificador OAI"
+
+#: app/templates/harvest/run_detail.html:64
+#, python-format
+msgid "Records (%(n)s)"
+msgstr "Registros (%(n)s)"
+
+#: app/templates/harvest/run_detail.html:70
+msgid "Title"
+msgstr "Título"
+
+#: app/templates/harvest/run_detail.html:71
+msgid "Year"
+msgstr "Ano"
+
+#: app/templates/harvest/run_detail.html:72
+msgid "Datestamp"
+msgstr "Datestamp"
+
+#: app/templates/harvest/run_detail.html:103
+msgid "No records associated with this run."
+msgstr "Nenhum registro associado a esta execução."
+
+#: app/templates/index.html:2
+msgid ""
+"A federated, bilingual catalog that scores Brazilian digital archives for"
+" scholarly pipeline-building and aggregates partner corpus explorers."
+msgstr ""
+"Um catálogo federado e bilíngue que avalia arquivos digitais brasileiros "
+"para a construção de pipelines acadêmicos e agrega exploradores de corpus"
+" parceiros."
+
+#: app/templates/index.html:8
+msgid ""
+"A federated catalog of Brazilian digital archives — standards-aware, "
+"bilingual, and built to support scholarship on the northeastern "
+"historical record."
+msgstr ""
+"Um catálogo federado de arquivos digitais brasileiros — atento a padrões,"
+" bilíngue e voltado a apoiar a pesquisa sobre o registro histórico "
+"nordestino."
+
+#: app/templates/index.html:15
+msgid "Archives cataloged"
+msgstr "Arquivos catalogados"
+
+#: app/templates/index.html:19
+msgid "Partner projects"
+msgstr "Projetos parceiros"
+
+#: app/templates/index.html:23
+msgid "Federated records"
+msgstr "Registros federados"
+
+#: app/templates/index.html:31
+msgid "Browse by state"
+msgstr "Explorar por estado"
+
+#: app/templates/index.html:45
+msgid "All archives"
+msgstr "Todos os arquivos"
+
+#: app/templates/index.html:53
+msgid "Featured archives"
+msgstr "Arquivos em destaque"
+
+#: app/templates/index.html:54
+msgid "Ranked by the two-axis evaluation; unscored archives sort last."
+msgstr ""
+"Ordenados pela avaliação de dois eixos; arquivos sem avaliação aparecem "
+"por último."
+
+#: app/templates/index.html:68
+msgid "Not yet scored"
+msgstr "Ainda não avaliado"
+
+#: app/templates/index.html:79
+msgid "Live from partner projects"
+msgstr "Ao vivo dos projetos parceiros"
+
+#: app/templates/index.html:89
+msgid "records available"
+msgstr "registros disponíveis"
+
+#: app/templates/index.html:90
+msgid "cached"
+msgstr "em cache"
+
+#: app/templates/index.html:97
+msgid "Preview unavailable right now."
+msgstr "Pré-visualização indisponível no momento."
+
+#: app/templates/index.html:110
+msgid "About the method"
+msgstr "Sobre o método"
+
+#: app/templates/index.html:112
+msgid ""
+"Each archive is evaluated on two axes — pipeline readiness and research "
+"value — rather than a single ranked score. Age is not treated as value."
+msgstr ""
+"Cada arquivo é avaliado em dois eixos — prontidão de pipeline e valor de "
+"pesquisa — em vez de uma única pontuação ordenada. A idade não é tratada "
+"como valor."
+
+#: app/templates/index.html:113
+msgid "See the full catalog"
+msgstr "Ver o catálogo completo"
+

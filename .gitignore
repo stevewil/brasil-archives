@@ -24,8 +24,9 @@ instance/
 *.sqlite
 *.sqlite3
 
-# Flask-Babel compiled catalogs
+# Flask-Babel compiled catalogs + extraction template
 app/translations/**/*.mo
+messages.pot
 
 # OS
 .DS_Store
