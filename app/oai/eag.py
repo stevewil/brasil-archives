@@ -34,20 +34,20 @@ _LANG_PT = "por"  # ISO 639-2/B
 _LANG_EN = "eng"
 
 # brasil-archives institutional-type slug -> EAG repositoryType enumeration.
+# Keys are the real slugs from configs/vocabularies/institutional_types.yaml
+# (all 11 covered). Slugs with no natural EAG bucket map to "Other".
 _REPOSITORY_TYPE = {
+    "national": "National archives",
     "federal-university": "University and research archives",
     "state-university": "University and research archives",
-    "university": "University and research archives",
-    "research-institute": "University and research archives",
-    "national-archive": "National archives",
+    "research-project": "University and research archives",
     "state-archive": "Regional archives",
-    "municipal-archive": "Municipal archives",
+    "municipal": "Municipal archives",
     "state-court": "Specialised government archives",
-    "federal-court": "Specialised government archives",
-    "court": "Specialised government archives",
-    "church": "Church and religious archives",
-    "diocese": "Church and religious archives",
-    "religious": "Church and religious archives",
+    "diocesan": "Church and religious archives",
+    "individual": "Private persons and family archives",
+    "third-party-hosted": "Other",
+    "special-thematic": "Other",
 }
 
 

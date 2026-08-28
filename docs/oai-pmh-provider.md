@@ -341,9 +341,11 @@ doesn't double-register.
    person/corporate authority records of its own yet (only identifier
    fields on `Archive`), so this was not built. Revisit when authority
    data exists.
-5. **`repositoryType` coverage.** The institutional-type → EAG
-   `repositoryType` map in `app/oai/eag.py` covers the common slugs; check
-   it against the full `institutional_types` vocabulary and extend.
+5. ~~**`repositoryType` coverage.**~~ **Resolved 2026-08-28** — the map in
+   `app/oai/eag.py` had invented slugs (`university`, `national-archive`,
+   `diocese`, …) that never matched. Rewritten against the real
+   `configs/vocabularies/institutional_types.yaml` — all 11 slugs covered,
+   `third-party-hosted` / `special-thematic` → `"Other"`.
 
 ---
 
