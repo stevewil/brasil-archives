@@ -33,25 +33,25 @@ archives:
     display_name: "APEB — Salvador notary books (EAP703, British Library)"
     scores:
       accessibility:
-        score: 6
+        score: 8
         justification_en: |
           EAP delivers digitised files anonymously through a IIIF viewer
-          with no registration — normally algorithm anchor 8. Scored one
-          tier down because the survey recorded the BL catalogue as
-          offline since the October 2023 cyber-attack; search-engine
-          visibility of eap.bl.uk/archive-file/EAP703-* pages on
-          2026-08-27 suggests it is indexed again, but item pages
-          returned empty from this session. Flag: re-verify viewer +
-          image delivery directly.
+          with no registration — algorithm anchor 8 "anonymous browsing
+          through a viewer". The BL Endangered Archives site (eap.bl.uk)
+          is confirmed restored after the October 2023 cyber-attack:
+          project, collection and archive-file pages for EAP703 resolve
+          and are search-indexed with substantive content (2026-08-28).
+          Access is stated "for research purposes only" but is not gated
+          by registration.
         justification_pt: |
           O EAP entrega os arquivos digitalizados de forma anônima por
-          um visualizador IIIF, sem cadastro — normalmente ancoragem 8
-          do algoritmo. Reduzido em um nível porque o levantamento
-          registrou o catálogo da BL fora do ar desde o ciberataque de
-          outubro de 2023; a indexação das páginas
-          eap.bl.uk/archive-file/EAP703-* em 27/08/2026 sugere retorno,
-          mas as páginas de item vieram vazias nesta sessão. Sinalizar:
-          reconfirmar visualizador e entrega de imagens diretamente.
+          um visualizador IIIF, sem cadastro — ancoragem 8 do algoritmo,
+          "navegação anônima por visualizador". O site Endangered
+          Archives da BL (eap.bl.uk) está confirmado restabelecido após
+          o ciberataque de outubro de 2023: as páginas de projeto,
+          coleção e arquivo do EAP703 respondem e estão indexadas com
+          conteúdo substantivo (28/08/2026). O acesso é declarado
+          "apenas para fins de pesquisa", mas não exige cadastro.
       provenance_curatorial:
         score: 6
         justification_en: |
@@ -97,15 +97,13 @@ archives:
           Properties 1 (addressable), 2 (IIIF image API returns the
           file), 3 (TIFF masters) and 5 (IIIF manifest / OAI enumerable)
           hold; property 4 fails because each livro bundles hundreds of
-          discrete escrituras. Four of five — algorithm anchor 8. Flag:
-          contingent on the catalogue being live.
+          discrete escrituras. Four of five — algorithm anchor 8.
         justification_pt: |
           As propriedades 1 (endereçável), 2 (a API de imagem IIIF
           devolve o arquivo), 3 (masters TIFF) e 5 (manifesto IIIF / OAI
           enumerável) são atendidas; a propriedade 4 falha porque cada
           livro reúne centenas de escrituras distintas. Quatro de cinco
-          — ancoragem 8 do algoritmo. Sinalizar: depende de o catálogo
-          estar no ar.
+          — ancoragem 8 do algoritmo.
       uniqueness_non_duplication:
         score: 10
         justification_en: |
@@ -564,6 +562,7 @@ archives:
       licensing_posture: bulk-restricted
       stated_roadmap: published-but-unmet
       fair_use_eligible: true
+      scholarly_access_practical: only-via-federation
       size_unit_note: |
         No counts published. A CEPE-APEJE cooperation agreement is
         stated to be digitizing more of the acervo; delivery channel is
@@ -1630,6 +1629,7 @@ archives:
       licensing_posture: bulk-restricted
       stated_roadmap: published-and-active
       fair_use_eligible: true
+      scholarly_access_practical: only-via-federation
       size_unit_note: |
         Denominated in FamilySearch images (one image ~ one register
         page/opening). 1,000,000+ for the Arquidiocese de Natal;
@@ -1757,6 +1757,7 @@ archives:
       licensing_posture: bulk-restricted
       stated_roadmap: published-and-active
       fair_use_eligible: true
+      scholarly_access_practical: only-via-federation
       size_unit_note: |
         Denominated in FamilySearch images. Counts not published on the
         wiki; collection date range 1673-1962 (some parishes to 2018).
@@ -1885,6 +1886,7 @@ archives:
       licensing_posture: bulk-restricted
       stated_roadmap: published-and-active
       fair_use_eligible: true
+      scholarly_access_practical: only-via-federation
       size_unit_note: |
         Denominated in FamilySearch images with a name index. RN count
         not published; date range 1803-2020.
@@ -2018,6 +2020,7 @@ archives:
       licensing_posture: bulk-restricted
       stated_roadmap: published-but-unmet
       fair_use_eligible: true
+      scholarly_access_practical: only-via-federation
       size_unit_note: |
         450,000+ pages digitized since 2022 under "Manuscritos Digitais"
         (SIEC/SECULT); ~5% published online with controlled access.

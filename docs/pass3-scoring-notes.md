@@ -1,10 +1,34 @@
-# Pass 3 scoring notes — DRAFT for Steve's review
+# Pass 3 scoring notes
 
-**Status:** DRAFT. Not loaded into any database. `scripts.load_calibration`
-has **not** been run against `configs/calibration/pass3.yaml`.
+**Status:** Reviewed by Steve 2026-08-28 — see "Review outcome" below.
+Ready to load.
 
-**Date:** 2026-08-27
+**Date:** 2026-08-27 (scored), 2026-08-28 (reviewed)
 **Scored by:** `calibration/pass3`
+
+---
+
+## Review outcome (2026-08-28)
+
+All eight borderline calls resolved **option A** (keep the drafted approach).
+Changes applied to `configs/calibration/pass3.yaml`:
+
+| # | Call | Decision | YAML change |
+|---|------|----------|-------------|
+| 1 | Scale = digitized vs. published volume | **A — digitized-volume basis** (Pass 2 TJMA precedent). Flagged as a known tension in `algorithm-v1.md` for the ADR-0001 review. | none |
+| 2 | EAP703 accessibility contingency | **A — confirmed live**, `accessibility 6 → 8`. eap.bl.uk restored post-2023 attack; pages resolve + are search-indexed with real content (re-checked 2026-08-28). Pipeline axis 31 → 33, stays High/High. | `t1r6` accessibility 6→8; dropped the "contingent on catalogue live" flags |
+| 3 | APEB indexes — finding aids scored as data | **A — leave as High pipeline / Low research.** They're scaffolding, not sources. Watch in the ADR-0001 threshold re-exam. | none |
+| 4 | Atas da Câmara — transcription tier | **A — keep `provenance_curatorial 9`.** Anchor language ("partial or unverified transcription, print OCR") fits. | none |
+| 5 | APEJE + APEPI — unreachable, not weak | **A — publish with floor scores** + `scholarly_access_practical = only-via-federation`. | `t1r10`, `t1r47` gain the facet |
+| 6 | Cúria de Maceió — nothing online | **A — keep in the scored catalog** (scans exist, sample published via CPDHis; consistent with call 1). | none |
+| 7 | `scholarly_access_practical` | **A — set it** for the clear `only-via-federation` cases: APEJE, APEPI, all 3 FamilySearch collections. | `t1r10`, `t1r37`, `t1r39`, `t1r43`, `t1r47` gain the facet |
+| 8 | FamilySearch `institutional_type` | **A — keep `third-party-hosted`.** | none |
+
+Net: EAP703 moves from "low confidence, contingent" to a firm High/High.
+Everything else scored as drafted. `algorithm-v1.md` §"Aggregation" gains a
+Scale-basis note for the ADR-0001 re-examination.
+
+---
 **Method:** desk scoring against `docs/algorithm-v1.md` anchors +
 `docs/nordeste-digital-archives-survey.md` Table 1 + live site inspection
 via WebFetch / WebSearch on 2026-08-27. Where a site could not be reached
@@ -314,7 +338,7 @@ Deliberately **not** picked this pass, and why:
 
 | # | Archive | Pipeline /40 | Research /40 | Naive /80 | Quadrant | Confidence |
 |---|---|---|---|---|---|---|
-| 1 | APEB — EAP703 Salvador notary books (BA) | 31 | 29 | 60 | High / High | **low** — catalogue live-status unverified |
+| 1 | APEB — EAP703 Salvador notary books (BA) | 33 | 29 | 62 | High / High | medium — live confirmed 2026-08-28; viewer not click-tested |
 | 2 | APEM — SIAPEM (MA) | 18 | 19 | 37 | Low / Low | low — item image access unverified |
 | 3 | Acervo Digital de Fortaleza (CE) | 25 | 21 | 46 | Low / Low | medium |
 | 4 | APEJE — AtoM (PE) | 10 | 19 | 29 | Low / Low | **very low** — host unreachable / robots-blocked |
