@@ -77,14 +77,15 @@ Full brief: `docs/UI-POLISH-PICKUP.md`. All five sub-tracks landed in code.
 
 ## 2. Track B — povos-indigenas-rn OAI-PMH endpoint
 
-Primary ref: `povos-indigenas-rn/docs/OAI-PMH-PICKUP.md` (that repo).
+Primary ref: `povos-indigenas-rn/docs/oai-pmh-povos.md` (that repo).
 
-- [ ] **[L] Give povos its own `/oai` endpoint.** ~1.5 days for an `oai_dc`
-  MVP, ~3 for parity with mipibu's `oai_ead`. **Rule of three:** copy
-  mipibu's `app/oai/` into povos rather than extracting a package —
-  premature abstraction with N=1 caller.
-  **Trigger to start:** user says "get povos federating."
-  Unblocks Track C.
+- [x] **[L] Give povos its own `/oai` endpoint.** Built by a subagent
+  2026-08-27, reviewed + merged to povos `main` 2026-08-28 (`817167c`).
+  Self-contained `app/oai/` package (13 modules), `oai_dc` format, 145
+  records / 7 kinds, stateless resumption tokens, all 6 verbs + error
+  codes. `oai_ead` deferred (povos is a composite AHU+CRL+UFRN evidence
+  base, not a single fonds). 134 tests. **Deploy:** routine 3-command pull
+  on cPanel (povos is already live). Unblocks Track C.
 
 ## 3. Track C — register povos as the 2nd upgrade project
 
@@ -114,11 +115,14 @@ with `/api/health` returning `federation_contract_version: "v1"`, and
 
 ## 4. Track D — extract a shared OAI package
 
-- [ ] **[L] `CorpusAdapter`-shaped package from mipibu's `app/oai/`.**
-  **Blocked on Track B.** Do NOT extract with N=1 caller. Once povos has a
-  working `/oai`, find the real seams between the two implementations.
-  Shape sketch: `povos-indigenas-rn/docs/HANDOFF-2026-08-26.md`
-  §"Package extraction plan".
+- [ ] **[L] `CorpusAdapter`-shaped package from the OAI providers.**
+  **Now unblocked** — povos has a working `/oai` (`817167c`). But mipibu
+  and povos ended up with **parallel from-scratch implementations** (the
+  povos build couldn't see mipibu's package — it was only on mipibu's
+  `origin/main`). brasil-archives has a *third* provider (`app/oai/`,
+  `54367f7`). Diff all three for the real seams before extracting —
+  `povos/app/oai/store.py` is explicitly the "CorpusAdapter would replace
+  this" module. Low priority. Rule of three is now satisfied (N=3).
 
 ## 5. Scoring backlog (the actual research work)
 
