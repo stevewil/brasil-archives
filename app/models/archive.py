@@ -62,6 +62,10 @@ class Archive(TimestampMixin, db.Model):
     description_pt: Mapped[str | None] = mapped_column(Text)
     curatorial_rarity_notes: Mapped[str | None] = mapped_column(Text)
     prior_use_note: Mapped[str | None] = mapped_column(Text)
+    # Free-text audit trail for the Scale dimension: what unit the archive
+    # counts in (processos vs. images vs. page-equivalents vs. items). See
+    # docs/algorithm-v1.md §Dimension 7 and docs/vocabularies.md.
+    size_unit_note: Mapped[str | None] = mapped_column(Text)
     stated_scope: Mapped[str | None] = mapped_column(Text)
 
     # Editorial state

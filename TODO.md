@@ -1,6 +1,6 @@
 # TODO — what's next
 
-**Updated:** 2026-08-27. Derived from `docs/handoff/2026-08-27-master.md` §4,
+**Updated:** 2026-08-27 (parallel-jobs session — see bottom). Derived from `docs/handoff/2026-08-27-master.md` §4,
 `docs/UI-POLISH-PICKUP.md`, `docs/integrations/povos-indigenas-rn.md`, and a
 code read. Source of truth for the *why* behind each item is the linked doc;
 this file is just the ordered agenda.
@@ -15,10 +15,10 @@ Legend: **[S]** small (<1h) · **[M]** medium (1–3h) · **[L]** large / multi-
   + `f9f57ca` (`DESCRIPTION.md` / `TODO.md`).
 - [x] **Fold `load_calibration` into the documented seed sequence.** Done
   `f9f57ca` — `README.md` + `docs/DEPLOY.md` now list it.
-- [ ] **[S] Decide `size_unit_note` facet.** `load_calibration` warns 6× that
-  it has "no storage yet; carried in YAML only". Either add a column /
-  `facet_values` entry for it, or note explicitly in `algorithm-v1.md` that
-  it stays YAML-only. *(Still open.)*
+- [x] **Decide `size_unit_note` facet.** Done 2026-08-27 (`e2c3d4f5a6b7`):
+  added `Archive.size_unit_note` `Text` column alongside
+  `curatorial_rarity_notes` / `prior_use_note`; `load_calibration` now stores
+  it (no more warning), backfilled from `pass2.yaml`. See `docs/vocabularies.md`.
 - [x] **Add an `app.bat` start/stop/restart script.** Done. `app.bat`
   (start/stop/restart/**status**), `PORT=9000`, `LOG=dev-server.log`,
   netstat-LISTENING PID detection, `pause` only when double-clicked.
@@ -130,9 +130,12 @@ with `/api/health` returning `federation_contract_version: "v1"`, and
 Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.md`
 §"Open follow-ups".
 
-- [ ] **[L] Pass 3 — score the rest of the survey.** Only 6 of ~50
-  pipeline-viable archives are scored (Pass 2 calibration set). Pass 3
-  targets ~12–15 archives.
+- [~] **[L] Pass 3 — score the rest of the survey.** DRAFT landed 2026-08-27
+  on branch `feature/pass3-scoring` (`3a21e07`): 15 archives in
+  `configs/calibration/pass3.yaml` + `docs/pass3-scoring-notes.md`.
+  **Not merged, not loaded** — 8 borderline calls need Steve's review
+  (see the notes doc). After review: merge + `python -m scripts.load_calibration
+  configs/calibration/pass3.yaml`.
 - [ ] **[M] Re-examine the 4-4 axis partition and the 28/40 quadrant
   threshold** after Pass 3 has ~12–15 archives. Changing either requires an
   **ADR-0001 supersession**, not a quiet edit.
@@ -142,17 +145,21 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
 
 ## 6. Infrastructure not yet built
 
-- [ ] **[L] Quarterly health probe.** `ProbeResult` table + models exist;
-  no runner. Would populate the four probe-fed facets (web ops health,
-  external preservation, growth signal, prior-use signal) from HTTPS/cert
-  checks, HTTP status sweeps, Wayback CDX, CrossRef/Semantic Scholar.
-  Ref: `algorithm-v1.md` §"Ongoing infrastructure".
+- [~] **[L] Quarterly health probe.** Runner **built + landed** 2026-08-27
+  (`d2b808d`): `scripts/probe.py` + `app/services/probe.py` populate the four
+  probe-fed facets from HTTPS/cert checks, HTTP sweeps, Wayback CDX,
+  CrossRef/Semantic Scholar; `archives.last_probed_at` column. **Left:**
+  (a) run it manually against prod once, (b) schedule the cron, (c) tune the
+  compositing thresholds (named constants at the top of `probe.py`) during
+  calibration.
 - [ ] **[M] Scheduled harvest (cron).** Explicitly deferred in
   `harvest-design.md` until the harvester has run manually against prod at
   least once. Still on-demand only today.
-- [ ] **[L] Phase 3 standards-native *output*.** Serve brasil-archives' own
-  catalog as OAI-PMH; institution descriptions as EAG XML; register with the
-  OAI-PMH registry. Ref: `standards.md` Phase 3.
+- [~] **[L] Phase 3 standards-native output.** OAI-PMH provider (`/oai`,
+  `oai_dc` + `eag` formats) + EAG XML route **built + landed** 2026-08-27
+  (`54367f7`). **Left:** EAC-CPF (no authority records yet), register at the
+  OAI-PMH registry (runbook in `docs/oai-pmh-provider.md` §6), resolve the
+  §7 open questions (public-bar policy, `harvested` passthrough set).
 - [ ] **[L] Phase 4 — IIIF Content Search fanout.** Federated full-text
   search across companion apps. Ref: `federation-v1.md` §"IIIF Content
   Search".
@@ -166,8 +173,8 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
   `/api/schema` once a 2nd corpus registers. Revisit during Track C.
 - [ ] `LICENSING.md` referenced by `algorithm-v1.md` §Licensing doesn't
   exist yet — "finalized before public release."
-- [ ] `docs/vocabularies.md` is referenced (`algorithm-v1.md`) but not
-  written; the vocab lives in `configs/vocabularies/*.yaml` + the DB tables.
+- [x] `docs/vocabularies.md` — written 2026-08-27 (`34fc5b3`): consolidates
+  every controlled vocabulary + the code single-selects + probe facets.
 - [ ] No `LICENSE` file in the repo (README says "TBD — finalized before
   public release").
 
@@ -175,7 +182,24 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
 
 ## Suggested next session
 
-1. Housekeeping §0 (fold in `load_calibration`, `app.bat`).
-2. UI polish Track A is complete — deploy Track 1 + Track 3 to cPanel
-   (Track 1 needs `pybabel compile` on the host; see `docs/DEPLOY.md`).
-3. Track B/C only when the user says "get povos federating."
+1. **Review Pass 3** — `docs/pass3-scoring-notes.md`, the 8 borderline calls;
+   then merge `feature/pass3-scoring` + load.
+2. **Deploy pending work to cPanel** — `main` (`34fc5b3`+) now carries UI-polish
+   Tracks 1+3 **plus** the probe runner, the `/oai` OAI-PMH provider, and the
+   `size_unit_note` column. One pull; run `flask db upgrade` (two new
+   migrations: `d7f1a2b3c4d5`, `e2c3d4f5a6b7`) and `pybabel compile -d
+   app/translations` before the Passenger restart. See `docs/DEPLOY.md`.
+3. **Run the probe against prod once**, then decide the harvest + probe crons (§6).
+4. **povos `feature/oai-pmh`** — review + merge in that repo; deploy povos;
+   then Track C (register as 2nd upgrade project).
+5. Track B is effectively done (povos `/oai` built) — Track D (extract shared
+   OAI package) is now unblocked but low priority; mipibu + povos have
+   parallel implementations to diff first.
+
+## Landed 2026-08-27 (parallel-jobs session)
+
+- `d2b808d` probe runner · `54367f7` OAI-PMH provider + EAG · `34fc5b3`
+  `docs/vocabularies.md` · `e2c3d4f5a6b7` `size_unit_note` column.
+- Session record: `docs/handoff/2026-08-27-parallel-jobs.md`.
+- **Not landed:** Pass 3 (`feature/pass3-scoring`, draft), povos `/oai`
+  (`feature/oai-pmh` in that repo).

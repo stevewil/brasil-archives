@@ -298,9 +298,9 @@ def test_loader_warns_on_unknown_institutional_type(seeded_app, tmp_path):
         load_calibration(yaml_path)
 
 
-def test_loader_size_unit_note_warned_and_ignored(seeded_app, tmp_path):
-    app = seeded_app
-    """size_unit_note has no storage yet — should warn and not fail."""
+def test_loader_size_unit_note_stored_on_archive(seeded_app, tmp_path):
+    """size_unit_note is an Archive column (like curatorial_rarity_notes) —
+    stored directly, no warning."""
     yaml_path = _write_yaml(
         tmp_path,
         """
@@ -312,5 +312,11 @@ def test_loader_size_unit_note_warned_and_ignored(seeded_app, tmp_path):
         """,
     )
     report = load_calibration(yaml_path)
-    assert any("size_unit_note" in w for w in report.warnings)
+    assert not any("size_unit_note" in w for w in report.warnings)
     assert report.facets_written == 0
+    assert report.archive_fields_updated == 1
+
+    archive = db.session.scalar(
+        select(Archive).where(Archive.slug == "test-archive-alpha")
+    )
+    assert archive.size_unit_note == "rows and pages"

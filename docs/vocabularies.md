@@ -186,6 +186,6 @@ not controlled values.
 - **`prior_use_note`** — concise description of main scholarly uses to date.
 - **`size_unit_note`** — what unit the archive counts in (processos vs.
   images vs. page-equivalents vs. items), so the Scale dimension score is
-  auditable. *Status:* carried in calibration YAML;
-  `scripts/load_calibration.py` currently warns and drops it pending a
-  storage decision (`TODO.md` §0).
+  auditable. Stored on `Archive.size_unit_note`; loaded from the
+  calibration YAML `facets:` block by `scripts/load_calibration.py`
+  alongside `curatorial_rarity_notes` / `prior_use_note`.

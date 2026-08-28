@@ -56,6 +56,7 @@ DEFAULT_PATH = Path("configs/calibration/pass2.yaml")
 _DIRECT_ARCHIVE_TEXT_FIELDS = {
     "curatorial_rarity_notes",
     "prior_use_note",
+    "size_unit_note",
 }
 _DIRECT_ARCHIVE_BOOL_FIELDS = {
     "fair_use_eligible",
@@ -70,9 +71,10 @@ _ARCHIVE_BACKED_FACET_KEYS = (
     | {"institutional_type"}
 )
 
-# YAML facet keys we simply don't have a home for yet. We warn once
-# per key rather than fail so YAML can stay expressive.
-_KNOWN_UNSUPPORTED_FACETS = {"size_unit_note"}
+# YAML facet keys we understand but deliberately don't persist. We warn
+# once per key rather than fail so YAML can stay expressive. (Empty for
+# now — size_unit_note graduated to an Archive column.)
+_KNOWN_UNSUPPORTED_FACETS: set[str] = set()
 
 
 @dataclass
