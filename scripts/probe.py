@@ -109,6 +109,10 @@ def _print_summary(s: probe.ProbeSummary) -> None:
         print("Signal errors:")
         for line in s.signal_errors[:8]:
             print(f"  - {line}")
+    if s.signal_notes:
+        print("Notes (soft — not errors):")
+        for line in s.signal_notes[:8]:
+            print(f"  - {line}")
 
 
 def _worst_exit(summaries: list[probe.ProbeSummary]) -> int:

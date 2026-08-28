@@ -65,7 +65,7 @@ class FakeHTTP:
         self.routes.append((substr, status, body, exc))
         return self
 
-    def __call__(self, url, *, timeout=probe.HTTP_TIMEOUT_SECONDS):
+    def __call__(self, url, *, timeout=probe.HTTP_TIMEOUT_SECONDS, headers=None):
         self.calls.append(url)
         for substr, status, body, exc in self.routes:
             if substr in url:
@@ -111,6 +111,12 @@ def _wire_happy_path(fake, *, sitemap_n=4, home_caps=3, interior_ts="20251201000
         .add("arq.example", status=200, body=b"<html>ok</html>")
     )
     return fake
+
+
+@pytest.fixture(autouse=True)
+def _no_sleep(monkeypatch):
+    """The probe pauses before Semantic Scholar; never do that in tests."""
+    monkeypatch.setattr(probe.time, "sleep", lambda *_a, **_k: None)
 
 
 @pytest.fixture
@@ -351,6 +357,58 @@ def test_growth_signal_uses_seeded_prior_row(app, archive, monkeypatch):
 def test_run_probe_requires_exactly_one_target(app):
     with pytest.raises(ValueError):
         probe.run_probe()
+
+
+def test_semantic_scholar_429_is_a_soft_miss_not_an_error(app, archive, monkeypatch):
+    fake = _wire_happy_path(FakeHTTP())
+    # S2 rate-limits. Should NOT land in signal_errors, should NOT flip
+    # the run to "partial"; the count is just left None.
+    fake.routes.insert(0, ("api.semanticscholar.org", 429, b"slow down", None))
+    monkeypatch.setattr(probe, "http_get", fake)
+    monkeypatch.setattr(probe, "tls_cert_expiry", lambda *a, **k: date(2026, 12, 1))
+
+    summary = probe.run_probe(archive=archive, now=NOW)
+
+    assert summary.status == "ok"
+    assert not any("semantic" in e for e in summary.signal_errors)
+    assert any("semantic scholar" in n for n in summary.signal_notes)
+    row = db.session.query(ProbeResult).one()
+    assert row.citation_count_semantic_scholar is None
+    # prior_use still composited from CrossRef alone (20 -> established)
+    assert row.prior_use_signal == "established"
+
+
+def test_wayback_home_timeout_is_soft(app, archive, monkeypatch):
+    fake = _wire_happy_path(FakeHTTP())
+    fake.routes.insert(
+        0, ("collapse=timestamp", 0, b"", probe.ProbeTimeout("Timeout after 20s"))
+    )
+    monkeypatch.setattr(probe, "http_get", fake)
+    monkeypatch.setattr(probe, "tls_cert_expiry", lambda *a, **k: date(2026, 12, 1))
+
+    summary = probe.run_probe(archive=archive, now=NOW)
+
+    assert summary.status == "ok"  # not partial
+    assert not any("wayback home" in e for e in summary.signal_errors)
+    assert any("wayback home" in n for n in summary.signal_notes)
+
+
+def test_per_target_budget_caps_wall_clock(app, archive, monkeypatch):
+    fake = _wire_happy_path(FakeHTTP())
+    monkeypatch.setattr(probe, "http_get", fake)
+    monkeypatch.setattr(probe, "tls_cert_expiry", lambda *a, **k: date(2026, 12, 1))
+    # Force the deadline to have already passed after step 1.
+    clock = iter([0.0] + [10_000.0] * 50)
+    monkeypatch.setattr(probe.time, "monotonic", lambda: next(clock))
+
+    sig = probe.collect_signals(
+        canonical_url="https://arq.example", citation_query="x", now=NOW,
+        budget_seconds=5,
+    )
+
+    assert sig.canonical_http_status == 200  # step 1 ran
+    assert any("budget" in n for n in sig.notes)
+    assert sig.wayback_home_count is None  # later steps skipped
 
 
 def test_cli_dry_run_smoke(app, archive, happy_http, monkeypatch, capsys):

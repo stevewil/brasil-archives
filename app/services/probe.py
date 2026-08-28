@@ -17,17 +17,27 @@ Design mirrors ``app/services/harvest.py``: a summary dataclass with an
 run), a ``dry_run`` mode that collects + composites + returns without
 touching the DB.
 
+Robustness: each target has a ``PROBE_TARGET_BUDGET_SECONDS`` wall-clock
+ceiling (a dead host otherwise stacks ~8 sequential socket waits); Wayback
+CDX gets a longer ``WAYBACK_TIMEOUT_SECONDS`` because it is routinely slow;
+an HTTP 429 (``ProbeRateLimited``) is a *soft* miss — the signal is left
+None and recorded in ``signals.notes``, never ``signals.errors``, and does
+not flip the run to ``partial``.
+
 All HTTP goes through :func:`http_get` / :func:`tls_cert_expiry`; tests
 monkeypatch those two and never hit the network. Public keyless APIs
 used: Wayback CDX (``web.archive.org/cdx/search/cdx``), CrossRef
-(``api.crossref.org``), Semantic Scholar (``api.semanticscholar.org``).
+(``api.crossref.org``), Semantic Scholar (``api.semanticscholar.org``;
+best-effort, honours ``SEMANTIC_SCHOLAR_API_KEY`` when set).
 """
 from __future__ import annotations
 
 import json
 import logging
+import os
 import socket
 import ssl
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -48,6 +58,16 @@ log = logging.getLogger(__name__)
 PROBE_VERSION = "probe-v1"
 
 HTTP_TIMEOUT_SECONDS = 10  # Probe is polite: short timeouts, sequential.
+WAYBACK_TIMEOUT_SECONDS = 20  # web.archive.org/cdx is routinely slow.
+# Hard wall-clock ceiling per target. Without it a dead host stacks
+# ~8 sequential socket waits (canonical GET + TLS + robots + sitemaps +
+# interior URLs) and can wedge a batch run. Signals not yet collected when
+# the budget runs out are left None and noted.
+PROBE_TARGET_BUDGET_SECONDS = 90
+# The keyless Semantic Scholar endpoint rate-limits aggressively; a small
+# pause before it (and an API key when SEMANTIC_SCHOLAR_API_KEY is set)
+# buys a better hit rate. A 429 is a soft miss, never a logged error.
+SEMANTIC_SCHOLAR_DELAY_SECONDS = 1.0
 USER_AGENT = (
     "brasil-archives/probe "
     "(+https://github.com/stevewil/brasil-archives)"
@@ -86,6 +106,16 @@ class ProbeTLSError(ProbeHTTPError):
     """TLS certificate verification failed."""
 
 
+class ProbeRateLimited(ProbeHTTPError):
+    """The remote returned HTTP 429. A soft miss — the caller drops the
+    signal (leaves it None) and does NOT record an error."""
+
+
+class ProbeTimeout(ProbeHTTPError):
+    """The request exceeded its timeout. Soft for routinely-slow services
+    (Wayback CDX); still an error for the canonical URL."""
+
+
 @dataclass
 class HTTPResponse:
     status: int
@@ -93,11 +123,19 @@ class HTTPResponse:
     body: bytes
 
 
-def http_get(url: str, *, timeout: int = HTTP_TIMEOUT_SECONDS) -> HTTPResponse:
+def http_get(
+    url: str,
+    *,
+    timeout: int = HTTP_TIMEOUT_SECONDS,
+    headers: dict[str, str] | None = None,
+) -> HTTPResponse:
     """GET ``url``. A 4xx/5xx still returns an :class:`HTTPResponse` (with
     that status and whatever body came back); only transport failures raise.
     """
-    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    all_headers = {"User-Agent": USER_AGENT}
+    if headers:
+        all_headers.update(headers)
+    req = urllib.request.Request(url, headers=all_headers)
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             return HTTPResponse(
@@ -115,9 +153,11 @@ def http_get(url: str, *, timeout: int = HTTP_TIMEOUT_SECONDS) -> HTTPResponse:
         reason = getattr(exc, "reason", exc)
         if isinstance(reason, ssl.SSLCertVerificationError):
             raise ProbeTLSError(f"TLS verify failed for {url}: {reason}") from exc
+        if isinstance(reason, (TimeoutError, socket.timeout)):
+            raise ProbeTimeout(f"Timeout after {timeout}s: {url}") from exc
         raise ProbeHTTPError(f"Network error for {url}: {reason}") from exc
-    except (TimeoutError, socket.timeout) as exc:  # pragma: no cover
-        raise ProbeHTTPError(f"Timeout after {timeout}s: {url}") from exc
+    except (TimeoutError, socket.timeout) as exc:
+        raise ProbeTimeout(f"Timeout after {timeout}s: {url}") from exc
 
 
 def tls_cert_expiry(
@@ -150,8 +190,15 @@ def _origin_of(url: str) -> str:
     return f"{parts.scheme}://{parts.netloc}"
 
 
-def _get_json(url: str):
-    resp = http_get(url)
+def _get_json(
+    url: str,
+    *,
+    timeout: int = HTTP_TIMEOUT_SECONDS,
+    headers: dict[str, str] | None = None,
+):
+    resp = http_get(url, timeout=timeout, headers=headers)
+    if resp.status == 429:
+        raise ProbeRateLimited(f"HTTP 429 from {url}")
     if resp.status >= 400:
         raise ProbeHTTPError(f"HTTP {resp.status} from {url}")
     return json.loads(resp.body.decode("utf-8", errors="replace"))
@@ -173,14 +220,18 @@ def _iter_sitemap_locs(xml_bytes: bytes) -> tuple[list[str], bool]:
 # Individual signal collectors — each tolerates failure at the caller
 # --------------------------------------------------------------------------- #
 def discover_interior_urls(
-    canonical_url: str, *, limit: int = INTERIOR_SAMPLE_SIZE
+    canonical_url: str,
+    *,
+    limit: int = INTERIOR_SAMPLE_SIZE,
+    deadline: float | None = None,
 ) -> tuple[list[str], int | None]:
     """Return (sample of up to ``limit`` interior URLs, total URL count).
 
     Sources, in order: ``robots.txt`` ``Sitemap:`` lines, ``/sitemap.xml``
     (following one level of ``<sitemapindex>``), then Wayback CDX distinct
     originals. ``total`` is the sitemap ``<loc>`` count (the growth signal's
-    directory size), or None when no sitemap was found.
+    directory size), or None when no sitemap was found. Stops early once
+    ``deadline`` (a ``time.monotonic()`` value) is past.
     """
     origin = _origin_of(canonical_url)
     sitemap_urls: list[str] = []
@@ -200,6 +251,8 @@ def discover_interior_urls(
     all_locs: list[str] = []
     total: int | None = None
     for sm in sitemap_urls[:3]:
+        if _past(deadline):
+            break
         try:
             resp = http_get(sm)
             if resp.status >= 400:
@@ -207,6 +260,8 @@ def discover_interior_urls(
             locs, is_index = _iter_sitemap_locs(resp.body)
             if is_index:
                 for child in locs[:3]:
+                    if _past(deadline):
+                        break
                     try:
                         cr = http_get(child)
                         if cr.status < 400:
@@ -224,6 +279,9 @@ def discover_interior_urls(
         total = len(all_locs)
         return _stride_sample(uniq, limit), total
 
+    if _past(deadline):
+        return [], total
+
     # Fallback: Wayback CDX distinct originals for the domain.
     try:
         host = _host_of(canonical_url)
@@ -237,7 +295,8 @@ def discover_interior_urls(
                     "collapse": "urlkey",
                     "limit": "200",
                 }
-            )
+            ),
+            timeout=WAYBACK_TIMEOUT_SECONDS,
         )
         rows = data[1:] if data and isinstance(data, list) else []
         cdx_urls = sorted(
@@ -253,6 +312,10 @@ def discover_interior_urls(
         pass
 
     return [], total
+
+
+def _past(deadline: float | None) -> bool:
+    return deadline is not None and time.monotonic() > deadline
 
 
 def _stride_sample(items: list[str], limit: int) -> list[str]:
@@ -285,7 +348,8 @@ def wayback_home_count(canonical_url: str) -> int | None:
                 "collapse": "timestamp:6",
                 "limit": "500",
             }
-        )
+        ),
+        timeout=WAYBACK_TIMEOUT_SECONDS,
     )
     if not data or not isinstance(data, list):
         return 0
@@ -293,22 +357,28 @@ def wayback_home_count(canonical_url: str) -> int | None:
 
 
 def wayback_interior_coverage(
-    urls: list[str], *, now: datetime
+    urls: list[str], *, now: datetime, deadline: float | None = None
 ) -> tuple[float | None, int | None]:
     """Return (fraction of ``urls`` with >=1 Wayback capture, age in days of
-    the newest capture seen across all of them).
+    the newest capture seen across all of them). Stops early once
+    ``deadline`` is past; the ratio is then over the URLs actually checked.
     """
     if not urls:
         return None, None
     hits = 0
+    checked = 0
     newest: datetime | None = None
     for u in urls:
+        if _past(deadline):
+            break
+        checked += 1
         try:
             data = _get_json(
                 "http://web.archive.org/cdx/search/cdx?"
                 + urllib.parse.urlencode(
                     {"url": u, "output": "json", "fl": "timestamp", "limit": "50"}
-                )
+                ),
+                timeout=WAYBACK_TIMEOUT_SECONDS,
             )
         except (ProbeHTTPError, ValueError):
             continue
@@ -323,7 +393,7 @@ def wayback_interior_coverage(
                 continue
             if newest is None or dt > newest:
                 newest = dt
-    ratio = hits / len(urls)
+    ratio = hits / checked if checked else None
     age = (now - newest).days if newest is not None else None
     return ratio, age
 
@@ -337,9 +407,17 @@ def crossref_works_count(query: str) -> int | None:
 
 
 def semantic_scholar_count(query: str) -> int | None:
+    """Best-effort. The keyless endpoint 429s often — that propagates as
+    :class:`ProbeRateLimited` and the caller treats it as a soft miss.
+    Set ``SEMANTIC_SCHOLAR_API_KEY`` in the environment to use a key."""
+    headers: dict[str, str] | None = None
+    api_key = os.environ.get("SEMANTIC_SCHOLAR_API_KEY")
+    if api_key:
+        headers = {"x-api-key": api_key}
     data = _get_json(
         "https://api.semanticscholar.org/graph/v1/paper/search?"
-        + urllib.parse.urlencode({"query": query, "limit": "1", "fields": "title"})
+        + urllib.parse.urlencode({"query": query, "limit": "1", "fields": "title"}),
+        headers=headers,
     )
     return int(data.get("total", 0))
 
@@ -366,6 +444,8 @@ class ProbeSignals:
     oai_pmh_earliest_datestamp: date | None = None
     iiif_search_endpoint_ok: bool | None = None
     errors: list[str] = field(default_factory=list)
+    # Informational, non-error: rate-limited soft misses, budget skips.
+    notes: list[str] = field(default_factory=list)
 
 
 def collect_signals(
@@ -375,13 +455,24 @@ def collect_signals(
     now: datetime,
     oai_pmh_base_url: str | None = None,
     iiif_search_endpoint: str | None = None,
+    budget_seconds: float = PROBE_TARGET_BUDGET_SECONDS,
 ) -> ProbeSignals:
     """Run every signal collector, swallowing per-signal failures into
-    ``signals.errors`` so one dead endpoint never aborts the run.
+    ``signals.errors`` so one dead endpoint never aborts the run. A
+    per-target wall-clock ``budget_seconds`` caps total time — signals not
+    reached when it runs out are left None and noted (a dead host otherwise
+    stacks ~8 sequential socket waits).
     """
     s = ProbeSignals(canonical_url=canonical_url)
     parts = urllib.parse.urlsplit(canonical_url)
     is_https = parts.scheme == "https"
+    deadline = time.monotonic() + budget_seconds
+
+    def over_budget(step: str) -> bool:
+        if time.monotonic() <= deadline:
+            return False
+        s.notes.append(f"budget {budget_seconds:.0f}s exceeded; skipped {step}")
+        return True
 
     # 1. canonical GET + TLS validity
     try:
@@ -398,55 +489,72 @@ def collect_signals(
         s.https_valid = False
 
     # 2. cert expiry
-    if is_https and parts.hostname:
+    if is_https and parts.hostname and not over_budget("cert expiry"):
         try:
             s.cert_expires_at = tls_cert_expiry(parts.hostname)
         except Exception as exc:  # noqa: BLE001 — any TLS/socket error is non-fatal
             s.errors.append(f"cert expiry: {exc}")
 
     # 3. interior URL discovery + directory size
-    try:
-        s.interior_url_sample, s.directory_url_count_now = discover_interior_urls(
-            canonical_url
-        )
-    except Exception as exc:  # noqa: BLE001
-        s.errors.append(f"interior discovery: {exc}")
+    if not over_budget("interior discovery"):
+        try:
+            s.interior_url_sample, s.directory_url_count_now = discover_interior_urls(
+                canonical_url, deadline=deadline
+            )
+        except Exception as exc:  # noqa: BLE001
+            s.errors.append(f"interior discovery: {exc}")
 
     # 4. interior HTTP statuses
     for u in s.interior_url_sample:
+        if over_budget("interior HTTP statuses"):
+            break
         try:
             s.interior_http_statuses.append(http_get(u).status)
         except ProbeHTTPError:
             s.interior_http_statuses.append(None)
 
     # 5. robots.txt
-    try:
-        s.robots_ok = robots_reachable(canonical_url)
-    except Exception as exc:  # noqa: BLE001
-        s.errors.append(f"robots: {exc}")
+    if not over_budget("robots"):
+        try:
+            s.robots_ok = robots_reachable(canonical_url)
+        except Exception as exc:  # noqa: BLE001
+            s.errors.append(f"robots: {exc}")
 
-    # 6. Wayback home coverage
-    try:
-        s.wayback_home_count = wayback_home_count(canonical_url)
-    except Exception as exc:  # noqa: BLE001
-        s.errors.append(f"wayback home: {exc}")
+    # 6. Wayback home coverage — Wayback CDX is routinely slow; a timeout
+    # or rate-limit here is a soft miss (interior coverage carries the
+    # preservation signal anyway), not a run-fails-partial error.
+    if not over_budget("wayback home"):
+        try:
+            s.wayback_home_count = wayback_home_count(canonical_url)
+        except (ProbeTimeout, ProbeRateLimited) as exc:
+            s.notes.append(f"wayback home: {exc}")
+        except Exception as exc:  # noqa: BLE001
+            s.errors.append(f"wayback home: {exc}")
 
     # 7. Wayback interior coverage
-    try:
-        s.wayback_interior_hit_ratio, s.newest_wayback_age_days = (
-            wayback_interior_coverage(s.interior_url_sample, now=now)
-        )
-    except Exception as exc:  # noqa: BLE001
-        s.errors.append(f"wayback interior: {exc}")
+    if not over_budget("wayback interior"):
+        try:
+            s.wayback_interior_hit_ratio, s.newest_wayback_age_days = (
+                wayback_interior_coverage(
+                    s.interior_url_sample, now=now, deadline=deadline
+                )
+            )
+        except Exception as exc:  # noqa: BLE001
+            s.errors.append(f"wayback interior: {exc}")
 
     # 8. CrossRef + Semantic Scholar
-    if citation_query:
+    if citation_query and not over_budget("citations"):
         try:
             s.citation_count_crossref = crossref_works_count(citation_query)
+        except ProbeRateLimited:
+            s.notes.append("crossref: rate-limited")
         except Exception as exc:  # noqa: BLE001
             s.errors.append(f"crossref: {exc}")
+        time.sleep(SEMANTIC_SCHOLAR_DELAY_SECONDS)
         try:
             s.citation_count_semantic_scholar = semantic_scholar_count(citation_query)
+        except ProbeRateLimited:
+            s.notes.append("semantic scholar: rate-limited (429) — soft miss")
         except Exception as exc:  # noqa: BLE001
             s.errors.append(f"semantic scholar: {exc}")
 
@@ -666,6 +774,7 @@ class ProbeSummary:
     growth_signal: str | None = None
     prior_use_signal: str | None = None
     signal_errors: list[str] = field(default_factory=list)
+    signal_notes: list[str] = field(default_factory=list)  # rate limits, budget skips
     dry_run: bool = False
     started_at: datetime | None = None
     finished_at: datetime | None = None
@@ -775,6 +884,7 @@ def run_probe(
     summary.growth_signal = facets["growth_signal"]
     summary.prior_use_signal = facets["prior_use_signal"]
     summary.signal_errors = list(signals.errors)
+    summary.signal_notes = list(signals.notes)
     summary.status = "partial" if signals.errors else "ok"
 
     if dry_run:
@@ -788,6 +898,7 @@ def run_probe(
             "newest_wayback_age_days": signals.newest_wayback_age_days,
             "citation_query": citation_query,
             "signal_errors": signals.errors,
+            "signal_notes": signals.notes,
         },
         ensure_ascii=False,
     )
@@ -878,7 +989,7 @@ def list_probe_targets(
 def _log_summary(summary: ProbeSummary) -> None:
     log.info(
         "probe %s/%s status=%s web_ops=%s preservation=%s growth=%s "
-        "prior_use=%s errors=%d dry_run=%s",
+        "prior_use=%s errors=%d notes=%d dry_run=%s",
         summary.target_kind,
         summary.target_slug,
         summary.status,
@@ -887,5 +998,6 @@ def _log_summary(summary: ProbeSummary) -> None:
         summary.growth_signal,
         summary.prior_use_signal,
         len(summary.signal_errors),
+        len(summary.signal_notes),
         summary.dry_run,
     )
