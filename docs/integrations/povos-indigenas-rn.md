@@ -5,8 +5,14 @@ federated partner. The mirror-image doc lives at
 [`povos-indigenas-rn/docs/INTEGRATION.md`](https://github.com/stevewil/povos-indigenas-rn/blob/main/docs/INTEGRATION.md)
 and covers povos's side (what endpoints povos must expose).
 
-**Status:** design + checklist. Nothing landed yet. Blocked on povos deploy
-and povos federation endpoints (see §2 for the ordering).
+**Status:** **LANDED 2026-08-28.** `scripts/seed_povos_archive.py` +
+`configs/upgrade_projects/povos-indigenas-rn.yaml` +
+`tests/test_load_povos.py` (3 tests). povos is upgrade project #2; the
+live federation preview on `/archives/povos-indigenas-rn-corpus` fetches
+`/api/health` and shows `record_count: 40`. Deploy: cPanel pull + run the
+seed + `load_upgrade_projects` (in `docs/DEPLOY.md`). First povos harvest
+cycle (`oai_pmh_base_url` is already set) is the remaining follow-up.
+The design notes below are kept as the record of the bootstrap.
 
 > **Read this alongside:**
 > - [`../federation-v1.md`](../federation-v1.md) — the federation contract povos must speak.

@@ -43,8 +43,10 @@ export FLASK_APP=wsgi.py
 # Load data (order matters)
 .venv/bin/python -m scripts.load_vocabularies      # periods, record types, themes, institutional types
 .venv/bin/python -m scripts.load_survey            # 79 archives from the Nordeste survey
-.venv/bin/python -m scripts.load_upgrade_projects  # Mipibu (extend by dropping YAML in configs/upgrade_projects/)
-.venv/bin/python -m scripts.load_calibration       # Pass 2 paper scores for the 6 anchor archives (idempotent)
+.venv/bin/python -m scripts.seed_povos_archive     # composite archives row povos's upgrade project points at
+.venv/bin/python -m scripts.load_upgrade_projects  # Mipibu + povos (extend by dropping YAML in configs/upgrade_projects/)
+.venv/bin/python -m scripts.load_calibration                                    # Pass 2 anchor scores (idempotent)
+.venv/bin/python -m scripts.load_calibration --path configs/calibration/pass3.yaml   # Pass 3, 15 more archives
 
 .venv/bin/flask run                       # http://127.0.0.1:5000
 .venv/bin/python -m pytest                # test suite

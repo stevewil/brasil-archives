@@ -1,0 +1,68 @@
+# Povos Indígenas do RN Corpus Explorer — upgrade project registration.
+# See docs/federation-v1.md §Registration for the schema.
+# See docs/integrations/povos-indigenas-rn.md for the bootstrap sequence.
+
+slug: povos-indigenas-rn
+name: Povos Indígenas do RN Corpus Explorer
+name_pt: Explorador do Corpus dos Povos Indígenas do RN
+
+# Resolves against the composite row seeded by scripts/seed_povos_archive.py.
+source_archive_slug: povos-indigenas-rn-corpus
+
+scope:
+  description_en: >
+    Colonial administrative correspondence (AHU / Projeto Resgate) and
+    imperial provincial reports (CRL) bearing on the Indigenous peoples of
+    Rio Grande do Norte, plus portal essays and academic works from UFRN.
+    Curated, transcribed and audited by the corpus explorer.
+  description_pt: >
+    Correspondência administrativa colonial (AHU / Projeto Resgate) e
+    relatórios provinciais imperiais (CRL) sobre os povos indígenas do
+    Rio Grande do Norte, além de ensaios do portal e trabalhos acadêmicos
+    da UFRN. Curado, transcrito e auditado pelo explorador de corpus.
+  period_tags:
+    - early-colonial-1500-1700
+    - late-colonial-pombaline-1700-1808
+    - joanine-1808-1822
+    - independence-first-reign-1822-1831
+    - regency-1831-1840
+    - second-reign-imperio-1840-1889
+  record_types:
+    - administrative-legislative
+    - manuscripts-books
+  geography:
+    - name: Rio Grande do Norte
+      geonames_id: 3451189
+  approximate_size:
+    document_count: 40
+    page_equivalents: null
+
+delivery:
+  primary_url: https://povos-indigenas-rn.from-bottom-to.top
+  source_repo: https://github.com/stevewil/povos-indigenas-rn
+  status: beta   # in-development | beta | stable | deprecated
+
+federation:
+  contract_version: v1
+  json_api_base_url: https://povos-indigenas-rn.from-bottom-to.top/api
+  oai_pmh_base_url: https://povos-indigenas-rn.from-bottom-to.top/oai
+  iiif_search_endpoint: null
+  ead_export_url: null
+  eac_cpf_export_url: null
+  supported_metadata_formats:
+    - oai_dc
+  supported_authorities:
+    - viaf
+    - geonames
+
+license:
+  code: MIT
+  data: CC-BY-SA-4.0
+  attribution_required: true
+
+maintainer:
+  name: Steve Williams
+  contact_email: stevewil@gmail.com
+
+# Dimension lifts: filled during a future scoring pass. Empty = none declared.
+lifts: {}

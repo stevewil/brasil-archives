@@ -89,29 +89,22 @@ Primary ref: `povos-indigenas-rn/docs/oai-pmh-povos.md` (that repo).
 
 ## 3. Track C — register povos as the 2nd upgrade project
 
-Primary ref: `docs/integrations/povos-indigenas-rn.md` (has the bootstrap
-baked in). **~2h mechanical once unblocked.**
+Primary ref: `docs/integrations/povos-indigenas-rn.md`.
 
-Blocked on: (a) povos deployed at `povos-indigenas-rn.from-bottom-to.top`
-with `/api/health` returning `federation_contract_version: "v1"`, and
-(b) Track B for the harvest half.
-
-- [ ] **[S] Add `research-project` institutional type** to
-  `configs/vocabularies/institutional_types.yaml` if missing; reload vocab.
-- [ ] **[S] `scripts/seed_povos_archive.py`** — the composite `archives` row
-  (`source_archive_id` is NOT NULL; povos's source is AHU+CRL+UFRN, not one
-  fonds). Code is in the integration doc §3a.
-- [ ] **[S] `configs/upgrade_projects/povos-indigenas-rn.yaml`** — copy
-  mipibu's shape; `oai_pmh_base_url: null` until Track B ships. YAML is in
-  the integration doc §4.
-- [ ] **[S] `python -m scripts.load_upgrade_projects`** + local verify
-  (`/archives/povos-indigenas-rn-corpus` renders a federation-preview
-  block), then push → cPanel pull → restart → live verify (home counter
-  1 → 2).
-- [ ] **[S] `tests/test_load_povos.py`** — loader integration test (doc §7).
-- [ ] **[S] After povos `/oai` lands:** set `oai_pmh_base_url` in the YAML,
-  reload, `scripts/harvest.py --project povos-indigenas-rn --dry-run` then
-  real.
+- [x] **Register povos as upgrade project #2.** Landed 2026-08-28.
+  `scripts/seed_povos_archive.py` (composite `archives` row
+  `povos-indigenas-rn-corpus`, `institutional_type=research-project`) +
+  `configs/upgrade_projects/povos-indigenas-rn.yaml` (`json_api` + `oai`
+  URLs set, `beta`, 6 period tags, `administrative-legislative` +
+  `manuscripts-books`) + `tests/test_load_povos.py` (3 tests). Loaded
+  locally: 2 upgrade projects; the live federation preview on
+  `/archives/povos-indigenas-rn-corpus` shows povos's `record_count: 40`.
+  **Deploy:** cPanel pull → `python -m scripts.seed_povos_archive` →
+  `python -m scripts.load_upgrade_projects` → restart → home counter 1→2.
+- [ ] **[S] First povos harvest cycle.** `oai_pmh_base_url` is set in the
+  YAML. Run `python -m scripts.harvest --project povos-indigenas-rn
+  --dry-run` then real (workstation or cPanel) to pull povos's `oai_dc`
+  into `aggregated_records`.
 
 ## 4. Track D — extract a shared OAI package
 

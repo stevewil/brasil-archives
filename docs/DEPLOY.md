@@ -46,8 +46,10 @@ Run that same recovery sequence after any future prod DB reseed.
    FLASK_APP=wsgi.py flask db upgrade
    python -m scripts.load_vocabularies
    python -m scripts.load_survey
-   python -m scripts.load_upgrade_projects
-   python -m scripts.load_calibration   # Pass 2 anchor scores; without it every detail page renders "—"
+   python -m scripts.seed_povos_archive        # composite row povos's upgrade project points at
+   python -m scripts.load_upgrade_projects     # mipibu + povos
+   python -m scripts.load_calibration                                   # Pass 2 anchor scores
+   python -m scripts.load_calibration --path configs/calibration/pass3.yaml   # Pass 3 (15 more archives)
    ```
 6. Compile the translation catalogs (the `.mo` files are git-ignored, so
    they must be built on the deploy host — see `app/translations/`):
