@@ -125,18 +125,21 @@ with `/api/health` returning `federation_contract_version: "v1"`, and
 Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.md`
 §"Open follow-ups".
 
-- [~] **[L] Pass 3 — score the rest of the survey.** DRAFT landed 2026-08-27
-  on branch `feature/pass3-scoring` (`3a21e07`): 15 archives in
-  `configs/calibration/pass3.yaml` + `docs/pass3-scoring-notes.md`.
-  **Not merged, not loaded** — 8 borderline calls need Steve's review
-  (see the notes doc). After review: merge + `python -m scripts.load_calibration
+- [x] **[L] Pass 3 — score the rest of the survey.** Scored 2026-08-27,
+  reviewed by Steve + merged + loaded 2026-08-28 (`39a08da`, `b6eceee`).
+  15 Nordeste archives; 21 archives now have active scores (6 Pass 2 +
+  15 Pass 3). 13 of 15 land Low/Low. Review outcome + all 8 borderline
+  calls: `docs/pass3-scoring-notes.md` §"Review outcome". **Deploy:** one
+  cPanel pull + `python -m scripts.load_calibration --path
   configs/calibration/pass3.yaml`.
 - [ ] **[M] Re-examine the 4-4 axis partition and the 28/40 quadrant
-  threshold** after Pass 3 has ~12–15 archives. Changing either requires an
-  **ADR-0001 supersession**, not a quiet edit.
-- [ ] Get at least one archive labeled `scholarly_access_practical =
-  only-via-federation` (first candidate: mipibu's source, once mipibu is
-  promoted from UpgradeProject to Archive).
+  threshold** — **now unblocked** (Pass 3 has 15 archives). Requires an
+  **ADR-0001 supersession**, not a quiet edit. Inputs flagged in
+  `algorithm-v1.md` change log 2026-08-28: the Scale digitized-vs-published
+  basis, and `t1r18` sitting at research axis 27/40.
+- [x] Get at least one archive labeled `scholarly_access_practical =
+  only-via-federation` — done via Pass 3: APEJE, APEPI, and the 3
+  FamilySearch collections (`t1r10/37/39/43/47`).
 
 ## 6. Infrastructure not yet built
 
