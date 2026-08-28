@@ -2,7 +2,16 @@
 
 **Model:** GitHub is the source of truth. cPanel pulls from GitHub. Never push to cPanel directly.
 
-Verified working 2026-08-27 with commit `a981b60` (Track 4).
+Verified working 2026-08-28 with commit `1cc5ded` (UI Tracks 1–5 + probe
+runner + `/oai` provider + `size_unit_note`). Prior: `a981b60` (Track 4),
+2026-08-27.
+
+**2026-08-28 note:** that deploy found the prod SQLite DB had been reseeded
+— missing Pass 2 scores, the harvest tables, and mipibu's `oai_pmh_base_url`.
+Recovery was: `flask db upgrade` (3 migrations) → `pybabel compile` →
+`python -m scripts.load_calibration` → `python -m scripts.load_upgrade_projects`
+→ `python -m scripts.harvest --project mipibu` (both `oai_dc` and `oai_ead`).
+Run that same recovery sequence after any future prod DB reseed.
 
 ## Prerequisites (one-time)
 

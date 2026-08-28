@@ -30,17 +30,12 @@ Legend: **[S]** small (<1h) · **[M]** medium (1–3h) · **[L]** large / multi-
 
 ## 1. Track A — public UI polish (5 of 5 landed) ✅
 
-Full brief: `docs/UI-POLISH-PICKUP.md`. All five sub-tracks have landed in
-code. **One action left:**
+Full brief: `docs/UI-POLISH-PICKUP.md`. All five sub-tracks landed in code.
 
-- [ ] **[S] Deploy Tracks 1 + 3 to cPanel.** One `git pull` on the cPanel
-  terminal. Track 1 additionally needs — inside the cPanel venv, before the
-  restart — `pybabel compile -d app/translations` (the `.mo` files are
-  git-ignored). Then `touch tmp/restart.txt` and verify:
-  `curl -s https://brasil-archives.from-bottom-to.top/ | grep -c home-featured` (Track 3, expect >0)
-  and `curl -s 'https://brasil-archives.from-bottom-to.top/?lang=pt' | grep -o 'Arquivos Digitais Brasileiros'` (Track 1).
-  Full steps in `docs/DEPLOY.md` "Routine deploy". If `pybabel` isn't on
-  the cPanel venv PATH, `pip install babel` (it's a Flask-Babel dep).
+- [x] **Deploy Tracks 1 + 3 to cPanel.** Done 2026-08-28 as part of the
+  `1cc5ded` deploy (runbook Phase 1). All five UI-polish tracks are now
+  live. The deploy also recovered a reseeded prod DB — see `docs/DEPLOY.md`
+  2026-08-28 note.
 
 - [x] **Track 4 — locale-aware vocab labels.** Landed `a981b60`.
 - [x] **Tooling prep — `scripts/dev/wrap_i18n.py`.** Not built — Track 1's
