@@ -182,6 +182,8 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
 
 ## Suggested next session
 
+**Step-by-step runbook for everything below: `docs/handoff/2026-08-27-runbook.md`.**
+
 1. **Review Pass 3** — `docs/pass3-scoring-notes.md`, the 8 borderline calls;
    then merge `feature/pass3-scoring` + load.
 2. **Deploy pending work to cPanel** — `main` (`34fc5b3`+) now carries UI-polish
