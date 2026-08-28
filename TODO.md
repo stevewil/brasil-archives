@@ -156,17 +156,39 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
   (`54367f7`). **Left:** EAC-CPF (no authority records yet), register at the
   OAI-PMH registry (runbook in `docs/oai-pmh-provider.md` §6), resolve the
   §7 open questions (public-bar policy, `harvested` passthrough set).
-- [ ] **[L] Phase 4 — IIIF Content Search fanout.** Federated full-text
-  search across companion apps. Ref: `federation-v1.md` §"IIIF Content
-  Search".
-- [ ] **[?] Deploy povos to cPanel.** Not this repo, but it's the gate on
-  Track C. `povos-indigenas-rn/docs/DEPLOY.md`.
+- [ ] **[M] Phase 3.5 — cross-corpus aggregated search.** *(Scoped 2026-08-28;
+  do AFTER the runbook §Remaining items — cPanel deploy, prod probe run,
+  crons, first prod povos harvest.)* brasil-archives harvests partner
+  records into `aggregated_records` but has **no public search over them** —
+  only a count on the home page, per-partner federation-preview cards, and
+  the admin-gated `/harvest/` browse. Build a public search view:
+  - **Route:** `main` blueprint, `GET /search` (or `/federated`), public.
+  - **Data:** query over `aggregated_records.extracted_json` (`canonical`
+    holds normalized title/date/creator; `raw` holds all DC fields). At
+    1161 records a `LIKE`/`json_extract` scan is fine; add an FTS5 virtual
+    table + triggers if it grows (mirror povos's `fts_documents` pattern).
+  - **Results:** grouped/attributed by source `UpgradeProject`, each row
+    deep-linking back to the partner (needs the `federation.html_deep_link`
+    fix in §7 — currently hardcoded to mipibu's `/cases?…`).
+  - **i18n + tests.** Bilingual; `tests/test_federated_search.py`.
+  - This is the pragmatic precursor to Phase 4 (full IIIF Content Search
+    fanout), which needs partners to also expose IIIF Content Search
+    endpoints and is a bigger build.
+- [ ] **[L] Phase 4 — IIIF Content Search fanout.** Live federated full-text
+  search — a query on brasil-archives fans out to every partner's IIIF
+  Content Search endpoint. Needs mipibu + povos to implement those endpoints
+  first. Ref: `federation-v1.md` §"IIIF Content Search". Supersedes Phase 3.5.
+- [x] **Deploy povos to cPanel.** Done — povos live at
+  `povos-indigenas-rn.from-bottom-to.top` with `/oai` + federation-v1
+  `/api/*` (`466f8c1`).
 
 ## 7. Known small gaps found while reading the code
 
 - [ ] `federation.html_deep_link` is hardcoded to Mipibu's `/cases?…` URL
-  shape with a `# TODO` to switch to a `links.html` template from
-  `/api/schema` once a 2nd corpus registers. Revisit during Track C.
+  shape. Now that povos is the 2nd registered corpus, this returns wrong
+  links for povos. Fix: derive the deep link from each project's
+  `/api/records` `links.html` (or `/api/schema`). **Needed by Phase 3.5
+  cross-corpus search.**
 - [ ] `LICENSING.md` referenced by `algorithm-v1.md` §Licensing doesn't
   exist yet — "finalized before public release."
 - [x] `docs/vocabularies.md` — written 2026-08-27 (`34fc5b3`): consolidates
@@ -178,26 +200,40 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
 
 ## Suggested next session
 
-**Step-by-step runbook for everything below: `docs/handoff/2026-08-27-runbook.md`.**
+**Runbook: `docs/handoff/2026-08-27-runbook.md`.** All 7 phases (0–6) are
+BUILT + merged as of 2026-08-28. `brasil-archives` main `0022fc3`+,
+`povos` main `466f8c1` (deployed). What's left is operational:
 
-1. **Review Pass 3** — `docs/pass3-scoring-notes.md`, the 8 borderline calls;
-   then merge `feature/pass3-scoring` + load.
-2. **Deploy pending work to cPanel** — `main` (`34fc5b3`+) now carries UI-polish
-   Tracks 1+3 **plus** the probe runner, the `/oai` OAI-PMH provider, and the
-   `size_unit_note` column. One pull; run `flask db upgrade` (two new
-   migrations: `d7f1a2b3c4d5`, `e2c3d4f5a6b7`) and `pybabel compile -d
-   app/translations` before the Passenger restart. See `docs/DEPLOY.md`.
-3. **Run the probe against prod once**, then decide the harvest + probe crons (§6).
-4. **povos `feature/oai-pmh`** — review + merge in that repo; deploy povos;
-   then Track C (register as 2nd upgrade project).
-5. Track B is effectively done (povos `/oai` built) — Track D (extract shared
-   OAI package) is now unblocked but low priority; mipibu + povos have
-   parallel implementations to diff first.
+1. **brasil-archives cPanel pull** (cPanel at `1cc5ded`) — *the interrupted
+   item.* One pull carries Pass 3 + probe robustness + EAG fix + Track C.
+   After the pull + venv activate (no migrations, no pybabel):
+   ```
+   python -m scripts.load_calibration --path configs/calibration/pass3.yaml
+   python -m scripts.seed_povos_archive
+   python -m scripts.load_upgrade_projects
+   touch tmp/restart.txt
+   ```
+   Verify: Pass 3 detail pages scored, home upgrade counter → 2,
+   `/archives/povos-indigenas-rn-corpus` renders (federation preview,
+   `record_count 40`).
+2. **Full prod probe run** + the probe/harvest crons (runbook Phase 2 §).
+3. **First prod povos harvest** — `python -m scripts.harvest --project
+   povos-indigenas-rn` on cPanel (dry-run confirmed clean: 145 records; a
+   local harvest was run 2026-08-28 → local `aggregated_records` = 1161,
+   **prod still 1016**).
+4. **OAI-PMH registry registration** — `docs/oai-pmh-provider.md` §6.
+5. **povos** `git add --renormalize . && commit` — line-ending churn snags
+   future pulls on cPanel.
+6. **ADR-0001 axis re-examination** — now has 15 Pass 3 archives.
+7. **[M] Phase 3.5 — cross-corpus aggregated search** (§6) — scoped
+   2026-08-28; the "search across sources" feature. Do after items 1–3.
+8. **Track D** (shared OAI `CorpusAdapter`) — low priority, N=3 providers.
 
-## Landed 2026-08-27 (parallel-jobs session)
+## Landed 2026-08-27/28
 
-- `d2b808d` probe runner · `54367f7` OAI-PMH provider + EAG · `34fc5b3`
-  `docs/vocabularies.md` · `e2c3d4f5a6b7` `size_unit_note` column.
-- Session record: `docs/handoff/2026-08-27-parallel-jobs.md`.
-- **Not landed:** Pass 3 (`feature/pass3-scoring`, draft), povos `/oai`
-  (`feature/oai-pmh` in that repo).
+Parallel-jobs (`34fc5b3`): `d2b808d` probe runner · `54367f7` OAI-PMH
+provider + EAG · `docs/vocabularies.md` · `e2c3d4f5a6b7` `size_unit_note`.
+Deploy/review (`0022fc3`): Pass 3 loaded (`b6eceee`), probe robustness
+(`9563f47`), EAG fix (`bb044b4`), Track C (`8d81da0`). povos: `/oai`
+(`817167c`) + federation-v1 `/api/*` (`466f8c1`), both deployed.
+Session records: `docs/handoff/2026-08-27-{parallel-jobs,runbook}.md`.
