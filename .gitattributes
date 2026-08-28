@@ -1,0 +1,10 @@
+# Scripts that run on the Linux cPanel host — keep LF regardless of the
+# checkout platform, so `git pull` on cPanel never snags on a CRLF-vs-LF
+# "your local changes would be overwritten" for these files.
+venv              text eol=lf
+github-pull       text eol=lf
+*.sh              text eol=lf
+passenger_wsgi.py text eol=lf
+
+# Windows batch file — keep CRLF.
+app.bat           text eol=crlf

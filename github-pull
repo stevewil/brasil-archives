@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+# Pull the latest main from GitHub and bring the cPanel deployment current.
+#
+# Run it (unlike `venv`, this one is executed, not sourced):
+#
+#     ~/flask/brasil-archives/github-pull
+#
+# Optional ~/.bashrc shortcut:
+#
+#     alias github-pull='~/flask/brasil-archives/github-pull'
+#
+# It handles the mechanical steps automatically:
+#   - pip install         when requirements.txt changed
+#   - flask db upgrade     when a new migration landed
+#   - pybabel compile      when a translation catalog (.po) changed
+#   - touch tmp/restart.txt  always (Passenger reload)
+#
+# It does NOT run the data loaders (load_calibration / seed_povos_archive /
+# load_upgrade_projects / load_vocabularies / load_survey) — those are
+# semi-idempotent but noisy on every deploy. If configs/ changed it prints
+# the exact commands to run by hand in the activated shell.
+
+set -euo pipefail
+
+APP_DIR="$HOME/flask/brasil-archives"
+cd "$APP_DIR"
+
+echo "==> Fetching origin"
+git fetch origin
+
+BEFORE="$(git rev-parse HEAD)"
+echo "==> Pulling origin/main"
+git pull --ff-only origin main
+AFTER="$(git rev-parse HEAD)"
+
+if [ "$BEFORE" = "$AFTER" ]; then
+    echo "==> Already up to date — nothing to do."
+    exit 0
+fi
+
+CHANGED="$(git diff --name-only "$BEFORE" "$AFTER")"
+echo "==> Changed files:"
+echo "$CHANGED" | sed 's/^/      /'
+
+ACTIVATE="$(ls "$HOME"/virtualenv/flask/brasil-archives/*/bin/activate \
+                "$HOME"/virtualenv/brasil-archives/*/bin/activate 2>/dev/null | head -1)"
+if [ -n "$ACTIVATE" ]; then
+    # shellcheck disable=SC1090
+    source "$ACTIVATE"
+else
+    echo "!!  virtualenv not found under ~/virtualenv — skipping venv-dependent steps" >&2
+fi
+
+if echo "$CHANGED" | grep -qx "requirements.txt"; then
+    echo "==> requirements.txt changed — pip install"
+    pip install -r requirements.txt
+fi
+
+if echo "$CHANGED" | grep -q "^migrations/versions/"; then
+    echo "==> new migration(s) — flask db upgrade"
+    FLASK_APP=wsgi.py flask db upgrade
+fi
+
+if echo "$CHANGED" | grep -qE "^app/translations/.*\.po$"; then
+    echo "==> translation catalog changed — pybabel compile"
+    pybabel compile -d app/translations
+fi
+
+if echo "$CHANGED" | grep -qE "^configs/(calibration|upgrade_projects|vocabularies)/"; then
+    cat <<'REMINDER'
+
+!!  configs/ changed. You may need to run these by hand in this shell
+    (they are idempotent):
+
+      python -m scripts.load_vocabularies
+      python -m scripts.load_survey
+      python -m scripts.seed_povos_archive
+      python -m scripts.load_upgrade_projects
+      python -m scripts.load_calibration
+      python -m scripts.load_calibration --path configs/calibration/pass3.yaml
+
+REMINDER
+fi
+
+echo "==> Restarting Passenger"
+mkdir -p tmp
+touch tmp/restart.txt
+
+echo "==> Done. Verify:"
+echo "    curl -s https://brasil-archives.from-bottom-to.top/healthz"

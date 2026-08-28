@@ -58,12 +58,23 @@ Run that same recovery sequence after any future prod DB reseed.
    ```
 7. Restart via **Setup Python App → Restart** or `touch tmp/restart.txt`.
 
+## Helper scripts (repo root, on the cPanel checkout)
+
+- **`venv`** — *source* it to activate the virtualenv and `cd` to the app
+  root: `source ~/flask/brasil-archives/venv` (or add
+  `alias venv='source ~/flask/brasil-archives/venv'` to `~/.bashrc`).
+- **`github-pull`** — *execute* it for a routine deploy:
+  `~/flask/brasil-archives/github-pull`. It pulls `--ff-only`, then runs
+  `pip install` / `flask db upgrade` / `pybabel compile` only when the
+  relevant files changed, and `touch tmp/restart.txt`. It prints (but does
+  not run) the data-loader commands when `configs/` changed.
+
 ## Routine deploy (every commit)
 
-Standard three-step. All from cPanel terminal.
+`~/flask/brasil-archives/github-pull` covers it. The manual equivalent:
 
 ```bash
-cd ~/brasil-archives
+cd ~/flask/brasil-archives
 git fetch origin
 git pull origin main
 touch tmp/restart.txt

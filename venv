@@ -1,0 +1,21 @@
+# Activate the cPanel virtualenv and jump to the app root.
+#
+# MUST be sourced, not executed — otherwise the activation dies with the
+# subshell and you're back where you started:
+#
+#     source ~/flask/brasil-archives/venv
+#
+# Optional: add a shortcut to ~/.bashrc so you can just type `venv`:
+#
+#     alias venv='source ~/flask/brasil-archives/venv'
+
+_ba_activate="$(ls "$HOME"/virtualenv/flask/brasil-archives/*/bin/activate \
+                   "$HOME"/virtualenv/brasil-archives/*/bin/activate 2>/dev/null | head -1)"
+if [ -n "$_ba_activate" ]; then
+    source "$_ba_activate"
+else
+    echo "brasil-archives virtualenv not found under ~/virtualenv — activate it manually" >&2
+fi
+unset _ba_activate
+
+cd "$HOME/flask/brasil-archives" 2>/dev/null || cd "$HOME/brasil-archives"
