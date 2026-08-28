@@ -141,12 +141,13 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
 ## 6. Infrastructure not yet built
 
 - [~] **[L] Quarterly health probe.** Runner **built + landed** 2026-08-27
-  (`d2b808d`): `scripts/probe.py` + `app/services/probe.py` populate the four
-  probe-fed facets from HTTPS/cert checks, HTTP sweeps, Wayback CDX,
-  CrossRef/Semantic Scholar; `archives.last_probed_at` column. **Left:**
-  (a) run it manually against prod once, (b) schedule the cron, (c) tune the
-  compositing thresholds (named constants at the top of `probe.py`) during
-  calibration.
+  (`d2b808d`), **robustness pass** 2026-08-28 (`9563f47`: per-target 90s
+  budget, Wayback/S2 soft-miss handling, `SEMANTIC_SCHOLAR_API_KEY` support).
+  Exercised from the workstation — compositing looks sane, a dead host
+  terminates in ~94s. **Left:** (a) full real run against prod on cPanel
+  (`python -m scripts.probe --all --include-upgrade-projects`), (b) add the
+  cPanel cron (lines in `docs/handoff/2026-08-27-runbook.md` Phase 2),
+  (c) tune the compositing thresholds during Pass 2 calibration.
 - [ ] **[M] Scheduled harvest (cron).** Explicitly deferred in
   `harvest-design.md` until the harvester has run manually against prod at
   least once. Still on-demand only today.
