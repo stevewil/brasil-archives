@@ -9,32 +9,35 @@
 #
 #     alias github-pull='~/flask/brasil-archives/github-pull'
 #
-# It handles the mechanical steps automatically:
-#   - pip install         when requirements.txt changed
-#   - flask db upgrade     when a new migration landed
-#   - pybabel compile      when a translation catalog (.po) changed
-#   - touch tmp/restart.txt  always (Passenger reload)
+# Automatic, only when the relevant files changed:
+#   - pip install          (requirements.txt)
+#   - flask db upgrade      (a new migration)
+#   - pybabel compile       (a translation catalog .po)
+# It ALWAYS restarts Passenger at the end, even if one of those steps
+# failed — a warning is printed and you finish the step by hand.
 #
-# It does NOT run the data loaders (load_calibration / seed_povos_archive /
-# load_upgrade_projects / load_vocabularies / load_survey) — those are
-# semi-idempotent but noisy on every deploy. If configs/ changed it prints
-# the exact commands to run by hand in the activated shell.
-
-set -euo pipefail
+# It does NOT run the data loaders (load_calibration / seed_povos_archive
+# / load_upgrade_projects / load_vocabularies / load_survey). If configs/
+# changed it prints the commands to run by hand in the activated shell.
 
 APP_DIR="$HOME/flask/brasil-archives"
-cd "$APP_DIR"
+cd "$APP_DIR" || { echo "!! $APP_DIR not found" >&2; exit 1; }
+
+WARN=0
+warn() { echo "!!  $*" >&2; WARN=1; }
 
 echo "==> Fetching origin"
-git fetch origin
+git fetch origin || { echo "!! git fetch failed" >&2; exit 1; }
 
 BEFORE="$(git rev-parse HEAD)"
 echo "==> Pulling origin/main"
-git pull --ff-only origin main
+git pull --ff-only origin main || { echo "!! git pull failed (not fast-forward?)" >&2; exit 1; }
 AFTER="$(git rev-parse HEAD)"
 
 if [ "$BEFORE" = "$AFTER" ]; then
-    echo "==> Already up to date — nothing to do."
+    echo "==> Already up to date."
+    echo "==> Restarting Passenger anyway (harmless)"
+    mkdir -p tmp && touch tmp/restart.txt
     exit 0
 fi
 
@@ -42,49 +45,59 @@ CHANGED="$(git diff --name-only "$BEFORE" "$AFTER")"
 echo "==> Changed files:"
 echo "$CHANGED" | sed 's/^/      /'
 
-ACTIVATE="$(ls "$HOME"/virtualenv/flask/brasil-archives/*/bin/activate \
-                "$HOME"/virtualenv/brasil-archives/*/bin/activate 2>/dev/null | head -1)"
-if [ -n "$ACTIVATE" ]; then
+# --- activate the virtualenv (needed by pip / flask / pybabel) -------------
+ACTIVATE="$(ls -1 \
+    "$HOME"/virtualenv/flask/brasil-archives/*/bin/activate \
+    "$HOME"/virtualenv/brasil-archives/*/bin/activate \
+    2>/dev/null | head -1)"
+if [ -n "$ACTIVATE" ] && [ -f "$ACTIVATE" ]; then
+    echo "==> venv: $ACTIVATE"
     # shellcheck disable=SC1090
-    source "$ACTIVATE"
+    . "$ACTIVATE"
 else
-    echo "!!  virtualenv not found under ~/virtualenv — skipping venv-dependent steps" >&2
+    warn "virtualenv not found under ~/virtualenv — pip/migrate/compile skipped; run them by hand"
+fi
+PYBIN="$(command -v python || true)"
+
+run_step() {  # description ; command...
+    local desc="$1"; shift
+    echo "==> $desc"
+    if ! "$@"; then
+        warn "'$desc' FAILED — finish it by hand, then: touch $APP_DIR/tmp/restart.txt"
+    fi
+}
+
+if [ -n "$PYBIN" ] && echo "$CHANGED" | grep -qx "requirements.txt"; then
+    run_step "requirements.txt changed — pip install" pip install -r requirements.txt
 fi
 
-if echo "$CHANGED" | grep -qx "requirements.txt"; then
-    echo "==> requirements.txt changed — pip install"
-    pip install -r requirements.txt
+if [ -n "$PYBIN" ] && echo "$CHANGED" | grep -q "^migrations/versions/"; then
+    run_step "new migration(s) — flask db upgrade" env FLASK_APP=wsgi.py flask db upgrade
 fi
 
-if echo "$CHANGED" | grep -q "^migrations/versions/"; then
-    echo "==> new migration(s) — flask db upgrade"
-    FLASK_APP=wsgi.py flask db upgrade
-fi
-
-if echo "$CHANGED" | grep -qE "^app/translations/.*\.po$"; then
-    echo "==> translation catalog changed — pybabel compile"
-    pybabel compile -d app/translations
+if [ -n "$PYBIN" ] && echo "$CHANGED" | grep -qE "^app/translations/.*\.po$"; then
+    run_step "translation catalog changed — pybabel compile" pybabel compile -d app/translations
 fi
 
 if echo "$CHANGED" | grep -qE "^configs/(calibration|upgrade_projects|vocabularies)/"; then
     cat <<'REMINDER'
 
-!!  configs/ changed. You may need to run these by hand in this shell
-    (they are idempotent):
-
+!!  configs/ changed. Run these by hand in the activated shell (idempotent):
       python -m scripts.load_vocabularies
       python -m scripts.load_survey
       python -m scripts.seed_povos_archive
       python -m scripts.load_upgrade_projects
       python -m scripts.load_calibration
       python -m scripts.load_calibration --path configs/calibration/pass3.yaml
-
 REMINDER
+    WARN=1
 fi
 
 echo "==> Restarting Passenger"
-mkdir -p tmp
-touch tmp/restart.txt
+mkdir -p tmp && touch tmp/restart.txt
 
-echo "==> Done. Verify:"
-echo "    curl -s https://brasil-archives.from-bottom-to.top/healthz"
+if [ "$WARN" -ne 0 ]; then
+    echo "==> Done WITH WARNINGS — see the !! lines above."
+else
+    echo "==> Done. Verify: curl -s https://brasil-archives.from-bottom-to.top/healthz"
+fi
