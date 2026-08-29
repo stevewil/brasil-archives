@@ -50,8 +50,12 @@
 
 {% if featured %}
 <section class="home-featured">
+  {% if show_scores() %}
   <h2>{{ _("Featured archives") }}</h2>
   <p class="disclaimer">{{ _("Ranked by the two-axis evaluation; unscored archives sort last.") }}</p>
+  {% else %}
+  <h2>{{ _("Archives in the catalog") }}</h2>
+  {% endif %}
   <ul class="home-featured__grid">
     {% for f in featured %}
       <li class="home-featured__card">
@@ -61,6 +65,7 @@
         <p class="home-featured__meta">
           {{ f.archive.home_state_code or '—' }} · {{ vocab_label(f.archive.institutional_type) or _("archive") }}
         </p>
+        {% if show_scores() %}
         <p class="home-featured__score">
           {% if f.naive_sum is not none %}
             <span class="badge badge--ok">{{ _("Score") }} {{ f.naive_sum }}/80</span>
@@ -68,6 +73,7 @@
             <span class="badge badge--muted">{{ _("Not yet scored") }}</span>
           {% endif %}
         </p>
+        {% endif %}
       </li>
     {% endfor %}
   </ul>

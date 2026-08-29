@@ -54,6 +54,16 @@ class BaseConfig:
     # Set BRASIL_ARCHIVES_ADMIN=1 on the internal deployment only.
     ADMIN_UI_ENABLED = os.environ.get("BRASIL_ARCHIVES_ADMIN") == "1"
 
+    # Public-scores visibility. When false (the public default), the
+    # scored judgments — dimension scores, the two axis totals, the
+    # quadrant label, the legacy naive sum, and the score-ranked home
+    # block — are hidden from the public UI; the catalog and federated
+    # search still work. Independent of ADMIN_UI_ENABLED: the internal
+    # deployment always sees scores. Set BRASIL_ARCHIVES_PUBLIC_SCORES=1
+    # once the judgments are trustworthy enough to publish. See
+    # app/visibility.py and docs/DEPLOY.md.
+    PUBLIC_SCORES_ENABLED = os.environ.get("BRASIL_ARCHIVES_PUBLIC_SCORES") == "1"
+
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
@@ -69,6 +79,10 @@ class TestingConfig(BaseConfig):
     # Exercise the full internal UI by default; the gate itself is
     # covered by tests that build an app with this flipped off.
     ADMIN_UI_ENABLED = True
+    # Score-display tests assume scores are visible; the public-scores
+    # gate is covered by tests that build an app with this flipped off
+    # (tests/test_public_scores_gate.py).
+    PUBLIC_SCORES_ENABLED = True
 
 
 class ProductionConfig(BaseConfig):

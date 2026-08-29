@@ -41,6 +41,13 @@ Run that same recovery sequence after any future prod DB reseed.
      Set it to `1` only on an internal/operator deployment: it unlocks the
      scoring forms, the facet editor, and the entire `/harvest` surface
      (all 404 otherwise). See `app/blueprints/_admin_gate.py`.
+   - `BRASIL_ARCHIVES_PUBLIC_SCORES` — **leave unset** on the public host
+     until the scored judgments are greenlit for release. When unset (and
+     not an admin deployment) the catalog and federated search work
+     normally but the dimension scores, the two axis totals, the quadrant
+     label, the naive sum, and the score-ranked home block are hidden.
+     Set to `1` to publish them. Independent of `BRASIL_ARCHIVES_ADMIN`
+     (which always shows scores). See `app/visibility.py`.
 5. DB initialized and seeded:
    ```bash
    FLASK_APP=wsgi.py flask db upgrade

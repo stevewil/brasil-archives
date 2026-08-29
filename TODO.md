@@ -221,21 +221,25 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
 **Pickup brief: `docs/handoff/2026-08-29-search-licensing-admin.md`.**
 Everything through the deep-link fix is built + deployed
 (brasil-archives `e2355c3`, povos `e73a892`, both cPanel-current). The
-scoped list, in order (licensing done 2026-08-29):
+scoped list, in order (licensing + public-scores toggle done 2026-08-29):
 
-1. **Public-scores visibility toggle** `[M]` —
-   `BRASIL_ARCHIVES_PUBLIC_SCORES` (default off), independent of
-   `BRASIL_ARCHIVES_ADMIN`. Hides the score profile / axis / quadrant /
-   dimension table (detail), the score columns + sorts (list), and the
-   score-ranked Featured block (home) from the public until Steve
-   greenlights. Handoff §3 item 2 has the full thread-through list.
-2. **Read-only admin dashboard** `[M]` — one `/admin/` page behind the
+1. **Read-only admin dashboard** `[M]` — one `/admin/` page behind the
    existing gate: scoring coverage, harvest history, probe status,
    federation health, recent errors. No auth, no write paths. Handoff §3
    item 3.
-3. **Archive-draft form** — lowest priority, confirm value first. Must
+2. **Archive-draft form** — lowest priority, confirm value first. Must
    generate a reviewable markdown/YAML draft, never write the prod DB
    (non-durable). Handoff §3 item 4.
+
+**Done this session (not yet deployed):**
+
+- **Public-scores visibility toggle** — `BRASIL_ARCHIVES_PUBLIC_SCORES`
+  (default off), independent of `BRASIL_ARCHIVES_ADMIN`. Hides the score
+  profile / axis / quadrant / dimension table (detail), the score columns
+  + sorts (list), and the score-ranked Featured block (home) from the
+  public until greenlit. `app/visibility.py`,
+  `tests/test_public_scores_gate.py`, `docs/DEPLOY.md`. **Leave the env
+  var unset on the cPanel host.**
 
 **Still open, unscheduled:**
 

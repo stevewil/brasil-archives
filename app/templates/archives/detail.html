@@ -45,6 +45,7 @@
   </p>
 </section>
 
+{% if show_scores() %}
 <section class="score-summary">
   <h2>{{ _("Score profile") }}</h2>
   {% if naive_sum is none %}
@@ -190,6 +191,12 @@
   {% endfor %}
   {% endif %}
 </section>
+{% else %}
+<section class="score-summary">
+  <h2>{{ _("Score profile") }}</h2>
+  <p class="empty-note">{{ _("Evaluation in progress. This archive's scores are not published yet.") }}</p>
+</section>
+{% endif %}
 
 <section class="facets">
   <h2>{{ _("Facets & tags") }}</h2>

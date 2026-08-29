@@ -99,7 +99,23 @@ project's name.** Hence:
 ### Item 1 — Finish + commit licensing  ✅ DONE 2026-08-29
 See §2 above.
 
-### Item 2 — Public-scores visibility toggle  `[M]`
+### Item 2 — Public-scores visibility toggle  `[M]`  ✅ DONE 2026-08-29
+
+Implemented: `BRASIL_ARCHIVES_PUBLIC_SCORES` in `app/config.py`
+(`TestingConfig` sets it on); single source of truth `app/visibility.py`
+`scores_visible()` = public flag **or** admin flag, exposed to Jinja as
+`show_scores()`. Gated in `detail.html` (score-summary + dimensions →
+neutral "Evaluation in progress" one-liner), `list.html` (columns, sort
+options, lede), `index.html` (Featured → "Archives in the catalog", no
+badge), `main.py::_featured_archives` (name ordering + no `naive_sum`),
+`archives/routes.py::list_archives` (score `?sort=` falls back to name so
+row order can't leak ranking). Probe "Observed signals" stay public
+(Steve confirmed). New msgids extracted + `pt` translated + compiled.
+`tests/test_public_scores_gate.py` (7 tests). `docs/DEPLOY.md` documents
+the env var — **stays unset on the public cPanel host until greenlit.**
+
+Original brief follows.
+
 
 **Goal:** soft-launch the catalog + federated search now; keep the scored
 judgments private until Steve greenlights them. Independent of the

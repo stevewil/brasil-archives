@@ -29,6 +29,7 @@ from ...models import (
 from ...services import federation as fed
 from ...services import scoring as svc
 from ...text import fold
+from ...visibility import scores_visible
 from .._admin_gate import admin_only
 from .forms import FacetForm, ScoreForm, TagsForm
 
@@ -165,7 +166,10 @@ def list_archives():
         "pipeline": func.coalesce(scores_sq.c.axis_pipeline, -1).desc(),
         "research": func.coalesce(scores_sq.c.axis_research, -1).desc(),
     }
-    if sort in _order_by_score:
+    # When scores are hidden from the public (app/visibility.py), a score
+    # sort would still leak relative ranking through row order — fall back
+    # to name.
+    if sort in _order_by_score and scores_visible():
         query = query.order_by(_order_by_score[sort], Archive.name.asc())
     else:
         query = query.order_by(Archive.name.asc())

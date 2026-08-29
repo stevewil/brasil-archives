@@ -9,6 +9,7 @@ from ..extensions import db
 from ..models import Archive, DimensionScore, UpgradeProject
 from ..services import federated_search as fedsearch
 from ..services import federation as fed
+from ..visibility import scores_visible
 
 bp = Blueprint("main", __name__)
 
@@ -68,10 +69,15 @@ def _aggregated_record_count() -> int:
 def _featured_archives() -> list[dict]:
     """Up to FEATURED_LIMIT archives to spotlight on the home page.
 
-    Ranked by naive sum of active dimension scores (NULLs last), then
-    name. Excludes no-digital-content rows and anything already ruled
-    fair-use-ineligible — the home page is a public surface.
+    When scores are visible, ranked by naive sum of active dimension
+    scores (NULLs last), then name. When scores are hidden (the public
+    default until greenlit — see ``app/visibility.py``), ranked by name
+    only and the ``naive_sum`` is not exposed. Always excludes
+    no-digital-content rows and anything already ruled fair-use-ineligible
+    — the home page is a public surface.
     """
+    show_scores = scores_visible()
+
     naive_sum = (
         select(
             DimensionScore.archive_id.label("aid"),
@@ -82,20 +88,25 @@ def _featured_archives() -> list[dict]:
         .subquery()
     )
 
-    rows = db.session.execute(
+    query = (
         select(Archive, naive_sum.c.total)
         .join(naive_sum, naive_sum.c.aid == Archive.id, isouter=True)
         .where(Archive.no_digital_content.is_(False))
         .where(Archive.fair_use_eligible.is_not(False))
-        .order_by(
+        .limit(FEATURED_LIMIT)
+    )
+    if show_scores:
+        query = query.order_by(
             func.coalesce(naive_sum.c.total, -1).desc(),
             Archive.name.asc(),
         )
-        .limit(FEATURED_LIMIT)
-    ).all()
+    else:
+        query = query.order_by(Archive.name.asc())
+
+    rows = db.session.execute(query).all()
 
     return [
-        {"archive": archive, "naive_sum": total}
+        {"archive": archive, "naive_sum": total if show_scores else None}
         for archive, total in rows
     ]
 

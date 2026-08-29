@@ -5,7 +5,11 @@
 {% block content %}
 <section class="page-header">
   <h1>{{ _("Archives") }}</h1>
+  {% if show_scores() %}
   <p class="page-header__lede">{{ _("%(count)s archives shown. Each archive gets two axis totals out of %(max)s — Pipeline (access readiness) and Research (evidentiary density) — alongside the legacy naive sum. Rationale:", count=rows|length, max=axis_max) }} <code>docs/adr-0001-two-axis-aggregation.md</code>.</p>
+  {% else %}
+  <p class="page-header__lede">{{ _("%(count)s archives shown. Filter by state, institutional type, and digital-content status.", count=rows|length) }}</p>
+  {% endif %}
 </section>
 
 <form method="get" class="filter-bar">
@@ -47,9 +51,11 @@
     {{ _("Sort") }}
     <select name="sort">
       <option value="name" {% if current.sort == 'name' %}selected{% endif %}>{{ _("Name (A–Z)") }}</option>
+      {% if show_scores() %}
       <option value="pipeline" {% if current.sort == 'pipeline' %}selected{% endif %}>{{ _("Pipeline axis (desc)") }}</option>
       <option value="research" {% if current.sort == 'research' %}selected{% endif %}>{{ _("Research axis (desc)") }}</option>
       <option value="score" {% if current.sort == 'score' %}selected{% endif %}>{{ _("Naive sum (desc)") }}</option>
+      {% endif %}
     </select>
   </label>
   <button type="submit">{{ _("Apply") }}</button>
@@ -64,10 +70,12 @@
       <th>{{ _("State") }}</th>
       <th>{{ _("Type") }}</th>
       <th>{{ _("Content") }}</th>
+      {% if show_scores() %}
       <th class="num" title="Axis A: accessibility, finding_aids, pipeline_ingestion_readiness, scale">{{ _("Pipeline") }}</th>
       <th class="num" title="Axis B: provenance_curatorial, corpus_completeness, uniqueness_non_duplication, linkage_potential">{{ _("Research") }}</th>
       <th class="num" title="{{ _('Legacy unweighted total; kept for continuity') }}">{{ _("Naive sum") }}</th>
       <th class="num">{{ _("Dims") }}</th>
+      {% endif %}
     </tr>
   </thead>
   <tbody>
@@ -79,13 +87,15 @@
         <td>{{ archive.home_state_code or '—' }}</td>
         <td>{{ vocab_label(archive.institutional_type) or '—' }}</td>
         <td>{% if archive.no_digital_content %}<span class="badge badge--muted">{{ _("No content") }}</span>{% else %}<span class="badge badge--ok">{{ _("Available") }}</span>{% endif %}</td>
+        {% if show_scores() %}
         <td class="num">{% if axis_pipeline is not none %}{{ axis_pipeline }}/{{ axis_max }}{% else %}—{% endif %}</td>
         <td class="num">{% if axis_research is not none %}{{ axis_research }}/{{ axis_max }}{% else %}—{% endif %}</td>
         <td class="num">{{ naive_sum if naive_sum is not none else '—' }}</td>
         <td class="num">{{ scored_dims or 0 }}/8</td>
+        {% endif %}
       </tr>
     {% else %}
-      <tr><td colspan="8" class="empty">{{ _("No archives match these filters.") }}</td></tr>
+      <tr><td colspan="{{ 8 if show_scores() else 4 }}" class="empty">{{ _("No archives match these filters.") }}</td></tr>
     {% endfor %}
   </tbody>
 </table>

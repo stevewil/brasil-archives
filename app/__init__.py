@@ -68,6 +68,12 @@ def create_app(config_name: str | None = None) -> Flask:
         app.config.get("ADMIN_UI_ENABLED")
     )
 
+    # Public-scores split — templates use ``show_scores()`` to gate the
+    # dimension scores, axis totals, quadrant, naive sum, and the
+    # score-ranked home block. See app/visibility.py.
+    from .visibility import scores_visible
+    app.jinja_env.globals["show_scores"] = scores_visible
+
     # Import models so SQLAlchemy metadata is populated for migrations.
     # Import here (not at module top) to avoid circular imports.
     from . import models  # noqa: F401
