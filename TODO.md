@@ -183,11 +183,11 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
 
 ## 7. Known small gaps found while reading the code
 
-- [ ] `federation.html_deep_link` is hardcoded to Mipibu's `/cases?…` URL
-  shape. Now that povos is the 2nd registered corpus, this returns wrong
-  links for povos. Fix: derive the deep link from each project's
-  `/api/records` `links.html` (or `/api/schema`). **Needed by Phase 3.5
-  cross-corpus search.**
+- [x] `federation.html_deep_link` — **fixed 2026-08-28** (`c5fb1f8`). Was
+  hardcoded to mipibu's `/cases?…`; now returns the partner's own
+  `/api/records` `links.html` (mipibu → `/cases`, povos → `/documents`),
+  falling back to the site root. Verified live. **Not yet deployed** —
+  next brasil-archives pull.
 - [ ] `LICENSING.md` referenced by `algorithm-v1.md` §Licensing doesn't
   exist yet — "finalized before public release."
 - [x] `docs/vocabularies.md` — written 2026-08-27 (`34fc5b3`): consolidates
