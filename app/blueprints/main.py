@@ -1,12 +1,13 @@
-"""Main blueprint — the landing page."""
+"""Main blueprint — the landing page and the federated search view."""
 from __future__ import annotations
 
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 from flask_babel import lazy_gettext as _l
 from sqlalchemy import func, select
 
 from ..extensions import db
 from ..models import Archive, DimensionScore, UpgradeProject
+from ..services import federated_search as fedsearch
 from ..services import federation as fed
 
 bp = Blueprint("main", __name__)
@@ -34,6 +35,25 @@ def index() -> str:
         featured=_featured_archives(),
         state_groups=_browse_by_state(),
         partners=_partner_previews(),
+    )
+
+
+@bp.get("/search")
+def search() -> str:
+    """Public search across harvested partner records (Phase 3.5).
+
+    Query params: ``q`` (the search string), ``source`` (restrict to one
+    partner slug), ``page``. See ``app/services/federated_search.py``.
+    """
+    resp = fedsearch.search(
+        q=request.args.get("q", ""),
+        source=(request.args.get("source", "").strip() or None),
+        page=request.args.get("page", 1),
+    )
+    return render_template(
+        "search.html",
+        page_title=_l("Search partner records"),
+        resp=resp,
     )
 
 

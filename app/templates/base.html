@@ -20,6 +20,7 @@
     <a class="brand" href="{{ url_for('main.index') }}">brasil-archives</a>
     <nav class="primary-nav">
       <a href="{{ url_for('archives.list_archives') }}">{{ _("Archives") }}</a>
+      <a href="{{ url_for('main.search') }}">{{ _("Search") }}</a>
       {% if admin_ui_enabled() %}
         <a href="{{ url_for('harvest.index') }}">{{ _("Harvest") }}</a>
       {% endif %}

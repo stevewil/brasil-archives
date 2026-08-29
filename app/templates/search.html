@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Search partner records") }}{% endblock %}
+{% block description %}{{ _("Search across the records harvested from partner corpus explorers — Dublin Core metadata, attributed to each project and linking back to its viewer.") }}{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <h1>{{ _("Search partner records") }}</h1>
+  <p class="page-header__lede">
+    {{ _("One search box over every record harvested from a partner corpus explorer. Results link back to the partner's own viewer; freshness is bounded by the monthly harvest.") }}
+  </p>
+</section>
+
+<form method="get" class="fedsearch-form" role="search">
+  <input
+    type="search"
+    name="q"
+    value="{{ resp.query }}"
+    placeholder="{{ _('e.g. sumário crime, sesmaria, aldeia') }}"
+    aria-label="{{ _('Search terms') }}"
+    autofocus>
+  <button type="submit">{{ _("Search") }}</button>
+</form>
+
+{% if not resp.searched %}
+  <p class="fedsearch-hint">
+    {{ _("Type at least two characters. Matching ignores accents and case.") }}
+  </p>
+  {% if resp.projects %}
+    <ul class="fedsearch-projects">
+      {% for p in resp.projects %}
+        {% set scope = p.scope_description_pt if (get_locale()|string == 'pt' and p.scope_description_pt) else p.scope_description_en %}
+        <li>
+          <strong>{{ p.name }}</strong>
+          {% if scope %}<span> — {{ scope }}</span>{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% else %}
+  <div class="fedsearch-summary">
+    {% if resp.total %}
+      <p>{{ _("%(total)s result(s) for", total=resp.total) }} <q>{{ resp.query }}</q>.</p>
+    {% else %}
+      <p>{{ _("No results for") }} <q>{{ resp.query }}</q>. {{ _("Try fewer or broader terms.") }}</p>
+    {% endif %}
+
+    {% if resp.facets %}
+      <nav class="fedsearch-facets" aria-label="{{ _('Filter by partner') }}">
+        <a
+          class="state-chip {% if not resp.source %}state-chip--all{% endif %}"
+          href="{{ url_for('main.search', q=resp.query) }}">
+          {{ _("All partners") }}
+          <span class="state-chip__count">{{ resp.facets | sum(attribute='count') }}</span>
+        </a>
+        {% for f in resp.facets %}
+          <a
+            class="state-chip {% if resp.source == f.slug %}state-chip--all{% endif %}"
+            href="{{ url_for('main.search', q=resp.query, source=f.slug) }}">
+            {{ f.name }}
+            <span class="state-chip__count">{{ f.count }}</span>
+          </a>
+        {% endfor %}
+      </nav>
+    {% endif %}
+  </div>
+
+  {% if resp.hits %}
+    <ul class="fedsearch-results">
+      {% for hit in resp.hits %}
+        <li class="fedsearch-hit">
+          <p class="fedsearch-hit__title">
+            {% if hit.link %}
+              <a href="{{ hit.link }}" rel="noreferrer noopener" target="_blank">{{ hit.title }}</a>
+            {% else %}
+              {{ hit.title }}
+            {% endif %}
+          </p>
+          <p class="fedsearch-hit__meta">
+            <span class="badge badge--ok">{{ hit.project_name }}</span>
+            {% if hit.creator %}<span>{{ hit.creator }}</span>{% endif %}
+            {% if hit.year_start %}
+              <span>{{ hit.year_start }}{% if hit.year_end and hit.year_end != hit.year_start %}–{{ hit.year_end }}{% endif %}</span>
+            {% elif hit.date_display %}
+              <span>{{ hit.date_display }}</span>
+            {% endif %}
+          </p>
+          {% if hit.description %}
+            <p class="fedsearch-hit__desc">{{ hit.description }}</p>
+          {% endif %}
+          {% if hit.subjects %}
+            <p class="fedsearch-hit__subjects">
+              {% for s in hit.subjects[:6] %}<span class="badge badge--muted">{{ s }}</span>{% endfor %}
+            </p>
+          {% endif %}
+          {% if hit.source_url %}
+            <p class="fedsearch-hit__source">
+              <a href="{{ hit.source_url }}" rel="noreferrer noopener" target="_blank">{{ _("Cited source") }} →</a>
+            </p>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+
+    {% if resp.pages > 1 %}
+      <nav class="pager" aria-label="{{ _('Pagination') }}">
+        {% if resp.has_prev %}
+          <a href="{{ url_for('main.search', q=resp.query, source=resp.source, page=resp.page - 1) }}">{{ _("← previous") }}</a>
+        {% endif %}
+        <span>{{ _("page %(n)s of %(total)s", n=resp.page, total=resp.pages) }}</span>
+        {% if resp.has_next %}
+          <a href="{{ url_for('main.search', q=resp.query, source=resp.source, page=resp.page + 1) }}">{{ _("next →") }}</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% endif %}
+{% endif %}
+{% endblock %}

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: brasil-archives 0.1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-28 19:04-0700\n"
+"POT-Creation-Date: 2026-08-28 19:47-0700\n"
 "PO-Revision-Date: 2026-08-27 14:00-0700\n"
 "Last-Translator: brasil-archives contributors\n"
 "Language: pt\n"
@@ -19,9 +19,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/blueprints/main.py:30 app/templates/index.html:6
+#: app/blueprints/main.py:31 app/templates/index.html:6
 msgid "Brazilian Digital Archives"
 msgstr "Arquivos Digitais Brasileiros"
+
+#: app/blueprints/main.py:55 app/templates/search.html:2
+#: app/templates/search.html:7
+msgid "Search partner records"
+msgstr "Buscar registros dos parceiros"
 
 #: app/blueprints/archives/routes.py:282
 #, python-format
@@ -61,11 +66,15 @@ msgstr ""
 msgid "Archives"
 msgstr "Arquivos"
 
-#: app/templates/base.html:24
+#: app/templates/base.html:23 app/templates/search.html:21
+msgid "Search"
+msgstr "Buscar"
+
+#: app/templates/base.html:25
 msgid "Harvest"
 msgstr "Coleta"
 
-#: app/templates/base.html:48
+#: app/templates/base.html:49
 msgid "Federated open metadata for Brazilian digital archives."
 msgstr "Metadados abertos e federados de arquivos digitais brasileiros."
 
@@ -171,6 +180,82 @@ msgstr ""
 #: app/templates/index.html:113
 msgid "See the full catalog"
 msgstr "Ver o catálogo completo"
+
+#: app/templates/search.html:3
+msgid ""
+"Search across the records harvested from partner corpus explorers — "
+"Dublin Core metadata, attributed to each project and linking back to its "
+"viewer."
+msgstr ""
+"Busca nos registros coletados dos exploradores de acervos parceiros — "
+"metadados Dublin Core, atribuídos a cada projeto e com links de volta "
+"para o seu visualizador."
+
+#: app/templates/search.html:9
+msgid ""
+"One search box over every record harvested from a partner corpus "
+"explorer. Results link back to the partner's own viewer; freshness is "
+"bounded by the monthly harvest."
+msgstr ""
+"Uma única caixa de busca sobre todos os registros coletados de um "
+"explorador de acervo parceiro. Os resultados remetem ao visualizador do "
+"próprio parceiro; a atualização é limitada pela coleta mensal."
+
+#: app/templates/search.html:18
+msgid "e.g. sumário crime, sesmaria, aldeia"
+msgstr "ex.: sumário crime, sesmaria, aldeia"
+
+#: app/templates/search.html:19
+msgid "Search terms"
+msgstr "Termos de busca"
+
+#: app/templates/search.html:26
+msgid "Type at least two characters. Matching ignores accents and case."
+msgstr "Digite ao menos dois caracteres. A busca ignora acentos e maiúsculas."
+
+#: app/templates/search.html:41
+#, python-format
+msgid "%(total)s result(s) for"
+msgstr "%(total)s resultado(s) para"
+
+#: app/templates/search.html:43
+msgid "No results for"
+msgstr "Nenhum resultado para"
+
+#: app/templates/search.html:43
+msgid "Try fewer or broader terms."
+msgstr "Tente termos mais curtos ou mais amplos."
+
+#: app/templates/search.html:47
+msgid "Filter by partner"
+msgstr "Filtrar por parceiro"
+
+#: app/templates/search.html:51
+msgid "All partners"
+msgstr "Todos os parceiros"
+
+#: app/templates/search.html:96
+msgid "Cited source"
+msgstr "Fonte citada"
+
+#: app/templates/search.html:104
+msgid "Pagination"
+msgstr "Paginação"
+
+#: app/templates/harvest/index.html:84 app/templates/harvest/run_detail.html:95
+#: app/templates/search.html:106
+msgid "← previous"
+msgstr "← anterior"
+
+#: app/templates/search.html:108
+#, python-format
+msgid "page %(n)s of %(total)s"
+msgstr "página %(n)s de %(total)s"
+
+#: app/templates/harvest/index.html:88 app/templates/harvest/run_detail.html:99
+#: app/templates/search.html:110
+msgid "next →"
+msgstr "próxima →"
 
 #: app/templates/archives/detail.html:3
 msgid ""
@@ -753,18 +838,10 @@ msgstr "Duração"
 msgid "Source"
 msgstr "Origem"
 
-#: app/templates/harvest/index.html:84 app/templates/harvest/run_detail.html:95
-msgid "← previous"
-msgstr "← anterior"
-
 #: app/templates/harvest/index.html:86 app/templates/harvest/run_detail.html:97
 #, python-format
 msgid "page %(n)s"
 msgstr "página %(n)s"
-
-#: app/templates/harvest/index.html:88 app/templates/harvest/run_detail.html:99
-msgid "next →"
-msgstr "próxima →"
 
 #: app/templates/harvest/index.html:92
 msgid "No harvest runs recorded yet. Run"

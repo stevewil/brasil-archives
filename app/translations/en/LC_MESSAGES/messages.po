@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: brasil-archives 0.1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-28 19:04-0700\n"
+"POT-Creation-Date: 2026-08-28 19:47-0700\n"
 "PO-Revision-Date: 2026-08-27 14:00-0700\n"
 "Last-Translator: brasil-archives contributors\n"
 "Language: en\n"
@@ -19,9 +19,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/blueprints/main.py:30 app/templates/index.html:6
+#: app/blueprints/main.py:31 app/templates/index.html:6
 msgid "Brazilian Digital Archives"
 msgstr "Brazilian Digital Archives"
+
+#: app/blueprints/main.py:55 app/templates/search.html:2
+#: app/templates/search.html:7
+msgid "Search partner records"
+msgstr "Search partner records"
 
 #: app/blueprints/archives/routes.py:282
 #, python-format
@@ -62,11 +67,15 @@ msgstr ""
 msgid "Archives"
 msgstr "Archives"
 
-#: app/templates/base.html:24
+#: app/templates/base.html:23 app/templates/search.html:21
+msgid "Search"
+msgstr "Search"
+
+#: app/templates/base.html:25
 msgid "Harvest"
 msgstr "Harvest"
 
-#: app/templates/base.html:48
+#: app/templates/base.html:49
 msgid "Federated open metadata for Brazilian digital archives."
 msgstr "Federated open metadata for Brazilian digital archives."
 
@@ -168,6 +177,82 @@ msgstr ""
 #: app/templates/index.html:113
 msgid "See the full catalog"
 msgstr "See the full catalog"
+
+#: app/templates/search.html:3
+msgid ""
+"Search across the records harvested from partner corpus explorers — "
+"Dublin Core metadata, attributed to each project and linking back to its "
+"viewer."
+msgstr ""
+"Search across the records harvested from partner corpus explorers — "
+"Dublin Core metadata, attributed to each project and linking back to its "
+"viewer."
+
+#: app/templates/search.html:9
+msgid ""
+"One search box over every record harvested from a partner corpus "
+"explorer. Results link back to the partner's own viewer; freshness is "
+"bounded by the monthly harvest."
+msgstr ""
+"One search box over every record harvested from a partner corpus "
+"explorer. Results link back to the partner's own viewer; freshness is "
+"bounded by the monthly harvest."
+
+#: app/templates/search.html:18
+msgid "e.g. sumário crime, sesmaria, aldeia"
+msgstr "e.g. sumário crime, sesmaria, aldeia"
+
+#: app/templates/search.html:19
+msgid "Search terms"
+msgstr "Search terms"
+
+#: app/templates/search.html:26
+msgid "Type at least two characters. Matching ignores accents and case."
+msgstr "Type at least two characters. Matching ignores accents and case."
+
+#: app/templates/search.html:41
+#, python-format
+msgid "%(total)s result(s) for"
+msgstr "%(total)s result(s) for"
+
+#: app/templates/search.html:43
+msgid "No results for"
+msgstr "No results for"
+
+#: app/templates/search.html:43
+msgid "Try fewer or broader terms."
+msgstr "Try fewer or broader terms."
+
+#: app/templates/search.html:47
+msgid "Filter by partner"
+msgstr "Filter by partner"
+
+#: app/templates/search.html:51
+msgid "All partners"
+msgstr "All partners"
+
+#: app/templates/search.html:96
+msgid "Cited source"
+msgstr "Cited source"
+
+#: app/templates/search.html:104
+msgid "Pagination"
+msgstr "Pagination"
+
+#: app/templates/harvest/index.html:84 app/templates/harvest/run_detail.html:95
+#: app/templates/search.html:106
+msgid "← previous"
+msgstr "← previous"
+
+#: app/templates/search.html:108
+#, python-format
+msgid "page %(n)s of %(total)s"
+msgstr "page %(n)s of %(total)s"
+
+#: app/templates/harvest/index.html:88 app/templates/harvest/run_detail.html:99
+#: app/templates/search.html:110
+msgid "next →"
+msgstr "next →"
 
 #: app/templates/archives/detail.html:3
 msgid ""
@@ -744,18 +829,10 @@ msgstr "Duration"
 msgid "Source"
 msgstr "Source"
 
-#: app/templates/harvest/index.html:84 app/templates/harvest/run_detail.html:95
-msgid "← previous"
-msgstr "← previous"
-
 #: app/templates/harvest/index.html:86 app/templates/harvest/run_detail.html:97
 #, python-format
 msgid "page %(n)s"
 msgstr "page %(n)s"
-
-#: app/templates/harvest/index.html:88 app/templates/harvest/run_detail.html:99
-msgid "next →"
-msgstr "next →"
 
 #: app/templates/harvest/index.html:92
 msgid "No harvest runs recorded yet. Run"

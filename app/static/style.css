@@ -647,6 +647,79 @@ section.canonical pre, section.raw-extracted pre, section.raw-xml pre {
 .home-federation__card .federation-live,
 .home-federation__card .federation-unavailable { margin: 0.25rem 0; }
 
+/* -------- Federated search (Phase 3.5) -------- */
+.fedsearch-form {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1.5rem 0 1rem;
+}
+
+.fedsearch-form input[type="search"] {
+  flex: 1;
+  padding: 0.55rem 0.75rem;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #fff;
+}
+
+.fedsearch-hint { color: var(--muted); font-size: 0.9rem; }
+
+.fedsearch-projects {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  display: grid;
+  gap: 0.5rem;
+}
+.fedsearch-projects span { color: var(--muted); }
+
+.fedsearch-summary { margin: 1rem 0; }
+
+.fedsearch-facets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.fedsearch-results {
+  list-style: none;
+  padding: 0;
+  margin: 1.25rem 0;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.fedsearch-hit {
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.fedsearch-hit:last-child { border-bottom: 0; }
+
+.fedsearch-hit__title { margin: 0 0 0.3rem; font-size: 1.05rem; }
+
+.fedsearch-hit__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: baseline;
+  margin: 0 0 0.4rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.fedsearch-hit__desc { margin: 0.4rem 0; }
+
+.fedsearch-hit__subjects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.4rem 0 0;
+}
+
+.fedsearch-hit__source { margin: 0.4rem 0 0; font-size: 0.9rem; }
+
 /* -------- Small viewports -------- */
 @media (max-width: 40rem) {
   .site-header {
@@ -686,4 +759,6 @@ section.canonical pre, section.raw-extracted pre, section.raw-xml pre {
 
   .home-featured__grid,
   .home-federation__list { grid-template-columns: 1fr; }
+
+  .fedsearch-form { flex-direction: column; align-items: stretch; }
 }

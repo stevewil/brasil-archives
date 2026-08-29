@@ -158,24 +158,16 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
   (`54367f7`). **Left:** EAC-CPF (no authority records yet), register at the
   OAI-PMH registry (runbook in `docs/oai-pmh-provider.md` §6), resolve the
   §7 open questions (public-bar policy, `harvested` passthrough set).
-- [ ] **[M] Phase 3.5 — cross-corpus aggregated search.** *(Scoped 2026-08-28;
-  do AFTER the runbook §Remaining items — cPanel deploy, prod probe run,
-  crons, first prod povos harvest.)* brasil-archives harvests partner
-  records into `aggregated_records` but has **no public search over them** —
-  only a count on the home page, per-partner federation-preview cards, and
-  the admin-gated `/harvest/` browse. Build a public search view:
-  - **Route:** `main` blueprint, `GET /search` (or `/federated`), public.
-  - **Data:** query over `aggregated_records.extracted_json` (`canonical`
-    holds normalized title/date/creator; `raw` holds all DC fields). At
-    1161 records a `LIKE`/`json_extract` scan is fine; add an FTS5 virtual
-    table + triggers if it grows (mirror povos's `fts_documents` pattern).
-  - **Results:** grouped/attributed by source `UpgradeProject`, each row
-    deep-linking back to the partner (needs the `federation.html_deep_link`
-    fix in §7 — currently hardcoded to mipibu's `/cases?…`).
-  - **i18n + tests.** Bilingual; `tests/test_federated_search.py`.
-  - This is the pragmatic precursor to Phase 4 (full IIIF Content Search
-    fanout), which needs partners to also expose IIIF Content Search
-    endpoints and is a bigger build.
+- [x] **[M] Phase 3.5 — cross-corpus aggregated search.** Built 2026-08-29.
+  Public `GET /search` (`main` blueprint) over the harvested `oai_dc`
+  records in `aggregated_records`: accent/case-insensitive full scan in
+  Python, two match tiers (title-ish "strong" ranks above subject-only
+  "weak"), per-partner facet chips, deep links back into each partner's
+  viewer (host-matched `canonical.urls` entry, home-page fallback),
+  pagination, bilingual. Nav link + home "Federated records" stat now
+  link in. `app/services/federated_search.py`,
+  `tests/test_federated_search.py` (16 tests). Design +
+  known follow-ups: [`docs/federated-search.md`](docs/federated-search.md).
 - [ ] **[L] Phase 4 — IIIF Content Search fanout.** Live federated full-text
   search — a query on brasil-archives fans out to every partner's IIIF
   Content Search endpoint. Needs mipibu + povos to implement those endpoints
@@ -227,8 +219,11 @@ BUILT + merged as of 2026-08-28. `brasil-archives` main `0022fc3`+,
 5. **povos** `git add --renormalize . && commit` — line-ending churn snags
    future pulls on cPanel.
 6. **ADR-0001 axis re-examination** — now has 15 Pass 3 archives.
-7. **[M] Phase 3.5 — cross-corpus aggregated search** (§6) — scoped
-   2026-08-28; the "search across sources" feature. Do after items 1–3.
+7. ~~Phase 3.5 — cross-corpus aggregated search~~ — **done 2026-08-29**
+   (`GET /search`; `docs/federated-search.md`). Ships on the next
+   brasil-archives cPanel pull; the deploy needs
+   `pybabel compile -d app/translations` (new PT/EN msgids for the search
+   UI — `.mo` is git-ignored).
 8. **Track D** (shared OAI `CorpusAdapter`) — low priority, N=3 providers.
 
 ## Landed 2026-08-27/28

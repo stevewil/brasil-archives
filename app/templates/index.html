@@ -21,7 +21,7 @@
     </div>
     <div>
       <dt>{{ _("Federated records") }}</dt>
-      <dd>{{ record_count }}</dd>
+      <dd>{% if record_count %}<a href="{{ url_for('main.search') }}">{{ record_count }}</a>{% else %}{{ record_count }}{% endif %}</dd>
     </div>
   </dl>
 </section>
