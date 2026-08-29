@@ -168,6 +168,16 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
   link in. `app/services/federated_search.py`,
   `tests/test_federated_search.py` (16 tests). Design +
   known follow-ups: [`docs/federated-search.md`](docs/federated-search.md).
+- [x] **[S] Archive catalog text search.** Built 2026-08-29. `GET /archives/`
+  gained a `q` param — accent- + case-insensitive (`app/text.py` `fold()`,
+  extracted from Phase 3.5's `_fold` and now shared) matched against
+  `name` / `name_pt` / `description_en` / `description_pt` / `stated_scope`
+  / `home_city`. Python post-filter on the existing query result (~80
+  rows, no FTS); composes with the state / type / content / sort filters;
+  input in the filter bar, prefilled from `current.q`; bilingual.
+  `tests/test_text.py` (4) + `tests/test_archives_blueprint.py` search
+  section (6). Distinct from Phase 3.5, which searches harvested *partner
+  records*, not the catalog of archives.
 - [ ] **[L] Phase 4 — IIIF Content Search fanout.** Live federated full-text
   search — a query on brasil-archives fans out to every partner's IIIF
   Content Search endpoint. Needs mipibu + povos to implement those endpoints

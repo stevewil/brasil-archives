@@ -4,6 +4,12 @@
 public). Service: [`app/services/federated_search.py`](../app/services/federated_search.py).
 Template: `app/templates/search.html`. Tests: `tests/test_federated_search.py`.
 
+> **Not to be confused with the archive-catalog search.** `GET /archives/?q=…`
+> (built the same day) is a free-text filter over the ~80 catalogued
+> *archives* — their names and descriptions. This page searches the
+> harvested *records* inside partner corpora. Both share
+> [`app/text.py`](../app/text.py) `fold()` for accent-insensitive matching.
+
 ## What it is
 
 One public search box over every record brasil-archives has **harvested**

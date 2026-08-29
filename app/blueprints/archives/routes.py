@@ -28,6 +28,7 @@ from ...models import (
 )
 from ...services import federation as fed
 from ...services import scoring as svc
+from ...text import fold
 from .._admin_gate import admin_only
 from .forms import FacetForm, ScoreForm, TagsForm
 
@@ -46,6 +47,25 @@ def _brazilian_states() -> list[str]:
         .distinct()
     ).all()
     return sorted(rows)
+
+
+# Descriptive text fields a catalog keyword search looks in.
+_SEARCH_FIELDS = (
+    "name",
+    "name_pt",
+    "description_en",
+    "description_pt",
+    "stated_scope",
+    "home_city",
+)
+
+
+def _text_matches(archive: Archive, folded_query: str) -> bool:
+    """True when the folded query is a substring of any descriptive field."""
+    haystack = fold(
+        " ".join(getattr(archive, f) or "" for f in _SEARCH_FIELDS)
+    )
+    return folded_query in haystack
 
 
 def _load_archive_or_404(slug: str) -> Archive:
@@ -73,6 +93,8 @@ def list_archives():
     """List archives with filters and two-axis + naive sum columns.
 
     Filters:
+      * ``q`` — free-text, matched accent- + case-insensitively against
+        name / description / stated scope / city (see ``_SEARCH_FIELDS``)
       * ``state`` — home state code, e.g. RN
       * ``institutional_type`` — vocabulary slug
       * ``content`` — ``with`` / ``without`` / ``all`` (default with)
@@ -80,6 +102,7 @@ def list_archives():
         ``pipeline`` (Axis A), ``research`` (Axis B). Each score sort is
         descending; ``name`` is ascending.
     """
+    q = request.args.get("q", "").strip() or None
     state = request.args.get("state", "").strip() or None
     itype = request.args.get("institutional_type", "").strip() or None
     content = request.args.get("content", "with").strip()
@@ -149,6 +172,10 @@ def list_archives():
 
     rows = db.session.execute(query).all()
 
+    if q:
+        folded = fold(q)
+        rows = [row for row in rows if _text_matches(row[0], folded)]
+
     institutional_types = db.session.scalars(
         select(InstitutionalType).order_by(InstitutionalType.sort_order)
     ).all()
@@ -160,6 +187,7 @@ def list_archives():
         institutional_types=institutional_types,
         axis_max=svc.AXIS_MAX,
         current={
+            "q": q or "",
             "state": state or "",
             "institutional_type": itype or "",
             "content": content,

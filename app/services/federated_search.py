@@ -25,7 +25,6 @@ from __future__ import annotations
 import json
 import logging
 import math
-import unicodedata
 from dataclasses import dataclass, field
 from urllib.parse import urlsplit
 
@@ -34,6 +33,7 @@ from sqlalchemy.orm import selectinload
 
 from ..extensions import db
 from ..models import AggregatedRecord, UpgradeProject
+from ..text import fold as _fold
 
 log = logging.getLogger(__name__)
 
@@ -199,12 +199,6 @@ def search(
 # ---------------------------------------------------------------------------
 # Matching
 # ---------------------------------------------------------------------------
-def _fold(text: str) -> str:
-    """Case-fold and strip combining marks so "sumario" matches "Sumário"."""
-    decomposed = unicodedata.normalize("NFKD", text.casefold())
-    return "".join(c for c in decomposed if not unicodedata.combining(c))
-
-
 def _match_strength(canonical: dict, needle: str) -> str | None:
     """Return ``"strong"``, ``"weak"``, or ``None`` for ``needle`` in a record."""
     strong_text = _fold(

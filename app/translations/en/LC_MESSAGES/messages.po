@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: brasil-archives 0.1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-28 19:47-0700\n"
+"POT-Creation-Date: 2026-08-28 20:10-0700\n"
 "PO-Revision-Date: 2026-08-27 14:00-0700\n"
 "Last-Translator: brasil-archives contributors\n"
 "Language: en\n"
@@ -28,16 +28,16 @@ msgstr "Brazilian Digital Archives"
 msgid "Search partner records"
 msgstr "Search partner records"
 
-#: app/blueprints/archives/routes.py:282
+#: app/blueprints/archives/routes.py:310
 #, python-format
 msgid "Recorded score for %(dim)s."
 msgstr "Recorded score for %(dim)s."
 
-#: app/blueprints/archives/routes.py:380
+#: app/blueprints/archives/routes.py:408
 msgid "Facets updated."
 msgstr "Facets updated."
 
-#: app/blueprints/archives/routes.py:401
+#: app/blueprints/archives/routes.py:429
 msgid "Tags updated."
 msgstr "Tags updated."
 
@@ -67,7 +67,8 @@ msgstr ""
 msgid "Archives"
 msgstr "Archives"
 
-#: app/templates/base.html:23 app/templates/search.html:21
+#: app/templates/archives/list.html:13 app/templates/base.html:23
+#: app/templates/search.html:21
 msgid "Search"
 msgstr "Search"
 
@@ -210,47 +211,47 @@ msgstr "Search terms"
 msgid "Type at least two characters. Matching ignores accents and case."
 msgstr "Type at least two characters. Matching ignores accents and case."
 
-#: app/templates/search.html:41
+#: app/templates/search.html:42
 #, python-format
 msgid "%(total)s result(s) for"
 msgstr "%(total)s result(s) for"
 
-#: app/templates/search.html:43
+#: app/templates/search.html:44
 msgid "No results for"
 msgstr "No results for"
 
-#: app/templates/search.html:43
+#: app/templates/search.html:44
 msgid "Try fewer or broader terms."
 msgstr "Try fewer or broader terms."
 
-#: app/templates/search.html:47
+#: app/templates/search.html:48
 msgid "Filter by partner"
 msgstr "Filter by partner"
 
-#: app/templates/search.html:51
+#: app/templates/search.html:52
 msgid "All partners"
 msgstr "All partners"
 
-#: app/templates/search.html:96
+#: app/templates/search.html:97
 msgid "Cited source"
 msgstr "Cited source"
 
-#: app/templates/search.html:104
+#: app/templates/search.html:105
 msgid "Pagination"
 msgstr "Pagination"
 
 #: app/templates/harvest/index.html:84 app/templates/harvest/run_detail.html:95
-#: app/templates/search.html:106
+#: app/templates/search.html:107
 msgid "← previous"
 msgstr "← previous"
 
-#: app/templates/search.html:108
+#: app/templates/search.html:109
 #, python-format
 msgid "page %(n)s of %(total)s"
 msgstr "page %(n)s of %(total)s"
 
 #: app/templates/harvest/index.html:88 app/templates/harvest/run_detail.html:99
-#: app/templates/search.html:110
+#: app/templates/search.html:111
 msgid "next →"
 msgstr "next →"
 
@@ -326,7 +327,7 @@ msgstr "Canonical URL"
 msgid "No canonical URL"
 msgstr "No canonical URL"
 
-#: app/templates/archives/detail.html:35 app/templates/archives/list.html:34
+#: app/templates/archives/detail.html:35 app/templates/archives/list.html:42
 msgid "No digital content"
 msgstr "No digital content"
 
@@ -669,88 +670,92 @@ msgstr ""
 "%(max)s — Pipeline (access readiness) and Research (evidentiary density) "
 "— alongside the legacy naive sum. Rationale:"
 
-#: app/templates/archives/list.html:13 app/templates/archives/list.html:56
+#: app/templates/archives/list.html:18
+msgid "name, description, city…"
+msgstr "name, description, city…"
+
+#: app/templates/archives/list.html:21 app/templates/archives/list.html:64
 msgid "State"
 msgstr "State"
 
-#: app/templates/archives/list.html:15 app/templates/archives/list.html:24
-#: app/templates/archives/list.html:35
+#: app/templates/archives/list.html:23 app/templates/archives/list.html:32
+#: app/templates/archives/list.html:43
 msgid "All"
 msgstr "All"
 
-#: app/templates/archives/list.html:22 app/templates/archives/list.html:57
+#: app/templates/archives/list.html:30 app/templates/archives/list.html:65
 msgid "Type"
 msgstr "Type"
 
-#: app/templates/archives/list.html:31 app/templates/archives/list.html:58
+#: app/templates/archives/list.html:39 app/templates/archives/list.html:66
 msgid "Content"
 msgstr "Content"
 
-#: app/templates/archives/list.html:33
+#: app/templates/archives/list.html:41
 msgid "With digital content"
 msgstr "With digital content"
 
-#: app/templates/archives/list.html:39
+#: app/templates/archives/list.html:47
 msgid "Sort"
 msgstr "Sort"
 
-#: app/templates/archives/list.html:41
+#: app/templates/archives/list.html:49
 msgid "Name (A–Z)"
 msgstr "Name (A–Z)"
 
-#: app/templates/archives/list.html:42
+#: app/templates/archives/list.html:50
 msgid "Pipeline axis (desc)"
 msgstr "Pipeline axis (desc)"
 
-#: app/templates/archives/list.html:43
+#: app/templates/archives/list.html:51
 msgid "Research axis (desc)"
 msgstr "Research axis (desc)"
 
-#: app/templates/archives/list.html:44
+#: app/templates/archives/list.html:52
 msgid "Naive sum (desc)"
 msgstr "Naive sum (desc)"
 
-#: app/templates/archives/list.html:47
+#: app/templates/archives/list.html:55
 msgid "Apply"
 msgstr "Apply"
 
-#: app/templates/archives/list.html:48
+#: app/templates/archives/list.html:56
 msgid "Reset"
 msgstr "Reset"
 
-#: app/templates/archives/list.html:55
+#: app/templates/archives/list.html:63
 msgid "Name"
 msgstr "Name"
 
-#: app/templates/archives/list.html:59
+#: app/templates/archives/list.html:67
 msgid "Pipeline"
 msgstr "Pipeline"
 
-#: app/templates/archives/list.html:60
+#: app/templates/archives/list.html:68
 msgid "Research"
 msgstr "Research"
 
-#: app/templates/archives/list.html:61
+#: app/templates/archives/list.html:69
 msgid "Legacy unweighted total; kept for continuity"
 msgstr "Legacy unweighted total; kept for continuity"
 
-#: app/templates/archives/list.html:61
+#: app/templates/archives/list.html:69
 msgid "Naive sum"
 msgstr "Naive sum"
 
-#: app/templates/archives/list.html:62
+#: app/templates/archives/list.html:70
 msgid "Dims"
 msgstr "Dims"
 
-#: app/templates/archives/list.html:73
+#: app/templates/archives/list.html:81
 msgid "No content"
 msgstr "No content"
 
-#: app/templates/archives/list.html:73
+#: app/templates/archives/list.html:81
 msgid "Available"
 msgstr "Available"
 
-#: app/templates/archives/list.html:80
+#: app/templates/archives/list.html:88
 msgid "No archives match these filters."
 msgstr "No archives match these filters."
 

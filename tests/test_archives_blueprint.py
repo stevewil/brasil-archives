@@ -339,6 +339,62 @@ def test_list_view_naive_sum_column(seeded_app, client):
     assert "10" in body  # naive sum column shows 10
 
 
+# --------------------------------------------------------------------------- #
+# List view — free-text search (q)
+
+
+def test_list_search_by_name(seeded_app, client):
+    body = client.get("/archives/?q=labim").get_data(as_text=True)
+    assert "LABIM/UFRN" in body
+    assert "TJMA" not in body
+
+
+def test_list_search_is_accent_and_case_insensitive(seeded_app, client):
+    with seeded_app.app_context():
+        archive = _db.session.scalar(select(Archive).where(Archive.slug == "ma-tjma-t1r2"))
+        archive.description_en = "Tribunal de Justiça do Maranhão — São Luís."
+        _db.session.commit()
+
+    # query without diacritics / different case still matches
+    body = client.get("/archives/?q=JUSTICA").get_data(as_text=True)
+    assert "TJMA" in body
+    assert "LABIM/UFRN" not in body
+
+
+def test_list_search_matches_description_and_scope(seeded_app, client):
+    with seeded_app.app_context():
+        archive = _db.session.scalar(select(Archive).where(Archive.slug == "rn-labim-t1r1"))
+        archive.description_en = "Digitized colonial cartography and sesmaria grants."
+        _db.session.commit()
+
+    body = client.get("/archives/?q=sesmaria").get_data(as_text=True)
+    assert "LABIM/UFRN" in body
+    assert "TJMA" not in body
+
+
+def test_list_search_combines_with_state_filter(seeded_app, client):
+    with seeded_app.app_context():
+        for slug in ("rn-labim-t1r1", "ma-tjma-t1r2"):
+            a = _db.session.scalar(select(Archive).where(Archive.slug == slug))
+            a.description_en = "holds notarial records"
+        _db.session.commit()
+
+    body = client.get("/archives/?q=notarial&state=RN").get_data(as_text=True)
+    assert "LABIM/UFRN" in body
+    assert "TJMA" not in body  # excluded by state, not by text
+
+
+def test_list_search_no_match_shows_empty_state(seeded_app, client):
+    body = client.get("/archives/?q=zzzznothing").get_data(as_text=True)
+    assert "No archives match these filters." in body
+
+
+def test_list_search_input_is_prefilled(seeded_app, client):
+    body = client.get("/archives/?q=labim").get_data(as_text=True)
+    assert 'name="q"' in body
+    assert 'value="labim"' in body
+
+
 def _score_full_profile(app_, slug: str, values: dict[str, int]) -> None:
     """Helper: score all dimensions on a given archive."""
     with app_.app_context():

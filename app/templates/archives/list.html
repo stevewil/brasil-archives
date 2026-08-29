@@ -9,6 +9,14 @@
 </section>
 
 <form method="get" class="filter-bar">
+  <label class="filter-bar__search">
+    {{ _("Search") }}
+    <input
+      type="search"
+      name="q"
+      value="{{ current.q }}"
+      placeholder="{{ _('name, description, city…') }}">
+  </label>
   <label>
     {{ _("State") }}
     <select name="state">
