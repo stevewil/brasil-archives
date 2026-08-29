@@ -450,6 +450,42 @@ def test_detail_view_shows_score_profile_card(seeded_app, client):
     assert "High pipeline / Low research" in body  # quadrant at threshold 28
 
 
+def test_detail_view_shows_probe_facets(seeded_app, client):
+    """The 4 probe-fed facets + a last-checked stamp render on the detail
+    page, with human-readable value labels."""
+    from datetime import datetime
+
+    with seeded_app.app_context():
+        archive = _db.session.scalar(
+            select(Archive).where(Archive.slug == "rn-labim-t1r1")
+        )
+        for facet, value in (
+            ("web_ops_health", "at-risk"),
+            ("external_preservation", "preserved"),
+            ("growth_signal", "slow"),
+            ("prior_use_signal", "foundational"),
+        ):
+            svc.set_probe_facet_value(
+                archive=archive, facet=facet, value=value, now=datetime(2026, 8, 29)
+            )
+        archive.last_probed_at = datetime(2026, 8, 29)
+        _db.session.commit()
+
+    body = client.get("/archives/rn-labim-t1r1").get_data(as_text=True)
+    assert "Observed signals" in body
+    assert "Last checked 2026-08-29" in body
+    assert "Web operations health" in body and "At risk" in body
+    assert "External preservation" in body and "Preserved" in body
+    assert "Growth signal" in body and "Slow" in body
+    assert "Prior scholarly use" in body and "Foundational" in body
+
+
+def test_detail_view_probe_facets_absent_when_unprobed(seeded_app, client):
+    body = client.get("/archives/rn-labim-t1r1").get_data(as_text=True)
+    assert "Observed signals" in body        # section always shown
+    assert "Not yet probed" in body          # but flagged as unprobed
+
+
 def test_facets_form_exposes_scholarly_access_practical(seeded_app, client):
     resp = client.get("/archives/rn-labim-t1r1/facets")
     assert resp.status_code == 200

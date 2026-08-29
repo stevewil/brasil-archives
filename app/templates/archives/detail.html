@@ -226,6 +226,28 @@
     <dt>{{ _("Prior use note") }}</dt>
     <dd>{{ archive.prior_use_note or '—' }}</dd>
   </dl>
+
+  <h3>{{ _("Observed signals") }}</h3>
+  <p class="facets__probe-caption">{{ _("Refreshed by a periodic automated probe.") }}
+    {% if archive.last_probed_at %}
+      {{ _("Last checked %(date)s.", date=archive.last_probed_at.strftime('%Y-%m-%d')) }}
+    {% else %}
+      {{ _("Not yet probed.") }}
+    {% endif %}
+  </p>
+  <dl class="summary-grid">
+    <dt title="{{ _('HTTPS + certificate validity, HTTP status on the canonical and interior URLs.') }}">{{ _("Web operations health") }}</dt>
+    <dd>{{ probe_facet_label('web_ops_health', active_facets['web_ops_health'].value) if 'web_ops_health' in active_facets else '—' }}</dd>
+    <dt title="{{ _('Wayback Machine coverage of the domain and a sample of interior pages.') }}">{{ _("External preservation") }}</dt>
+    <dd>{{ probe_facet_label('external_preservation', active_facets['external_preservation'].value) if 'external_preservation' in active_facets else '—' }}</dd>
+    <dt title="{{ _('New content in the last 12–24 months, from sitemap and Wayback diffs.') }}">{{ _("Growth signal") }}</dt>
+    <dd>{{ probe_facet_label('growth_signal', active_facets['growth_signal'].value) if 'growth_signal' in active_facets else '—' }}</dd>
+    <dt title="{{ _('Best-effort from CrossRef and Semantic Scholar; human-editable when it misses Portuguese-language scholarship.') }}">{{ _("Prior scholarly use") }}</dt>
+    <dd>
+      {{ probe_facet_label('prior_use_signal', active_facets['prior_use_signal'].value) if 'prior_use_signal' in active_facets else '—' }}
+      {% if 'prior_use_signal' in active_facets and active_facets['prior_use_signal'].note %} — <em>{{ active_facets['prior_use_signal'].note }}</em>{% endif %}
+    </dd>
+  </dl>
 </section>
 
 {% if upgrade_projects %}

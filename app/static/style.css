@@ -267,6 +267,17 @@ button[type="submit"]:hover { filter: brightness(1.1); }
 
 .summary-grid dd { margin: 0; }
 
+.facets h3 {
+  margin: 1.25rem 0 0.15rem;
+  font-size: 0.95rem;
+}
+
+.facets__probe-caption {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin: 0 0 0.35rem;
+}
+
 .disclaimer { color: var(--muted); font-size: 0.85rem; font-style: italic; }
 
 .dimension {

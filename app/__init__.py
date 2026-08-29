@@ -57,8 +57,9 @@ def create_app(config_name: str | None = None) -> Flask:
     # Locale-aware vocabulary label helper. Templates call
     # ``vocab_label(obj)`` in place of ``obj.label_en`` so PT visitors
     # see ``label_pt`` where available and fall back cleanly.
-    from .i18n import vocab_label
+    from .i18n import probe_facet_label, vocab_label
     app.jinja_env.globals["vocab_label"] = vocab_label
+    app.jinja_env.globals["probe_facet_label"] = probe_facet_label
 
     # Admin/public split — templates use ``admin_ui_enabled()`` to hide
     # scoring forms, the facet editor, and the Harvest nav link on the
