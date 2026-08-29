@@ -251,6 +251,25 @@ Registration makes the repository discoverable to harvesters. It is a
 **manual external step** — do it once, after the endpoint is live at its
 production URL.
 
+### Ready-to-submit values (verified live 2026-08-29)
+
+| Field | Value |
+|---|---|
+| Base URL | `https://brasil-archives.from-bottom-to.top/oai` |
+| Repository name | `brasil-archives — Catálogo de arquivos digitais brasileiros` |
+| Admin email | `stevewil@gmail.com` |
+| Protocol version | 2.0 |
+| Metadata formats | `oai_dc`, `eag` |
+| Sample identifier | `oai:brasil-archives.from-bottom-to.top:archive:labim-ufrn` |
+| Earliest datestamp | `2026-08-26` · granularity `YYYY-MM-DD` · `deletedRecord: no` |
+
+**Before validating — set `OAI_PAGE_SIZE` so a resumption token is
+exercised.** Prod has ~80 public archives and the default page size is
+100, so `ListRecords` returns everything in one page and the validator
+never sees paging. In **Setup Python App → brasil-archives → environment
+variables**, set `OAI_PAGE_SIZE=50` (a sane production value — 2 pages),
+Restart, then validate. Leave it at 50.
+
 ### Prerequisites
 
 1. `/oai` is reachable at the **stable public HTTPS URL**
