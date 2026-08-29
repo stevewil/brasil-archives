@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Admin dashboard") }}{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <h1>{{ _("Admin dashboard") }}</h1>
+  <p class="page-header__lede">
+    {{ _("Read-only observability for the internal deployment. No editing happens here — scoring and facets live on the archive pages, harvest and probe are scripts.") }}
+  </p>
+</section>
+
+<section class="admin-panel">
+  <h2>{{ _("Scoring coverage") }}</h2>
+  <dl class="summary-grid">
+    <dt>{{ _("Pipeline-viable archives") }}</dt>
+    <dd>{{ coverage.viable_total }}</dd>
+    <dt>{{ _("With at least one active score") }}</dt>
+    <dd>{{ coverage.any_score }}</dd>
+    <dt>{{ _("Fully scored (%(n)s dimensions)", n=coverage.dimension_count) }}</dt>
+    <dd>{{ coverage.fully_scored }}</dd>
+    <dt>{{ _("Not yet scored") }}</dt>
+    <dd>{{ coverage.unscored }}</dd>
+  </dl>
+</section>
+
+<section class="admin-panel">
+  <h2>{{ _("Probe status") }}</h2>
+  <dl class="summary-grid">
+    <dt>{{ _("Archives probed") }}</dt>
+    <dd>{{ probe.probed }} / {{ probe.archive_total }}</dd>
+    <dt>{{ _("Never probed") }}</dt>
+    <dd>{{ probe.unprobed }}</dd>
+    <dt>{{ _("Most recent probe") }}</dt>
+    <dd>{{ probe.most_recent.strftime('%Y-%m-%d %H:%M') if probe.most_recent else _("never") }}</dd>
+    <dt>{{ _("Failing canonical URL (latest run)") }}</dt>
+    <dd>{% if probe.failing %}<strong>{{ probe.failing }}</strong>{% else %}0{% endif %}</dd>
+  </dl>
+</section>
+
+<section class="admin-panel">
+  <h2>{{ _("Federation health") }}</h2>
+  {% if federation %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>{{ _("Project") }}</th>
+        <th>{{ _("Status") }}</th>
+        <th class="num">{{ _("Records") }}</th>
+        <th>{{ _("Contract") }}</th>
+        <th>{{ _("Source") }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for f in federation %}
+      <tr>
+        <td><code>{{ f.project.slug }}</code></td>
+        <td>
+          {% if f.preview.available %}
+            <span class="status status--ok">{{ _("live") }}</span>
+            {% if f.preview.stale %}<span class="federation-note federation-note--stale">{{ _("(stale)") }}</span>
+            {% elif f.preview.from_cache %}<span class="federation-note">{{ _("(cached)") }}</span>{% endif %}
+          {% else %}
+            <span class="status status--failed" title="{{ f.preview.reason }}">{{ _("unavailable") }}</span>
+          {% endif %}
+        </td>
+        <td class="num">{{ f.preview.record_count if f.preview.available and f.preview.record_count is not none else '—' }}</td>
+        <td>{% if f.preview.available and f.preview.contract_version %}<code>{{ f.preview.contract_version }}</code>{% else %}—{% endif %}</td>
+        <td>{% if f.project.primary_url %}<a href="{{ f.project.primary_url }}" rel="noreferrer noopener" target="_blank">{{ f.project.primary_url }}</a>{% else %}—{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>{{ _("No upgrade projects registered.") }}</p>
+  {% endif %}
+</section>
+
+<section class="admin-panel">
+  <h2>{{ _("Recent harvest runs") }}</h2>
+  {% if harvest_runs %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>{{ _("Run") }}</th>
+        <th>{{ _("Project") }}</th>
+        <th>{{ _("Prefix") }}</th>
+        <th>{{ _("Status") }}</th>
+        <th class="num">{{ _("Upserted") }}</th>
+        <th class="num">{{ _("Errors") }}</th>
+        <th>{{ _("Started") }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for run in harvest_runs %}
+      <tr>
+        <td><a href="{{ url_for('harvest.run_detail', run_id=run.id) }}">#{{ run.id }}</a></td>
+        <td>{% if run.upgrade_project %}<code>{{ run.upgrade_project.slug }}</code>{% else %}—{% endif %}</td>
+        <td><code>{{ run.metadata_prefix }}</code></td>
+        <td><span class="status status--{{ run.status }}">{{ run.status }}</span></td>
+        <td class="num">{{ run.records_upserted }}</td>
+        <td class="num">{% if run.error_count %}<strong>{{ run.error_count }}</strong>{% else %}0{% endif %}</td>
+        <td>{{ run.started_at.strftime('%Y-%m-%d %H:%M') if run.started_at else '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p><a href="{{ url_for('harvest.index') }}">{{ _("All harvest runs") }} →</a></p>
+  {% else %}
+  <p>{{ _("No harvest runs recorded yet.") }}</p>
+  {% endif %}
+</section>
+
+<section class="admin-panel">
+  <h2>{{ _("Recent harvest errors") }}</h2>
+  {% if harvest_errors %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>{{ _("Run") }}</th>
+        <th>{{ _("Phase") }}</th>
+        <th>{{ _("Identifier") }}</th>
+        <th>{{ _("Message") }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for err in harvest_errors %}
+      <tr>
+        <td><a href="{{ url_for('harvest.run_detail', run_id=err.harvest_run_id) }}">#{{ err.harvest_run_id }}</a></td>
+        <td><code>{{ err.phase }}</code></td>
+        <td>{{ err.oai_identifier or '—' }}</td>
+        <td class="text-small">{{ err.message | truncate(160) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>{{ _("No harvest errors logged.") }}</p>
+  {% endif %}
+</section>
+{% endblock %}

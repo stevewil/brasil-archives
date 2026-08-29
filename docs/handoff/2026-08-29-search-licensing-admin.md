@@ -10,10 +10,13 @@ now.
 
 | Repo | `main` | Deployed | Tests |
 |---|---|---|---|
-| brasil-archives | **`e2355c3`** | cPanel current + verified | 304 passed / 4 skipped |
+| brasil-archives | **local ahead of cPanel** (licensing + public-scores gate + admin dashboard, 2026-08-29) | cPanel still on `e2355c3` — **needs a pull** | 316 passed / 4 skipped |
 | povos-indigenas-rn | **`e73a892`** | cPanel current + verified | 148 passed |
 
-Both cPanel checkouts are clean and current. povos's checkout had
+When pulling brasil-archives to cPanel: `pybabel compile -d app/translations`
+(new msgids), and **leave `BRASIL_ARCHIVES_PUBLIC_SCORES` unset**.
+
+Both cPanel checkouts were clean and current at the start of the session. povos's checkout had
 `core.autocrlf` / `core.filemode` set to `false` this session to stop
 phantom-modification pull failures (see the memory note
 `cpanel-phantom-modifications`).
@@ -167,7 +170,21 @@ existing `BRASIL_ARCHIVES_ADMIN` flag.
   public cPanel host until greenlit; document it next to
   `BRASIL_ARCHIVES_ADMIN` in `docs/DEPLOY.md` and `app/config.py`.
 
-### Item 3 — Read-only admin dashboard  `[M]`
+### Item 3 — Read-only admin dashboard  `[M]`  ✅ DONE 2026-08-29
+
+Implemented as `app/blueprints/admin/` → `GET /admin/`, `@admin_only`
+(404s when `BRASIL_ARCHIVES_ADMIN` is unset), registered in
+`app/__init__.py`. One template `app/templates/admin/index.html`, five
+read-only panels: scoring coverage (viable / any-score / fully-scored /
+unscored), probe status (probed count, most-recent stamp, latest-run
+canonical-URL failures), federation health (`fed.preview()` per
+`UpgradeProject`), recent harvest runs (last 10, links to `/harvest/`),
+recent harvest errors (last 10). Admin-only nav link in `base.html`.
+`tests/test_admin_dashboard.py` (6 tests). New msgids translated +
+compiled. `.admin-panel` CSS in `style.css`. No forms → no CSRF concern.
+
+Original brief follows.
+
 
 **Not** a write-capable CRUD panel — see the "why I pushed back" reasoning
 below. A single observability page behind the existing gate.

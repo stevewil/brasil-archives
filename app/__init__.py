@@ -82,10 +82,12 @@ def create_app(config_name: str | None = None) -> Flask:
     from .blueprints.main import bp as main_bp
     from .blueprints.archives import bp as archives_bp
     from .blueprints.harvest import bp as harvest_bp
+    from .blueprints.admin import bp as admin_bp
     from .oai import bp as oai_bp
     app.register_blueprint(main_bp)
     app.register_blueprint(archives_bp)
     app.register_blueprint(harvest_bp)
+    app.register_blueprint(admin_bp)
     app.register_blueprint(oai_bp)
 
     # The OAI-PMH provider is a public, read-only, machine surface that

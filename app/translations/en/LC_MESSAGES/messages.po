@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: brasil-archives 0.1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-29 14:36-0700\n"
+"POT-Creation-Date: 2026-08-29 14:44-0700\n"
 "PO-Revision-Date: 2026-08-27 14:00-0700\n"
 "Last-Translator: brasil-archives contributors\n"
 "Language: en\n"
@@ -27,6 +27,11 @@ msgstr "Brazilian Digital Archives"
 #: app/templates/search.html:15
 msgid "Search partner records"
 msgstr "Search partner records"
+
+#: app/blueprints/admin/routes.py:151 app/templates/admin/index.html:2
+#: app/templates/admin/index.html:6
+msgid "Admin dashboard"
+msgstr "Admin dashboard"
 
 #: app/blueprints/archives/routes.py:314
 #, python-format
@@ -76,7 +81,11 @@ msgstr "Search"
 msgid "Harvest"
 msgstr "Harvest"
 
-#: app/templates/base.html:49
+#: app/templates/base.html:26
+msgid "Admin"
+msgstr "Admin"
+
+#: app/templates/base.html:50
 msgid "Federated open metadata for Brazilian digital archives."
 msgstr "Federated open metadata for Brazilian digital archives."
 
@@ -139,7 +148,7 @@ msgstr "archive"
 msgid "Score"
 msgstr "Score"
 
-#: app/templates/index.html:73
+#: app/templates/admin/index.html:21 app/templates/index.html:73
 msgid "Not yet scored"
 msgstr "Not yet scored"
 
@@ -262,6 +271,163 @@ msgstr "page %(n)s of %(total)s"
 #: app/templates/search.html:121
 msgid "next →"
 msgstr "next →"
+
+#: app/templates/admin/index.html:8
+msgid ""
+"Read-only observability for the internal deployment. No editing happens "
+"here — scoring and facets live on the archive pages, harvest and probe "
+"are scripts."
+msgstr ""
+"Read-only observability for the internal deployment. No editing happens "
+"here — scoring and facets live on the archive pages, harvest and probe "
+"are scripts."
+
+#: app/templates/admin/index.html:13
+msgid "Scoring coverage"
+msgstr "Scoring coverage"
+
+#: app/templates/admin/index.html:15
+msgid "Pipeline-viable archives"
+msgstr "Pipeline-viable archives"
+
+#: app/templates/admin/index.html:17
+msgid "With at least one active score"
+msgstr "With at least one active score"
+
+#: app/templates/admin/index.html:19
+#, python-format
+msgid "Fully scored (%(n)s dimensions)"
+msgstr "Fully scored (%(n)s dimensions)"
+
+#: app/templates/admin/index.html:27
+msgid "Probe status"
+msgstr "Probe status"
+
+#: app/templates/admin/index.html:29
+msgid "Archives probed"
+msgstr "Archives probed"
+
+#: app/templates/admin/index.html:31
+msgid "Never probed"
+msgstr "Never probed"
+
+#: app/templates/admin/index.html:33
+msgid "Most recent probe"
+msgstr "Most recent probe"
+
+#: app/templates/admin/index.html:34
+msgid "never"
+msgstr "never"
+
+#: app/templates/admin/index.html:35
+msgid "Failing canonical URL (latest run)"
+msgstr "Failing canonical URL (latest run)"
+
+#: app/templates/admin/index.html:41
+msgid "Federation health"
+msgstr "Federation health"
+
+#: app/templates/admin/index.html:46 app/templates/admin/index.html:85
+#: app/templates/harvest/index.html:19 app/templates/harvest/index.html:41
+#: app/templates/harvest/record_detail.html:15
+#: app/templates/harvest/run_detail.html:12
+msgid "Project"
+msgstr "Project"
+
+#: app/templates/admin/index.html:47 app/templates/admin/index.html:87
+#: app/templates/harvest/index.html:43 app/templates/harvest/run_detail.html:16
+msgid "Status"
+msgstr "Status"
+
+#: app/templates/admin/index.html:48 app/templates/harvest/index.html:19
+msgid "Records"
+msgstr "Records"
+
+#: app/templates/admin/index.html:49
+msgid "Contract"
+msgstr "Contract"
+
+#: app/templates/admin/index.html:50 app/templates/harvest/index.html:50
+#: app/templates/harvest/run_detail.html:18
+msgid "Source"
+msgstr "Source"
+
+#: app/templates/admin/index.html:59
+msgid "live"
+msgstr "live"
+
+#: app/templates/admin/index.html:60
+msgid "(stale)"
+msgstr "(stale)"
+
+#: app/templates/admin/index.html:61 app/templates/archives/detail.html:293
+msgid "(cached)"
+msgstr "(cached)"
+
+#: app/templates/admin/index.html:63
+msgid "unavailable"
+msgstr "unavailable"
+
+#: app/templates/admin/index.html:74
+msgid "No upgrade projects registered."
+msgstr "No upgrade projects registered."
+
+#: app/templates/admin/index.html:79
+msgid "Recent harvest runs"
+msgstr "Recent harvest runs"
+
+#: app/templates/admin/index.html:84 app/templates/admin/index.html:119
+#: app/templates/harvest/index.html:40
+msgid "Run"
+msgstr "Run"
+
+#: app/templates/admin/index.html:86 app/templates/harvest/index.html:19
+#: app/templates/harvest/index.html:42
+msgid "Prefix"
+msgstr "Prefix"
+
+#: app/templates/admin/index.html:88 app/templates/harvest/index.html:45
+#: app/templates/harvest/run_detail.html:30
+msgid "Upserted"
+msgstr "Upserted"
+
+#: app/templates/admin/index.html:89 app/templates/harvest/index.html:47
+#: app/templates/harvest/run_detail.html:34
+msgid "Errors"
+msgstr "Errors"
+
+#: app/templates/admin/index.html:90 app/templates/harvest/index.html:48
+#: app/templates/harvest/run_detail.html:20
+msgid "Started"
+msgstr "Started"
+
+#: app/templates/admin/index.html:107
+msgid "All harvest runs"
+msgstr "All harvest runs"
+
+#: app/templates/admin/index.html:109
+msgid "No harvest runs recorded yet."
+msgstr "No harvest runs recorded yet."
+
+#: app/templates/admin/index.html:114
+msgid "Recent harvest errors"
+msgstr "Recent harvest errors"
+
+#: app/templates/admin/index.html:120 app/templates/harvest/run_detail.html:48
+msgid "Phase"
+msgstr "Phase"
+
+#: app/templates/admin/index.html:121
+msgid "Identifier"
+msgstr "Identifier"
+
+#: app/templates/admin/index.html:122 app/templates/harvest/run_detail.html:48
+msgid "Message"
+msgstr "Message"
+
+#: app/templates/admin/index.html:137
+msgid "No harvest errors logged."
+msgstr "No harvest errors logged."
 
 #: app/templates/archives/detail.html:3
 msgid ""
@@ -591,10 +757,6 @@ msgstr "(cached, stale)"
 msgid "Served from the 15-minute local cache."
 msgstr "Served from the 15-minute local cache."
 
-#: app/templates/archives/detail.html:293
-msgid "(cached)"
-msgstr "(cached)"
-
 #: app/templates/archives/detail.html:312
 msgid "Federation not yet configured for this upgrade project."
 msgstr "Federation not yet configured for this upgrade project."
@@ -800,60 +962,22 @@ msgstr "for the pipeline."
 msgid "Aggregated records by project"
 msgstr "Aggregated records by project"
 
-#: app/templates/harvest/index.html:19 app/templates/harvest/index.html:41
-#: app/templates/harvest/record_detail.html:15
-#: app/templates/harvest/run_detail.html:12
-msgid "Project"
-msgstr "Project"
-
-#: app/templates/harvest/index.html:19 app/templates/harvest/index.html:42
-msgid "Prefix"
-msgstr "Prefix"
-
-#: app/templates/harvest/index.html:19
-msgid "Records"
-msgstr "Records"
-
 #: app/templates/harvest/index.html:35
 #, python-format
 msgid "Runs (%(n)s)"
 msgstr "Runs (%(n)s)"
 
-#: app/templates/harvest/index.html:40
-msgid "Run"
-msgstr "Run"
-
-#: app/templates/harvest/index.html:43 app/templates/harvest/run_detail.html:16
-msgid "Status"
-msgstr "Status"
-
 #: app/templates/harvest/index.html:44
 msgid "Seen"
 msgstr "Seen"
-
-#: app/templates/harvest/index.html:45 app/templates/harvest/run_detail.html:30
-msgid "Upserted"
-msgstr "Upserted"
 
 #: app/templates/harvest/index.html:46 app/templates/harvest/run_detail.html:32
 msgid "Unchanged"
 msgstr "Unchanged"
 
-#: app/templates/harvest/index.html:47 app/templates/harvest/run_detail.html:34
-msgid "Errors"
-msgstr "Errors"
-
-#: app/templates/harvest/index.html:48 app/templates/harvest/run_detail.html:20
-msgid "Started"
-msgstr "Started"
-
 #: app/templates/harvest/index.html:49
 msgid "Duration"
 msgstr "Duration"
-
-#: app/templates/harvest/index.html:50 app/templates/harvest/run_detail.html:18
-msgid "Source"
-msgstr "Source"
 
 #: app/templates/harvest/index.html:86 app/templates/harvest/run_detail.html:97
 #, python-format
@@ -939,17 +1063,9 @@ msgid "Errors (%(n)s, first 50)"
 msgstr "Errors (%(n)s, first 50)"
 
 #: app/templates/harvest/run_detail.html:48
-msgid "Phase"
-msgstr "Phase"
-
-#: app/templates/harvest/run_detail.html:48
 #: app/templates/harvest/run_detail.html:69
 msgid "OAI identifier"
 msgstr "OAI identifier"
-
-#: app/templates/harvest/run_detail.html:48
-msgid "Message"
-msgstr "Message"
 
 #: app/templates/harvest/run_detail.html:64
 #, python-format
