@@ -116,8 +116,19 @@ def seeded(app):
             _make_record(povos, run_p, "oai:p:passage:9", {
                 "title": "Passagem sobre os Janduí",
                 "year_start": 1701, "year_end": 1701,
-                # no partner-host URL -> deep link falls back to the site
+                # no URL of any kind -> deep link falls back to the site
                 "urls": [],
+            }),
+            # collection-like: only an off-host URL (gov.br Projeto Resgate)
+            _make_record(povos, run_p, "oai:p:collection:1", {
+                "title": "Índice do acervo zpfx-collection",
+                "urls": ["https://www.gov.br/projeto-resgate/rn"],
+            }),
+            # work-like: no urls, only a dc:source page
+            _make_record(povos, run_p, "oai:p:work:1", {
+                "title": "Trabalho acadêmico zpfx-work",
+                "urls": [],
+                "source_urls": ["https://ufrn.example/trabalhos.html"],
             }),
         ])
         _db.session.commit()
@@ -183,13 +194,25 @@ def test_strong_hits_rank_above_weak_hits(seeded):
         assert resp.hits[1].strong is False
 
 
-def test_deep_link_prefers_partner_host_then_falls_back(seeded):
+def test_link_prefers_on_host_then_off_host_then_source_then_home(seeded):
     with seeded.app_context():
-        resp = fs.search(q="Sumário")
-        hit = resp.hits[0]
+        # 1. on-host wins, off-host becomes the "cited source"
+        hit = fs.search(q="Sumário").hits[0]
         assert hit.link == "https://mipibu.from-bottom-to.top/cases/SJM-0001"
         assert hit.source_url == "http://repositorio.example/bitstream/1.pdf"
 
+        # 2. no on-host URL -> the off-host URL is the primary link,
+        #    and it is not also repeated as the cited source
+        coll = fs.search(q="zpfx-collection").hits[0]
+        assert coll.link == "https://www.gov.br/projeto-resgate/rn"
+        assert coll.source_url is None
+
+        # 3. no urls at all -> fall back to the dc:source page
+        work = fs.search(q="zpfx-work").hits[0]
+        assert work.link == "https://ufrn.example/trabalhos.html"
+        assert work.source_url is None
+
+        # 4. nothing usable -> the project home page
         passage = fs.search(q="Janduí").hits[0]
         assert passage.link == "https://povos.from-bottom-to.top"
         assert passage.source_url is None

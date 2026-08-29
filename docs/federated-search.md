@@ -38,16 +38,24 @@ the two in sync.
 | **Full scan in Python, no FTS5 (yet).** | ~10³ harvested records; a scan + parse is well under a frame. The spec (`TODO.md` §6) anticipated a `LIKE`/`json_extract` scan. Move to an FTS5 virtual table with a `remove_diacritics=2` tokenizer if the corpus reaches ~10⁴ (mirror povos's `fts_documents`). |
 | **Accent- and case-insensitive matching.** | Brazilian users type "sumario" for "Sumário". Both needle and haystack are `NFKD`-folded with combining marks stripped. An FTS5 `LIKE` prefilter would be accent-sensitive, which is why the current version scans instead. |
 | **Two match tiers.** | A hit in title/creator/publisher/description ("strong") sorts above a hit only in subjects/coverage/identifiers/date ("weak"). Within a tier, alphabetical by folded title. |
-| **Deep link = the `canonical.urls` entry that shares a host with the project's `primary_url`.** | mipibu's `dc:identifier` carries `…/cases/SJM-0001`. Partners whose `oai_dc` omits a self URL (povos passages today) fall back to the project home page; the first off-host URL is surfaced separately as "Cited source". |
+| **Result link, best available first.** | (1) an on-host URL — the partner's own record page (mipibu `…/cases/SJM-0001`, povos `…/documents/N`, including the parent document a passage carries); (2) an off-host URL from `dc:identifier`/`dc:relation` (povos `collection` → gov.br Projeto Resgate); (3) a `dc:source` URL — where the record was catalogued from (povos `passage`/`work`); (4) the project home page, last resort. The "Cited source" secondary link shows only when it is a *different* destination than the primary. |
 | **Facet counts ignore the `source` filter.** | The per-partner chips always show the full spread so a visitor who narrowed to one partner can widen back out. |
+
+The extractor captures `dc:source` http values into `canonical.source_urls`
+for tier (3). After an extractor change, `python -m scripts.reextract`
+re-derives `extracted_json` for already-harvested rows (a plain harvest
+only refreshes rows whose raw XML changed).
 
 ## Known follow-ups
 
-- **povos `oai_dc` enrichment.** povos `passage:*` records harvest with no
-  `dc:identifier` URL and no `dc:date`, so they deep-link only to the
-  povos home page and show no date. If povos adds a per-record
-  `dc:identifier` (e.g. `https://povos-indigenas-rn.from-bottom-to.top/passages/<id>`)
-  and `dc:date` where known, those hits improve with no change here.
+- **povos `passage` / `work` deep links go off-site.** As of povos
+  `e73a892` (2026-08-29) a `passage` deep-links to its **parent document
+  page** on povos (`/documents/N`); `work` and the 5 `ethnic-group` rows
+  with no `portal_url` still land on an external page or the povos home,
+  because povos has no per-record detail page for those kinds. Add a
+  `/works/<id>` / `/ethnic-groups/<id>` view on povos if that matters.
+- **povos `passage` records have no `dc:date`.** They show no year in
+  results. povos could carry the parent document's date.
 - **Tie search hits back into the catalog.** Each hit could also link to
   the brasil-archives archive-detail page for the partner's
   `source_archive`. Deferred — keeps the row clean for v1.

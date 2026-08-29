@@ -21,6 +21,8 @@ DC_XML = """
   <dc:identifier>https://example.org/cases/001</dc:identifier>
   <dc:relation>https://example.org/downloads/001.pdf</dc:relation>
   <dc:relation>see also X</dc:relation>
+  <dc:source>https://repositorio.example/catalog/001</dc:source>
+  <dc:source>Fundo X</dc:source>
   <dc:type>Text</dc:type>
   <dc:type>InteractiveResource</dc:type>
   <dc:subject>Ofensas físicas</dc:subject>
@@ -40,6 +42,8 @@ def test_dc_canonical_pulls_first_and_ranges():
     assert can["identifiers"] == ["oai:example:case:001"]
     assert "https://example.org/cases/001" in can["urls"]
     assert "https://example.org/downloads/001.pdf" in can["urls"]
+    # dc:source http values are captured separately; non-URL sources dropped
+    assert can["source_urls"] == ["https://repositorio.example/catalog/001"]
     assert can["types"] == ["Text", "InteractiveResource"]
 
 

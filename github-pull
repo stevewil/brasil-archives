@@ -93,6 +93,16 @@ REMINDER
     WARN=1
 fi
 
+if echo "$CHANGED" | grep -qE "^app/services/oai_extractors/"; then
+    cat <<'REMINDER'
+
+!!  An OAI extractor changed. A plain harvest only refreshes records whose
+    raw XML changed, so re-derive the stored ones by hand (no network):
+      python -m scripts.reextract            # add --dry-run first to preview
+REMINDER
+    WARN=1
+fi
+
 echo "==> Restarting Passenger"
 mkdir -p tmp && touch tmp/restart.txt
 

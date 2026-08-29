@@ -285,26 +285,39 @@ def _build_hit(
 
 
 def _links(project: UpgradeProject, canonical: dict) -> tuple[str | None, str | None]:
-    """(deep link into the partner viewer, external cited source).
+    """(primary link for the result, secondary "cited source" link).
 
-    The partner's own record URL is whichever ``canonical.urls`` entry
-    shares a host with the project's primary URL — mipibu's ``dc:identifier``
-    carries ``…/cases/SJM-0001``. Partners whose ``oai_dc`` omits a
-    self URL (povos today) fall back to the project home page; the first
-    off-host URL, if any, is surfaced separately as the cited source.
+    Preference for the primary link, best first:
+
+    1. an on-host URL — the partner's own record page (mipibu
+       ``…/cases/SJM-0001``; povos ``…/documents/N``, including the parent
+       document a passage carries)
+    2. an off-host URL from ``dc:identifier`` / ``dc:relation`` (povos
+       ``collection`` → the gov.br Projeto Resgate page)
+    3. a ``dc:source`` URL — where the record was catalogued from (povos
+       ``passage``/``work`` before their own pages exist)
+    4. the project home page — last resort
+
+    The secondary link is the best external URL *if it is a different
+    destination* than the primary, so a row never shows "Cited source"
+    pointing where its title already points.
     """
     base = (project.primary_url or "").rstrip("/")
     home_host = urlsplit(base).netloc
-    urls = [u for u in (canonical.get("urls") or []) if isinstance(u, str)]
 
-    deep_link = None
-    source_url = None
-    for url in urls:
-        if urlsplit(url).netloc == home_host:
-            deep_link = deep_link or url
-        else:
-            source_url = source_url or url
-    return (deep_link or base or None), source_url
+    def _clean(key: str) -> list[str]:
+        return [u for u in (canonical.get(key) or []) if isinstance(u, str) and u]
+
+    urls = _clean("urls")
+    source_urls = _clean("source_urls")
+
+    on_host = next((u for u in urls if urlsplit(u).netloc == home_host), None)
+    off_host = next((u for u in urls if urlsplit(u).netloc != home_host), None)
+    ext_source = off_host or (source_urls[0] if source_urls else None)
+
+    primary = on_host or ext_source or base or None
+    secondary = ext_source if (ext_source and ext_source != primary) else None
+    return primary, secondary
 
 
 def _as_int(value: object) -> int | None:

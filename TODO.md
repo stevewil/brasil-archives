@@ -197,6 +197,15 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
   `/api/records` `links.html` (mipibu → `/cases`, povos → `/documents`),
   falling back to the site root. Verified live. **Not yet deployed** —
   next brasil-archives pull.
+- [x] **Federated-search result links pointed at the povos home page.**
+  Fixed 2026-08-29. `oai_dc` extractor now captures `dc:source` URLs
+  (`canonical.source_urls`); `federated_search._links()` falls through
+  on-host → off-host → `dc:source` → home. povos side: `passage` records
+  now emit their parent document's page URL. New `scripts/reextract.py`
+  re-derives `extracted_json` without a re-fetch (needed whenever an
+  extractor changes). Follow-ups (povos `/works/<id>` +
+  `/ethnic-groups/<id>` pages, passage `dc:date`) in
+  [`docs/federated-search.md`](docs/federated-search.md) §Known follow-ups.
 - [ ] `LICENSING.md` referenced by `algorithm-v1.md` §Licensing doesn't
   exist yet — "finalized before public release."
 - [x] `docs/vocabularies.md` — written 2026-08-27 (`34fc5b3`): consolidates

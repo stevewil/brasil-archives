@@ -93,6 +93,11 @@ def extract(dc_element: ET.Element) -> dict[str, Any]:
     urls_from_relation = [v for v in raw["dc:relation"] if _URL_RE.match(v)]
     urls = urls_from_identifier + urls_from_relation
 
+    # dc:source points at where the record came from (a repository record,
+    # a catalog page). Not a canonical location for the item itself, but a
+    # useful fallback link when the provider gives no self URL.
+    source_urls = [v for v in raw["dc:source"] if _URL_RE.match(v)]
+
     year_start, year_end = _extract_years(raw["dc:date"], raw["dc:coverage"])
 
     canonical: dict[str, Any] = {
@@ -104,6 +109,7 @@ def extract(dc_element: ET.Element) -> dict[str, Any]:
         "rights": _first(raw["dc:rights"]),
         "identifiers": non_url_identifiers,
         "urls": urls,
+        "source_urls": source_urls,
         "types": raw["dc:type"],           # keep all — often multi-valued
         "subjects": raw["dc:subject"],
         "creator": _first(raw["dc:creator"]),

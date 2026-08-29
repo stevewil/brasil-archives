@@ -67,7 +67,14 @@ Run that same recovery sequence after any future prod DB reseed.
   `~/flask/brasil-archives/github-pull`. It pulls `--ff-only`, then runs
   `pip install` / `flask db upgrade` / `pybabel compile` only when the
   relevant files changed, and `touch tmp/restart.txt`. It prints (but does
-  not run) the data-loader commands when `configs/` changed.
+  not run) the data-loader commands when `configs/` changed, and the
+  `scripts.reextract` command when an OAI extractor changed.
+- **`scripts/reextract.py`** — re-derives `extracted_json` for
+  already-harvested `aggregated_records` from their stored raw XML, with
+  no network. Run it after an extractor change
+  (`app/services/oai_extractors/`): a plain harvest only refreshes rows
+  whose raw XML changed. `python -m scripts.reextract --dry-run` previews;
+  `python -m scripts.reextract` writes; `--project <slug>` narrows.
 
 ## Routine deploy (every commit)
 
