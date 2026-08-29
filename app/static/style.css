@@ -668,6 +668,16 @@ section.canonical pre, section.raw-extracted pre, section.raw-xml pre {
 
 .fedsearch-hint { color: var(--muted); font-size: 0.9rem; }
 
+.fedsearch-samples {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: 0.75rem 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .fedsearch-projects {
   list-style: none;
   padding: 0;

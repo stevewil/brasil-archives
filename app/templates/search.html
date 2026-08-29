@@ -3,6 +3,14 @@
 {% block description %}{{ _("Search across the records harvested from partner corpus explorers — Dublin Core metadata, attributed to each project and linking back to its viewer.") }}{% endblock %}
 
 {% block content %}
+{% macro sample_chips(samples) %}
+  {% if samples %}
+    <p class="fedsearch-samples">
+      {{ _("Try:") }}
+      {% for s in samples %}<a class="state-chip" href="{{ url_for('main.search', q=s) }}">{{ s }}</a>{% endfor %}
+    </p>
+  {% endif %}
+{% endmacro %}
 <section class="page-header">
   <h1>{{ _("Search partner records") }}</h1>
   <p class="page-header__lede">
@@ -25,6 +33,7 @@
   <p class="fedsearch-hint">
     {{ _("Type at least two characters. Matching ignores accents and case.") }}
   </p>
+  {{ sample_chips(resp.samples) }}
   {% if resp.projects %}
     <ul class="fedsearch-projects">
       {% for p in resp.projects %}
@@ -42,6 +51,7 @@
       <p>{{ _("%(total)s result(s) for", total=resp.total) }} <q>{{ resp.query }}</q>.</p>
     {% else %}
       <p>{{ _("No results for") }} <q>{{ resp.query }}</q>. {{ _("Try fewer or broader terms.") }}</p>
+      {{ sample_chips(resp.samples) }}
     {% endif %}
 
     {% if resp.facets %}

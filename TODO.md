@@ -165,9 +165,13 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
   "weak"), per-partner facet chips, deep links back into each partner's
   viewer (host-matched `canonical.urls` entry, home-page fallback),
   pagination, bilingual. Nav link + home "Federated records" stat now
-  link in. `app/services/federated_search.py`,
-  `tests/test_federated_search.py` (16 tests). Design +
-  known follow-ups: [`docs/federated-search.md`](docs/federated-search.md).
+  link in. Empty/no-results states show a curated `SAMPLE_QUERIES` chip
+  row; **operator keyword cheat sheet**
+  [`docs/federated-search-keywords.md`](docs/federated-search-keywords.md)
+  (per-partner productive terms, types, year spans, dead-end terms).
+  `app/services/federated_search.py`, `tests/test_federated_search.py`
+  (19 tests). Design + follow-ups:
+  [`docs/federated-search.md`](docs/federated-search.md).
 - [x] **[S] Archive catalog text search.** Built 2026-08-29. `GET /archives/`
   gained a `q` param — accent- + case-insensitive (`app/text.py` `fold()`,
   extracted from Phase 3.5's `_fold` and now shared) matched against

@@ -243,6 +243,29 @@ def test_search_view_no_results(seeded, client):
     assert "No results for" in body
 
 
+def test_sample_queries_are_valid():
+    assert fs.SAMPLE_QUERIES
+    for s in fs.SAMPLE_QUERIES:
+        assert s == s.strip()
+        assert len(s) >= fs.MIN_QUERY_LEN
+
+
+def test_sample_chips_render_on_empty_and_no_results(seeded, client):
+    first = fs.SAMPLE_QUERIES[0]
+    from urllib.parse import quote
+
+    empty = client.get("/search").get_data(as_text=True)
+    no_hits = client.get("/search?q=zzznomatch").get_data(as_text=True)
+    for body in (empty, no_hits):
+        assert "Try:" in body
+        assert f"q={quote(first)}" in body or f"q={first}" in body
+
+
+def test_sample_chips_absent_once_there_are_hits(seeded, client):
+    body = client.get("/search?q=despejo").get_data(as_text=True)
+    assert "Try:" not in body
+
+
 def test_search_view_source_filter_chip(seeded, client):
     body = client.get("/search?q=sesmaria").get_data(as_text=True)
     assert "source=povos" in body

@@ -21,6 +21,14 @@ This is the pragmatic precursor to **Phase 4** (live IIIF Content Search
 fan-out — `federation-v1.md` §"IIIF Content Search"). Phase 4 queries the
 partners' live indexes; Phase 3.5 queries our last harvest.
 
+**What's actually in there:** the two federated corpora are narrow.
+[`federated-search-keywords.md`](federated-search-keywords.md) is the
+operator cheat sheet — productive terms, document/case types, year spans
+per partner, and the queries that deliberately return nothing (e.g.
+`escravo`). The empty and no-results states of the page also show a
+curated `SAMPLE_QUERIES` row (`app/services/federated_search.py`) — keep
+the two in sync.
+
 ## Design decisions
 
 | Decision | Why |

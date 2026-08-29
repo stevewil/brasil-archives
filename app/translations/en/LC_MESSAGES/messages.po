@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: brasil-archives 0.1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-28 20:10-0700\n"
+"POT-Creation-Date: 2026-08-28 20:19-0700\n"
 "PO-Revision-Date: 2026-08-27 14:00-0700\n"
 "Last-Translator: brasil-archives contributors\n"
 "Language: en\n"
@@ -24,7 +24,7 @@ msgid "Brazilian Digital Archives"
 msgstr "Brazilian Digital Archives"
 
 #: app/blueprints/main.py:55 app/templates/search.html:2
-#: app/templates/search.html:7
+#: app/templates/search.html:15
 msgid "Search partner records"
 msgstr "Search partner records"
 
@@ -68,7 +68,7 @@ msgid "Archives"
 msgstr "Archives"
 
 #: app/templates/archives/list.html:13 app/templates/base.html:23
-#: app/templates/search.html:21
+#: app/templates/search.html:29
 msgid "Search"
 msgstr "Search"
 
@@ -190,6 +190,10 @@ msgstr ""
 "viewer."
 
 #: app/templates/search.html:9
+msgid "Try:"
+msgstr "Try:"
+
+#: app/templates/search.html:17
 msgid ""
 "One search box over every record harvested from a partner corpus "
 "explorer. Results link back to the partner's own viewer; freshness is "
@@ -199,59 +203,59 @@ msgstr ""
 "explorer. Results link back to the partner's own viewer; freshness is "
 "bounded by the monthly harvest."
 
-#: app/templates/search.html:18
+#: app/templates/search.html:26
 msgid "e.g. sumário crime, sesmaria, aldeia"
 msgstr "e.g. sumário crime, sesmaria, aldeia"
 
-#: app/templates/search.html:19
+#: app/templates/search.html:27
 msgid "Search terms"
 msgstr "Search terms"
 
-#: app/templates/search.html:26
+#: app/templates/search.html:34
 msgid "Type at least two characters. Matching ignores accents and case."
 msgstr "Type at least two characters. Matching ignores accents and case."
 
-#: app/templates/search.html:42
+#: app/templates/search.html:51
 #, python-format
 msgid "%(total)s result(s) for"
 msgstr "%(total)s result(s) for"
 
-#: app/templates/search.html:44
+#: app/templates/search.html:53
 msgid "No results for"
 msgstr "No results for"
 
-#: app/templates/search.html:44
+#: app/templates/search.html:53
 msgid "Try fewer or broader terms."
 msgstr "Try fewer or broader terms."
 
-#: app/templates/search.html:48
+#: app/templates/search.html:58
 msgid "Filter by partner"
 msgstr "Filter by partner"
 
-#: app/templates/search.html:52
+#: app/templates/search.html:62
 msgid "All partners"
 msgstr "All partners"
 
-#: app/templates/search.html:97
+#: app/templates/search.html:107
 msgid "Cited source"
 msgstr "Cited source"
 
-#: app/templates/search.html:105
+#: app/templates/search.html:115
 msgid "Pagination"
 msgstr "Pagination"
 
 #: app/templates/harvest/index.html:84 app/templates/harvest/run_detail.html:95
-#: app/templates/search.html:107
+#: app/templates/search.html:117
 msgid "← previous"
 msgstr "← previous"
 
-#: app/templates/search.html:109
+#: app/templates/search.html:119
 #, python-format
 msgid "page %(n)s of %(total)s"
 msgstr "page %(n)s of %(total)s"
 
 #: app/templates/harvest/index.html:88 app/templates/harvest/run_detail.html:99
-#: app/templates/search.html:111
+#: app/templates/search.html:121
 msgid "next →"
 msgstr "next →"
 

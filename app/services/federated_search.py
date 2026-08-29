@@ -53,6 +53,23 @@ DESCRIPTION_SNIPPET_CHARS = 280
 _STRONG_FIELDS = ("title", "creator", "publisher", "description")
 _WEAK_FIELDS = ("subjects", "coverage", "types", "identifiers", "date")
 
+# Curated example queries shown on the empty and no-results states — one
+# tap into a corpus a first-time visitor has no vocabulary for. Keep them
+# productive against the harvested data; the full operator cheat sheet is
+# docs/federated-search-keywords.md. Verified 2026-08-29:
+#   índios 74 · Potiguara 21 · aldeia 24 · capitão-mor 34 · sesmaria 4
+#   (povos) · sumário crime 86 · habeas corpus 19 · furto 39 (mipibu)
+SAMPLE_QUERIES: tuple[str, ...] = (
+    "índios",
+    "Potiguara",
+    "aldeia",
+    "sesmaria",
+    "capitão-mor",
+    "sumário crime",
+    "habeas corpus",
+    "furto",
+)
+
 
 # ---------------------------------------------------------------------------
 # Return shapes
@@ -96,6 +113,7 @@ class SearchResponse:
     hits: tuple[SearchHit, ...] = ()
     facets: tuple[SourceFacet, ...] = ()
     projects: tuple[UpgradeProject, ...] = ()
+    samples: tuple[str, ...] = SAMPLE_QUERIES
     searched: bool = False
     truncated: bool = False
 
