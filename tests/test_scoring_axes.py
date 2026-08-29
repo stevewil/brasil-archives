@@ -165,8 +165,8 @@ def test_axis_scores_unscored_returns_none_pair(app, seed_archive):
         (32, 20, "High pipeline / Low research"),
         (20, 32, "Low pipeline / High research"),
         (20, 20, "Low pipeline / Low research"),
-        (28, 28, "High pipeline / High research"),  # threshold is inclusive
-        (27, 27, "Low pipeline / Low research"),
+        (26, 26, "High pipeline / High research"),  # threshold 26, inclusive (ADR-0002)
+        (25, 25, "Low pipeline / Low research"),
         (None, 30, "n.a."),
         (30, None, "n.a."),
         (None, None, "n.a."),

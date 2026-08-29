@@ -438,16 +438,16 @@ def test_detail_view_shows_score_profile_card(seeded_app, client):
         {
             "accessibility": 8, "finding_aids": 7,
             "pipeline_ingestion_readiness": 8, "scale": 8,   # pipeline = 31
-            "provenance_curatorial": 6, "corpus_completeness": 6,
-            "uniqueness_non_duplication": 8, "linkage_potential": 6,  # research = 26
+            "provenance_curatorial": 6, "corpus_completeness": 5,
+            "uniqueness_non_duplication": 7, "linkage_potential": 6,  # research = 24
         },
     )
     resp = client.get("/archives/rn-labim-t1r1")
     body = resp.get_data(as_text=True)
     assert "Score profile" in body
-    assert "31" in body and "26" in body
+    assert "31" in body and "24" in body
     assert "axis-card" in body  # profile card rendered
-    assert "High pipeline / Low research" in body  # quadrant at threshold 28
+    assert "High pipeline / Low research" in body  # research 24 < threshold 26 (ADR-0002)
 
 
 def test_detail_view_shows_probe_facets(seeded_app, client):

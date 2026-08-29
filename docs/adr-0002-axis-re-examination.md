@@ -1,6 +1,6 @@
 # ADR-0002: Re-examining the two-axis aggregation after Pass 3
 
-- **Status:** **Proposed** — awaiting Steve's decision on §Recommendations.
+- **Status:** **Accepted, 2026-08-29** — R1 + R2 + R3 all adopted.
 - **Date:** 2026-08-29
 - **Deciders:** Steve Williams
 - **Amends:** [ADR-0001](adr-0001-two-axis-aggregation.md) (does not replace it —

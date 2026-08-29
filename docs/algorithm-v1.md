@@ -196,11 +196,29 @@ Dimensions initially proposed but demoted or removed. Each carries a rationale s
 
 - **Pipeline axis** (0–40) = accessibility + finding_aids + pipeline_ingestion_readiness + scale. What it costs us to ingest.
 - **Research axis** (0–40) = provenance_curatorial + corpus_completeness + uniqueness_non_duplication + linkage_potential. What we get back once we do.
-- **Quadrant label** at threshold 28/40 (average anchor 7 per dimension = "uniformly usable" tier) using inclusive comparison: `pipeline >= 28 and research >= 28` → "High pipeline / High research", and so on. Unscored archives return `"n.a."`.
+- **Quadrant label** at threshold **26/40** (average anchor ~6.5, just above the field median) using inclusive comparison: `pipeline >= 26 and research >= 26` → "High pipeline / High research", and so on. Unscored archives return `"n.a."`. *(ADR-0001 originally set 28; [ADR-0002](adr-0002-axis-re-examination.md) lowered it after Pass 3 showed 28 admitted only 2 of 21 archives to High/High.)*
 - **Naive sum kept** as a legacy 0–80 column on both the list page (sortable) and the detail card. It remains useful when one axis is unscored and it preserves continuity with Pass 1 outputs.
 - **Sorting.** The list page offers `sort=name`, `sort=score` (naive sum), `sort=pipeline`, and `sort=research`. Each axis sort ranks NULLs last so partially-scored archives don't crowd the top.
 
 The axis membership table (`app.services.scoring.AXES`) lives in code and is guarded by an import-time sanity check that asserts every dimension in `DIMENSIONS` appears in exactly one axis. Any change to that partition is a code-review event, not a config edit.
+
+**ADR-0002 re-examination (2026-08-29, 21 archives).** The 4-4 partition was
+re-tested and kept. Two findings recorded for a Pass 4 review — *do not act
+without an ADR*:
+
+- The **research axis is not internally coherent** (Cronbach α ≈ 0.49; the
+  pipeline axis is 0.66). `uniqueness_non_duplication` is near-constant
+  (mean 7.7, sd 1.5 — almost every Nordeste archive is the only digital
+  copy) and uncorrelated with everything; `corpus_completeness` correlates
+  with the *pipeline* dimensions (r ≈ 0.65), a resourcing confound rather
+  than a mis-categorisation. Pass 4 should consider demoting `uniqueness`
+  to a standalone flag and/or splitting research into "metadata quality"
+  (provenance + linkage) vs "collection substance" (completeness + scale).
+- The two axis totals **co-vary** (r ≈ 0.68) — both track archive
+  resourcing; they are not the trade-off ADR-0001 assumed. The split still
+  earns its place: ~30% of archives sit off the diagonal (INTERPI, LABIM,
+  BCZM, TJMA, Jornais de Sergipe, APEB finding-aid indexes) where a single
+  scalar misleads.
 
 **Related facet: `scholarly_access_practical`** (added at the same time). Single-select over `well-supported`, `usable-with-effort`, `only-via-federation`, `not-yet-assessed`. This is *not* a scoring dimension — it annotates whether an archive's own access surface supports scholarly workflows or whether reaching that material practically requires our federation tooling. It complements the pipeline axis by naming *who pays the ingestion cost*.
 
@@ -245,3 +263,4 @@ Full text lives in `LICENSING.md` when we get closer to public release.
 - **2026-08-28** — Pass 3 loaded: 15 pipeline-viable Nordeste archives (`configs/calibration/pass3.yaml`, `docs/pass3-scoring-notes.md`). 13 of 15 land Low/Low pipeline/research.
   - **Open tension for the ADR-0001 re-examination — Scale basis.** Dimension 7 is scored on *digitally held* volume, not *published* volume, following the Pass 2 TJMA precedent (`scale 10` on ~2.5M images digitized though ~10k processos are public). Pass 3 applies the same to APEPI (`10`, 450k pages digitized / ~5% online), Cúria de Maceió (`8`, corpus digitized / ~nothing online) and APEB–Independência (`4`). If the axis re-examination decides Scale should track published volume, these four scores drop hard and the quadrant distribution shifts. Not changed now (would re-open Pass 2); flagged here.
   - **Threshold sensitivity.** APEB finding-aid indexes (`t1r18`) sit at research axis 27/40 — one point below the 28 threshold — and are scored as ingestible data despite being finding aids. The entry most sensitive to any threshold change.
+- **2026-08-29 — [ADR-0002](adr-0002-axis-re-examination.md) accepted** (re-examination over 21 scored archives): 4-4 partition kept; **quadrant threshold 28 → 26** (`quadrant_label` default); research-axis low coherence (α ≈ 0.49) + the `uniqueness`/`corpus_completeness` findings recorded above for Pass 4. Two archives' quadrant labels change (LABIM/UFRN, APEB finding-aid indexes → High research). The Scale-basis tension is *not* resolved by ADR-0002 — it stays flagged for Pass 4. No re-scoring.

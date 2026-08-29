@@ -178,17 +178,16 @@ def quadrant_label(
     pipeline: int | None,
     research: int | None,
     *,
-    threshold: int = 28,
+    threshold: int = 26,
 ) -> str:
     """Human label for the four quadrants on the two-axis plane.
 
-    ``threshold`` (default 28) splits each axis into low/high halves.
-    28/40 corresponds to an average dimension score of 7, which is the
-    anchor point at which every dimension describes an archive with
-    faceted browse, ISAD(G)-adjacent description, or their equivalent
-    (see docs/algorithm-v1.md §Scored dimensions). Below 28 on an axis,
-    the archive has at least one dimension below the "uniformly good"
-    tier; at or above, all four are in that tier or better.
+    ``threshold`` (default 26, per ADR-0002) splits each axis into
+    low/high halves. 26/40 is an average dimension score of ~6.5 — just
+    above the field median (pipeline 24, research 22 across the 21 scored
+    archives) — and makes "High/High" a non-trivial bucket. ADR-0001
+    originally used 28 (avg 7, "uniformly usable"); ADR-0002 lowered it
+    after Pass 3 showed 28 admitted only 2 archives to High/High.
 
     Returns "n.a." when either axis is unscored.
     """

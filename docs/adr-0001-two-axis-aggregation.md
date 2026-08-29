@@ -1,6 +1,11 @@
 # ADR-0001: Two-axis aggregation for the eight scored dimensions
 
-- **Status:** accepted, 2026-08-24
+- **Status:** accepted, 2026-08-24 · **re-examined by
+  [ADR-0002](adr-0002-axis-re-examination.md), 2026-08-29** — the 4-4
+  partition was re-tested against 21 scored archives and **held**; the
+  quadrant threshold was lowered 28 → 26; the motivating "no archive high
+  on both axes" claim was found not to survive Pass 3 (the axes co-vary,
+  r ≈ 0.68) and is superseded by ADR-0002 §"Finding 1".
 - **Deciders:** Steve Williams
 - **Consulted:** the six-archive Pass 2 calibration set (LABIM/UFRN, INTERPI, TJMA, BCZM/UFRN, Jornais de Sergipe, Nupem)
 - **Supersedes:** v0 placeholder aggregation (naive sum only) documented in `docs/algorithm-v1.md §Aggregation`.
@@ -93,9 +98,9 @@ This facet is annotation, not scoring. It informs the scenario-driven federation
 
 ### Open follow-ups
 
-- After Pass 3 (roughly 12–15 archives) we should re-examine whether the 4-4 partition still fits and whether the 28 threshold still separates "uniformly usable" from the middle band. Do not change either without an ADR-0001 supersession.
-- If a future archive scores fully on one axis and zero on the other, revisit whether the quadrant label should degrade to an explicit "one-axis only" tier rather than defaulting to `Low <other> axis`.
-- The `scholarly_access_practical` facet needs at least one calibration archive labeled `only-via-federation` before it is meaningful; the first candidate is Mipibu once it is promoted from `UpgradeProject` to `Archive` in a follow-on turn.
+- ~~After Pass 3 … re-examine whether the 4-4 partition still fits and whether the 28 threshold still separates "uniformly usable" from the middle band.~~ **Done — [ADR-0002](adr-0002-axis-re-examination.md), 2026-08-29.** Partition held; threshold 28 → 26; research-axis coherence flagged for a Pass 4 review.
+- If a future archive scores fully on one axis and zero on the other, revisit whether the quadrant label should degrade to an explicit "one-axis only" tier. **Still open** — no such archive yet (closest: APEJE, 10 pipeline / 19 research).
+- ~~The `scholarly_access_practical` facet needs at least one calibration archive labeled `only-via-federation` before it is meaningful.~~ **Done** — Pass 3 labels 5 (APEJE, APEPI, and the three FamilySearch collections).
 
 ## Implementation
 
