@@ -365,6 +365,10 @@ def test_junk_canonical_url_degrades_to_down_not_abort(app, monkeypatch):
     db.session.add(bad)
     db.session.commit()
     monkeypatch.setattr(probe, "tls_cert_expiry", lambda *a, **k: None)
+    # No network in tests: every http_get fails fast with ProbeHTTPError.
+    def _boom(url, **_kw):
+        raise probe.ProbeHTTPError(f"no network in test: {url}")
+    monkeypatch.setattr(probe, "http_get", _boom)
 
     summary = probe.run_probe(archive=bad, now=NOW)
 
