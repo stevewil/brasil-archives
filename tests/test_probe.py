@@ -326,6 +326,54 @@ def test_per_signal_failure_is_survivable(app, archive, monkeypatch):
     assert row.prior_use_signal == "emerging"
 
 
+@pytest.mark.parametrize(
+    "url,expected",
+    [
+        ("https://plain.example/ok", "https://plain.example/ok"),
+        ("https://ex.com/caça?q=São", "https://ex.com/ca%C3%A7a?q=S%C3%A3o"),
+    ],
+)
+def test_ascii_url_encodes_non_ascii(url, expected):
+    assert probe._ascii_url(url) == expected
+
+
+@pytest.mark.parametrize(
+    "raiser",
+    [
+        lambda *a, **k: (_ for _ in ()).throw(ValueError("unknown url type: 'n.a.'")),
+        lambda *a, **k: (_ for _ in ()).throw(ConnectionResetError(104, "Connection reset by peer")),
+    ],
+)
+def test_http_get_wraps_valueerror_and_oserror(monkeypatch, raiser):
+    """A malformed URL or a bare OSError (ConnectionResetError) must surface
+    as ProbeHTTPError, not the raw exception — otherwise the whole target
+    aborts instead of degrading to web_ops=down."""
+    monkeypatch.setattr(probe.urllib.request, "urlopen", raiser)
+    with pytest.raises(probe.ProbeHTTPError):
+        probe.http_get("https://example.test/")
+
+
+def test_junk_canonical_url_degrades_to_down_not_abort(app, monkeypatch):
+    it = InstitutionalType(slug="u2", label_en="U", label_pt="U", sort_order=2)
+    db.session.add(it)
+    db.session.commit()
+    bad = Archive(
+        slug="arq-bad-url", name="Bad URL", institutional_type_id=it.id,
+        canonical_url="n.a. (portal URL not published in the source consulted)",
+        home_state_code="RN",
+    )
+    db.session.add(bad)
+    db.session.commit()
+    monkeypatch.setattr(probe, "tls_cert_expiry", lambda *a, **k: None)
+
+    summary = probe.run_probe(archive=bad, now=NOW)
+
+    assert summary.status == "partial"        # not "failed"
+    row = db.session.query(ProbeResult).filter_by(archive_id=bad.id).one()
+    assert row.web_ops_health == "down"
+    assert bad.last_probed_at == NOW
+
+
 def test_growth_signal_uses_seeded_prior_row(app, archive, monkeypatch):
     prior = ProbeResult(
         archive_id=archive.id,

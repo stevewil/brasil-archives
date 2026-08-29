@@ -22,7 +22,11 @@ ceiling (a dead host otherwise stacks ~8 sequential socket waits); Wayback
 CDX gets a longer ``WAYBACK_TIMEOUT_SECONDS`` because it is routinely slow;
 an HTTP 429 (``ProbeRateLimited``) is a *soft* miss — the signal is left
 None and recorded in ``signals.notes``, never ``signals.errors``, and does
-not flip the run to ``partial``.
+not flip the run to ``partial``. ``http_get`` funnels *every* failure mode
+— malformed URL (``ValueError``), non-ASCII URL (auto percent/IDNA-encoded
+by ``_ascii_url``), ``ConnectionResetError`` and friends — into
+``ProbeHTTPError`` so a bad ``canonical_url`` degrades a target to
+``web_ops_health=down`` instead of aborting it.
 
 All HTTP goes through :func:`http_get` / :func:`tls_cert_expiry`; tests
 monkeypatch those two and never hit the network. Public keyless APIs
@@ -135,7 +139,10 @@ def http_get(
     all_headers = {"User-Agent": USER_AGENT}
     if headers:
         all_headers.update(headers)
-    req = urllib.request.Request(url, headers=all_headers)
+    try:
+        req = urllib.request.Request(_ascii_url(url), headers=all_headers)
+    except ValueError as exc:  # malformed URL ("n.a. (…)", missing scheme, …)
+        raise ProbeHTTPError(f"bad URL {url!r}: {exc}") from exc
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             return HTTPResponse(
@@ -158,12 +165,46 @@ def http_get(
         raise ProbeHTTPError(f"Network error for {url}: {reason}") from exc
     except (TimeoutError, socket.timeout) as exc:
         raise ProbeTimeout(f"Timeout after {timeout}s: {url}") from exc
+    except (ValueError, OSError) as exc:
+        # ConnectionResetError, "unknown url type", malformed redirects, …
+        # — all transport-level, none should abort the whole target.
+        raise ProbeHTTPError(f"transport error for {url}: {exc}") from exc
+
+
+def _ascii_url(url: str) -> str:
+    """Percent/IDNA-encode a URL so ``urllib`` won't UnicodeEncodeError on
+    non-ASCII characters (accented paths, IDN hosts). ASCII URLs pass
+    through untouched."""
+    try:
+        url.encode("ascii")
+        return url
+    except UnicodeEncodeError:
+        pass
+    parts = urllib.parse.urlsplit(url)
+    netloc = parts.netloc
+    if parts.hostname:
+        try:
+            host = parts.hostname.encode("idna").decode("ascii")
+            netloc = host + (f":{parts.port}" if parts.port else "")
+        except (UnicodeError, ValueError):
+            netloc = parts.netloc.encode("utf-8").decode("latin-1")
+    return urllib.parse.urlunsplit((
+        parts.scheme,
+        netloc,
+        urllib.parse.quote(parts.path, safe="/%~:@!$&'()*+,;="),
+        urllib.parse.quote(parts.query, safe="/%~:@!$&'()*+,;=?"),
+        parts.fragment,
+    ))
 
 
 def tls_cert_expiry(
     host: str, port: int = 443, *, timeout: int = HTTP_TIMEOUT_SECONDS
 ) -> date | None:
     """Return the ``notAfter`` date of ``host``'s TLS certificate, or None."""
+    try:
+        host = host.encode("idna").decode("ascii")
+    except (UnicodeError, ValueError):
+        pass
     ctx = ssl.create_default_context()
     with socket.create_connection((host, port), timeout=timeout) as sock:
         with ctx.wrap_socket(sock, server_hostname=host) as ssock:
