@@ -92,6 +92,14 @@ def records_body():
         "notes": [],
         "rejected": [],
         "filters": {"q": None, "period_start": None, "period_end": None, "themes": []},
+        # The list-level links.html is what html_deep_link returns — the
+        # partner has already applied the filters to it.
+        "links": {
+            "self": "https://mipibu.from-bottom-to.top/api/records",
+            "html": "https://mipibu.from-bottom-to.top/cases?year_from=1870",
+            "schema": "https://mipibu.from-bottom-to.top/api/schema",
+            "health": "https://mipibu.from-bottom-to.top/api/health",
+        },
     }
 
 
@@ -231,20 +239,31 @@ def test_clean_records_params_drops_empties_and_normalizes_themes():
 
 
 # ---------------------------------------------------------------------------
-# Deep-link construction
+# Deep link — comes from the partner's /api/records links.html, not built here
 # ---------------------------------------------------------------------------
-def test_html_deep_link_period_and_theme(mipibu):
-    url = fed.html_deep_link(mipibu, period_start=1870, period_end=1875, themes=["homicidio"])
-    assert url == "https://mipibu.from-bottom-to.top/cases?year_from=1870&year_to=1875&case_type=homicidio"
+def test_html_deep_link_returns_partner_links_html(mipibu, records_body):
+    with _mock_ok(records_body):
+        url = fed.html_deep_link(mipibu, period_start=1870, period_end=1875)
+    assert url == "https://mipibu.from-bottom-to.top/cases?year_from=1870"
 
 
-def test_html_deep_link_uses_first_theme_only(mipibu):
-    url = fed.html_deep_link(mipibu, themes=["homicidio", "inventario"])
-    assert url == "https://mipibu.from-bottom-to.top/cases?case_type=homicidio"
+def test_html_deep_link_partner_specific_shape(mipibu, records_body):
+    """A partner with a different URL shape (e.g. povos /documents) is
+    returned verbatim — brasil-archives does not know or care."""
+    records_body["links"]["html"] = "https://povos-indigenas-rn.from-bottom-to.top/documents?q=xingu"
+    with _mock_ok(records_body):
+        url = fed.html_deep_link(mipibu, q="xingu")
+    assert url == "https://povos-indigenas-rn.from-bottom-to.top/documents?q=xingu"
 
 
-def test_html_deep_link_bare_when_no_filters(mipibu):
-    assert fed.html_deep_link(mipibu) == "https://mipibu.from-bottom-to.top/cases"
+def test_html_deep_link_falls_back_to_site_root_on_failure(mipibu):
+    # No mock -> the /api/records fetch raises -> fall back to primary_url.
+    with patch(
+        "app.services.federation.urllib.request.urlopen",
+        side_effect=OSError("boom"),
+    ):
+        url = fed.html_deep_link(mipibu)
+    assert url == "https://mipibu.from-bottom-to.top"
 
 
 def test_html_deep_link_none_when_no_primary_url(mipibu):

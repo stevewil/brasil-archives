@@ -177,31 +177,37 @@ def html_deep_link(
     themes: Iterable[str] | None = None,
     q: str | None = None,
 ) -> str | None:
-    """Return an absolute URL to the companion app's HTML view for a filter set.
+    """Return an absolute URL to the companion app's HTML browse view for a
+    filter set.
 
-    Currently hardcoded to Mipibu's ``/cases`` shape because it's the only
-    live federation participant. When a second corpus registers, this
-    switches to the ``links.html`` template exposed in ``/api/schema``.
-    Returns ``None`` when ``project`` has no primary URL.
+    The URL shape differs per partner (mipibu ``/cases?year_from=…``, povos
+    ``/documents?q=…``), so we don't construct it — we ask. Every
+    federation-v1 ``/api/records`` response carries ``links.html`` pointing
+    at the equivalent HTML view with the filters already applied. This
+    fetches that (cached 15 min like every federation call) and returns it.
+
+    Falls back to the partner's site root on any failure — a valid link is
+    always better than a 404. Returns ``None`` only when ``project`` has no
+    primary URL at all.
     """
     base = (project.primary_url or "").rstrip("/")
     if not base:
         return None
-    query: dict[str, str] = {}
-    if period_start is not None:
-        query["year_from"] = str(period_start)
-    if period_end is not None:
-        query["year_to"] = str(period_end)
-    theme_list = _normalize_themes(themes)
-    if theme_list:
-        # Federation-v1 says "first valid theme wins" at the Mipibu end,
-        # so we only forward the first one.
-        query["case_type"] = theme_list[0]
-    if q:
-        query["q"] = q
-    if not query:
-        return f"{base}/cases"
-    return f"{base}/cases?{urlencode(query, doseq=False)}"
+    try:
+        resp = fetch_records(
+            project,
+            period_start=period_start,
+            period_end=period_end,
+            themes=themes,
+            q=q,
+            page_size=1,
+        )
+        html = (resp.body.get("links") or {}).get("html")
+        if isinstance(html, str) and html.startswith(("http://", "https://")):
+            return html
+    except FederationError:
+        log.debug("html_deep_link: /api/records unavailable for %s", project.slug)
+    return base
 
 
 # ---------------------------------------------------------------------------
