@@ -206,48 +206,55 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
   extractor changes). Follow-ups (povos `/works/<id>` +
   `/ethnic-groups/<id>` pages, passage `dc:date`) in
   [`docs/federated-search.md`](docs/federated-search.md) §Known follow-ups.
-- [ ] `LICENSING.md` referenced by `algorithm-v1.md` §Licensing doesn't
-  exist yet — "finalized before public release."
+- [~] **Licensing — decisions locked, files WIP (2026-08-29).** Code → MIT;
+  Nordeste survey + vocabularies → CC BY 4.0 (attribution only, no
+  share-alike, no covenant); scoring output stays non-public + unlicensed
+  for now. `LICENSE`, `LICENSE-CC-BY-4.0.txt`, `LICENSING.md` written +
+  committed as a WIP checkpoint. **Remaining:** `README.md` §License,
+  `docs/algorithm-v1.md` §Licensing, `DESCRIPTION.md` line ~304 pointer
+  updates — scoped item 1 in
+  `docs/handoff/2026-08-29-search-licensing-admin.md` §3.
 - [x] `docs/vocabularies.md` — written 2026-08-27 (`34fc5b3`): consolidates
   every controlled vocabulary + the code single-selects + probe facets.
-- [ ] No `LICENSE` file in the repo (README says "TBD — finalized before
-  public release").
 
 ---
 
 ## Suggested next session
 
-**Runbook: `docs/handoff/2026-08-27-runbook.md`.** All 7 phases (0–6) are
-BUILT + merged as of 2026-08-28. `brasil-archives` main `0022fc3`+,
-`povos` main `466f8c1` (deployed). What's left is operational:
+**Pickup brief: `docs/handoff/2026-08-29-search-licensing-admin.md`.**
+Everything through the deep-link fix is built + deployed
+(brasil-archives `e2355c3`, povos `e73a892`, both cPanel-current). The
+scoped list, in order:
 
-1. **brasil-archives cPanel pull** (cPanel at `1cc5ded`) — *the interrupted
-   item.* One pull carries Pass 3 + probe robustness + EAG fix + Track C.
-   After the pull + venv activate (no migrations, no pybabel):
-   ```
-   python -m scripts.load_calibration --path configs/calibration/pass3.yaml
-   python -m scripts.seed_povos_archive
-   python -m scripts.load_upgrade_projects
-   touch tmp/restart.txt
-   ```
-   Verify: Pass 3 detail pages scored, home upgrade counter → 2,
-   `/archives/povos-indigenas-rn-corpus` renders (federation preview,
-   `record_count 40`).
-2. **Full prod probe run** + the probe/harvest crons (runbook Phase 2 §).
-3. **First prod povos harvest** — `python -m scripts.harvest --project
-   povos-indigenas-rn` on cPanel (dry-run confirmed clean: 145 records; a
-   local harvest was run 2026-08-28 → local `aggregated_records` = 1161,
-   **prod still 1016**).
-4. **OAI-PMH registry registration** — `docs/oai-pmh-provider.md` §6.
-5. **povos** `git add --renormalize . && commit` — line-ending churn snags
-   future pulls on cPanel.
-6. **ADR-0001 axis re-examination** — now has 15 Pass 3 archives.
-7. ~~Phase 3.5 — cross-corpus aggregated search~~ — **done 2026-08-29**
-   (`GET /search`; `docs/federated-search.md`). Ships on the next
-   brasil-archives cPanel pull; the deploy needs
-   `pybabel compile -d app/translations` (new PT/EN msgids for the search
-   UI — `.mo` is git-ignored).
-8. **Track D** (shared OAI `CorpusAdapter`) — low priority, N=3 providers.
+1. **Finish + commit licensing** — `README.md` / `docs/algorithm-v1.md` /
+   `DESCRIPTION.md` pointer updates. Files already written + committed WIP.
+   ~15 min. Handoff §2–3.
+2. **Public-scores visibility toggle** `[M]` —
+   `BRASIL_ARCHIVES_PUBLIC_SCORES` (default off), independent of
+   `BRASIL_ARCHIVES_ADMIN`. Hides the score profile / axis / quadrant /
+   dimension table (detail), the score columns + sorts (list), and the
+   score-ranked Featured block (home) from the public until Steve
+   greenlights. Handoff §3 item 2 has the full thread-through list.
+3. **Read-only admin dashboard** `[M]` — one `/admin/` page behind the
+   existing gate: scoring coverage, harvest history, probe status,
+   federation health, recent errors. No auth, no write paths. Handoff §3
+   item 3.
+4. **Archive-draft form** — lowest priority, confirm value first. Must
+   generate a reviewable markdown/YAML draft, never write the prod DB
+   (non-durable). Handoff §3 item 4.
+
+**Still open, unscheduled:**
+
+- **OAI-PMH registry registration** — `docs/oai-pmh-provider.md` §6; set
+  `OAI_PAGE_SIZE=50` on the cPanel host first. User-driven.
+- **"Toward 1.0" discussion** — the score-publishing decision (item 2 is
+  the mechanism), Pass 4 scoring coverage, whether to publish scores at
+  all. Liability context in the handoff §2.
+- **Pass 4 scoring** — ADR-0002 deferred `uniqueness` /
+  `corpus_completeness` (research axis α 0.49) + the Scale basis question.
+- **povos `/works/<id>` + `/ethnic-groups/<id>` detail pages** — ~7
+  federated-search results still fall back to an external/home page.
+- **Track D** (shared OAI `CorpusAdapter`) — low priority, N=3 providers.
 
 ## Landed 2026-08-27/28
 
