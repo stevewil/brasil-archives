@@ -109,6 +109,14 @@ def get_public_archive(slug: str) -> Archive | None:
     return db.session.scalar(stmt)
 
 
+def first_public_archive_slug() -> str | None:
+    """Slug of the first public archive by slug order — used for the
+    ``Identify`` sample identifier so it actually resolves via GetRecord."""
+    return db.session.scalar(
+        _public_filter(select(Archive.slug)).order_by(Archive.slug).limit(1)
+    )
+
+
 def earliest_datestamp() -> str:
     value = db.session.scalar(
         _public_filter(select(func.min(func.date(Archive.updated_at))))

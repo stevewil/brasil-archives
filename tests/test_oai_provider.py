@@ -126,6 +126,18 @@ def test_identify(oai_app, client):
     assert scheme is not None and scheme.text == "oai"
 
 
+def test_identify_sample_identifier_resolves(oai_app, client):
+    """The Identify sampleIdentifier must be a real record — a harvester
+    (and the OAI validator) calls GetRecord on it."""
+    root = get_xml(client, "?verb=Identify")
+    sample = root.find(
+        ".//{http://www.openarchives.org/OAI/2.0/oai-identifier}sampleIdentifier"
+    ).text
+    got = get_xml(client, f"?verb=GetRecord&identifier={sample}&metadataPrefix=oai_dc")
+    assert got.find("oai:error", Q) is None
+    assert got.findtext("oai:GetRecord/oai:record/oai:header/oai:identifier", namespaces=Q) == sample
+
+
 # --------------------------------------------------------------------------- #
 # ListMetadataFormats
 

@@ -4,7 +4,7 @@ One identifier kind:
 
     oai:<repositoryIdentifier>:archive:<slug>
 
-e.g. ``oai:brasil-archives.from-bottom-to.top:archive:labim-ufrn``
+e.g. ``oai:brasil-archives.from-bottom-to.top:archive:rn-...-t1r8``
 """
 from __future__ import annotations
 
@@ -35,4 +35,11 @@ def parse_archive_slug(identifier: str) -> str:
 
 
 def sample_identifier() -> str:
-    return make_archive_id("labim-ufrn")
+    """A real, resolvable identifier for the ``Identify`` response.
+
+    A harvester (and the OAI validator) will call ``GetRecord`` on this, so
+    it must exist. Falls back to a placeholder only when the catalog is
+    empty (fresh DB / tests)."""
+    from .queries import first_public_archive_slug
+
+    return make_archive_id(first_public_archive_slug() or "example-archive")
