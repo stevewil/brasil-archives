@@ -206,14 +206,11 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
   extractor changes). Follow-ups (povos `/works/<id>` +
   `/ethnic-groups/<id>` pages, passage `dc:date`) in
   [`docs/federated-search.md`](docs/federated-search.md) §Known follow-ups.
-- [~] **Licensing — decisions locked, files WIP (2026-08-29).** Code → MIT;
-  Nordeste survey + vocabularies → CC BY 4.0 (attribution only, no
-  share-alike, no covenant); scoring output stays non-public + unlicensed
-  for now. `LICENSE`, `LICENSE-CC-BY-4.0.txt`, `LICENSING.md` written +
-  committed as a WIP checkpoint. **Remaining:** `README.md` §License,
-  `docs/algorithm-v1.md` §Licensing, `DESCRIPTION.md` line ~304 pointer
-  updates — scoped item 1 in
-  `docs/handoff/2026-08-29-search-licensing-admin.md` §3.
+- [x] **Licensing — finalized 2026-08-29.** Code → MIT; Nordeste survey +
+  vocabularies → CC BY 4.0 (attribution only, no share-alike, no covenant);
+  scoring output stays non-public + unlicensed for now. `LICENSE`,
+  `LICENSE-CC-BY-4.0.txt`, `LICENSING.md` + the `README.md` / `docs/algorithm-v1.md`
+  / `DESCRIPTION.md` pointer updates all landed.
 - [x] `docs/vocabularies.md` — written 2026-08-27 (`34fc5b3`): consolidates
   every controlled vocabulary + the code single-selects + probe facets.
 
@@ -224,22 +221,19 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
 **Pickup brief: `docs/handoff/2026-08-29-search-licensing-admin.md`.**
 Everything through the deep-link fix is built + deployed
 (brasil-archives `e2355c3`, povos `e73a892`, both cPanel-current). The
-scoped list, in order:
+scoped list, in order (licensing done 2026-08-29):
 
-1. **Finish + commit licensing** — `README.md` / `docs/algorithm-v1.md` /
-   `DESCRIPTION.md` pointer updates. Files already written + committed WIP.
-   ~15 min. Handoff §2–3.
-2. **Public-scores visibility toggle** `[M]` —
+1. **Public-scores visibility toggle** `[M]` —
    `BRASIL_ARCHIVES_PUBLIC_SCORES` (default off), independent of
    `BRASIL_ARCHIVES_ADMIN`. Hides the score profile / axis / quadrant /
    dimension table (detail), the score columns + sorts (list), and the
    score-ranked Featured block (home) from the public until Steve
    greenlights. Handoff §3 item 2 has the full thread-through list.
-3. **Read-only admin dashboard** `[M]` — one `/admin/` page behind the
+2. **Read-only admin dashboard** `[M]` — one `/admin/` page behind the
    existing gate: scoring coverage, harvest history, probe status,
    federation health, recent errors. No auth, no write paths. Handoff §3
    item 3.
-4. **Archive-draft form** — lowest priority, confirm value first. Must
+3. **Archive-draft form** — lowest priority, confirm value first. Must
    generate a reviewable markdown/YAML draft, never write the prod DB
    (non-durable). Handoff §3 item 4.
 

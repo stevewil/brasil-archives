@@ -301,8 +301,8 @@ changed) → `touch tmp/restart.txt` → `curl .../healthz`.
 - **Federation failure is normal and must never break a render.**
 - **Bilingual from the start** — every user-facing model has a `_pt`
   column; retrofitting later was considered too expensive.
-- **Code: MIT/Apache. Derived data: CC-BY-SA.** (Finalized before public
-  release.)
+- **Code: MIT. Survey + vocab data: CC BY 4.0. Scoring output: unpublished,
+  license TBD.** (`LICENSING.md`, finalized 2026-08-29.)
 
 ## Key docs
 

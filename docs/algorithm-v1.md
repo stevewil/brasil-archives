@@ -245,15 +245,23 @@ without an ADR*:
 
 Probe outputs update the four probe-fed facets and log a `last_probed` timestamp per archive.
 
-## Licensing (deferred until public release)
+## Licensing (finalized 2026-08-29 — see `LICENSING.md`)
 
-To be finalized before public release. Planned structure:
+- **Code** — [MIT](../LICENSE).
+- **Curated data** (the Nordeste survey + the controlled vocabularies) —
+  [CC BY 4.0](../LICENSE-CC-BY-4.0.txt), attribution only.
+- **Scoring output** — kept non-public and deliberately unlicensed for now;
+  its license (expected CC BY 4.0) will be named when the judgments are
+  trustworthy enough to publish.
 
-- **Code license** — permissive (MIT or Apache 2.0). Encourages other historians and small projects to build on the tooling.
-- **Data license** — share-alike (CC-BY-SA 4.0 or similar) with attribution required. Downstream reusers of the derived database must (a) attribute, (b) inherit the license, (c) preserve archive-level `bulk-restricted` flags. Defense against hyperscaler abuse — a downstream service ingesting our data and republishing under permissive terms would be in violation.
-- **Optional responsible-use clause** — modeled on RAIL licenses; prohibits use for surveillance, mass-scale republishing of restricted-content archives, or use that violates the ToS of source archives our metadata points to.
+Two earlier ideas from this section were **dropped**: a share-alike
+(CC BY-SA) data license — unnecessary friction for a project meant to be
+reused by resource-poor scholars — and a RAIL-style responsible-use clause,
+which would have failed the open-data definition. Those concerns are now
+handled by the fair-use floor, by keeping the scoring output non-public
+until it is trustworthy, and by the non-binding request in `LICENSING.md`.
 
-Full text lives in `LICENSING.md` when we get closer to public release.
+Full rationale and the "what is *not* covered" list live in `LICENSING.md`.
 
 ## Change log
 

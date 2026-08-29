@@ -96,8 +96,8 @@ project's name.** Hence:
 
 ## 3. Scoped TODO for the resume session (in order)
 
-### Item 1 — Finish + commit licensing
-See §2 above. ~15 min.
+### Item 1 — Finish + commit licensing  ✅ DONE 2026-08-29
+See §2 above.
 
 ### Item 2 — Public-scores visibility toggle  `[M]`
 
@@ -220,14 +220,13 @@ no new write paths.
 | Featured-by-score | `app/blueprints/main.py::_featured_archives` |
 | Gate test pattern | `tests/test_admin_gate.py` (`public_app` fixture) |
 | Survey loader (markdown source) | `scripts/load_survey.py`, `docs/nordeste-digital-archives-survey.md` |
-| Licensing | `LICENSE`, `LICENSE-CC-BY-SA-4.0.txt`, `LICENSING.md` |
+| Licensing | `LICENSE`, `LICENSE-CC-BY-4.0.txt`, `LICENSING.md` |
 
 ---
 
 ## 6. Safe to clear?
 
-Yes, once this handoff + the `TODO.md` updates are committed. The
-three licensing files (`LICENSE`, `LICENSE-CC-BY-SA-4.0.txt`,
-`LICENSING.md`) are committed as a WIP checkpoint in the same commit — the
-resume session finishes them as scoped item 1. Nothing else is
-uncommitted. Local DB is reextracted + reharvested and matches prod.
+Yes. The three licensing files (`LICENSE`, `LICENSE-CC-BY-4.0.txt`,
+`LICENSING.md`) plus the `README` / `algorithm-v1` / `DESCRIPTION` pointer
+updates all landed (scoped item 1 done 2026-08-29). Local DB is reextracted
++ reharvested and matches prod.

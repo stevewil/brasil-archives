@@ -61,4 +61,10 @@ Instance data (SQLite DB) lives under `instance/` and is git-ignored.
 
 ## License
 
-TBD — will be finalized before public release. Planned split: permissive license for code, share-alike license for the derived database (see `docs/algorithm-v1.md` §Licensing for rationale).
+Finalized 2026-08-29 — see [`LICENSING.md`](LICENSING.md).
+
+- **Code** — [MIT](LICENSE). All application source, tests, migrations, scripts, deployment helpers, and documentation prose.
+- **Curated data** — [CC BY 4.0](LICENSE-CC-BY-4.0.txt), attribution only. The Nordeste digital archives survey (`docs/nordeste-digital-archives-survey.md`) and the controlled vocabularies (`configs/vocabularies/*.yaml`).
+- **Scoring output** — not exposed on the public site and not yet licensed; a license (expected CC BY 4.0) will be named when the judgments are trustworthy enough to publish.
+
+Harvested partner records, the source archives' own holdings, and vendored fonts are **not** covered here — each carries its own terms. See [`LICENSING.md`](LICENSING.md).
