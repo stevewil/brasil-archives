@@ -9,6 +9,22 @@ Legend: **[S]** small (<1h) · **[M]** medium (1–3h) · **[L]** large / multi-
 
 ---
 
+## ⏳ IN FLIGHT — Supabase keep-alive cron (parked 2026-08-29)
+
+Full plan: **[`docs/supabase-keepalive.md`](docs/supabase-keepalive.md)** —
+script, secrets file, wrapper, cPanel cron line, test steps, all captured.
+
+Parked mid-design to resolve an unrelated Supabase issue first. **Resume:**
+create the `keepalive` table + RLS policy, drop the script + env file +
+wrapper on the cPanel host (`fromuagq`), add the `0 6 * * 1,4` cron, test
+both branches (ping + restore).
+
+Why: Free-plan Supabase projects pause after 7 days idle; a twice-weekly
+request to the project's own endpoint prevents it, with an optional
+Management-API status-check + `/restore` fallback.
+
+---
+
 ## 0. Housekeeping
 
 - [x] **Commit the working-tree changes.** Done `891f30a` (utf-8 test fix)
