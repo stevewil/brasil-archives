@@ -129,11 +129,13 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
   calls: `docs/pass3-scoring-notes.md` §"Review outcome". **Deploy:** one
   cPanel pull + `python -m scripts.load_calibration --path
   configs/calibration/pass3.yaml`.
-- [ ] **[M] Re-examine the 4-4 axis partition and the 28/40 quadrant
-  threshold** — **now unblocked** (Pass 3 has 15 archives). Requires an
-  **ADR-0001 supersession**, not a quiet edit. Inputs flagged in
-  `algorithm-v1.md` change log 2026-08-28: the Scale digitized-vs-published
-  basis, and `t1r18` sitting at research axis 27/40.
+- [x] **Re-examine the 4-4 axis partition and quadrant threshold.** Done
+  2026-08-29 — [`docs/adr-0002-axis-re-examination.md`](docs/adr-0002-axis-re-examination.md)
+  (`d9376ee`). Over 21 scored archives: partition kept; **threshold 28 → 26**;
+  research-axis low coherence (α 0.49) + `uniqueness`/`corpus_completeness`
+  flagged for Pass 4; the Scale basis question stays open for Pass 4.
+  **Deploy:** `github-pull` (Python-only change; changes 2 archives' quadrant
+  labels on the live list/detail pages).
 - [x] Get at least one archive labeled `scholarly_access_practical =
   only-via-federation` — done via Pass 3: APEJE, APEPI, and the 3
   FamilySearch collections (`t1r10/37/39/43/47`).
