@@ -141,11 +141,12 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
 ## 6. Infrastructure not yet built
 
 - [~] **[L] Quarterly health probe.** Runner `d2b808d`, robustness pass
-  `9563f47`. **First prod run STARTED 2026-08-28** (detached on cPanel,
-  `~/logs/probe-firstrun.log`). **Left:** (a) confirm the run finished +
-  spot-check facets, (b) add the quarterly cron (lines + confirmed paths in
-  `docs/handoff/2026-08-27-runbook.md` Phase 2), (c) tune thresholds during
-  Pass 2 calibration.
+  `9563f47`, `http_get` failure-mode fix `77a22ae` (junk/non-ASCII URL,
+  `ConnectionResetError`), **detail-page display** `3dbb3ac` ("Observed
+  signals" section). **First prod run done 2026-08-28** — 82 targets, all
+  now have data. **Left:** (a) add the quarterly cron (lines + confirmed
+  paths in `docs/handoff/2026-08-27-runbook.md` Phase 2), (b) tune
+  thresholds during Pass 2 calibration.
 - [~] **[M] Scheduled harvest (cron).** Unblocked — mipibu harvested against
   prod 2026-08-28. **Left:** run the first prod **povos** harvest once, then
   add the monthly harvest cron (mipibu `oai_dc` + `oai_ead` + povos
