@@ -140,17 +140,16 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
 
 ## 6. Infrastructure not yet built
 
-- [~] **[L] Quarterly health probe.** Runner **built + landed** 2026-08-27
-  (`d2b808d`), **robustness pass** 2026-08-28 (`9563f47`: per-target 90s
-  budget, Wayback/S2 soft-miss handling, `SEMANTIC_SCHOLAR_API_KEY` support).
-  Exercised from the workstation — compositing looks sane, a dead host
-  terminates in ~94s. **Left:** (a) full real run against prod on cPanel
-  (`python -m scripts.probe --all --include-upgrade-projects`), (b) add the
-  cPanel cron (lines in `docs/handoff/2026-08-27-runbook.md` Phase 2),
-  (c) tune the compositing thresholds during Pass 2 calibration.
-- [ ] **[M] Scheduled harvest (cron).** Explicitly deferred in
-  `harvest-design.md` until the harvester has run manually against prod at
-  least once. Still on-demand only today.
+- [~] **[L] Quarterly health probe.** Runner `d2b808d`, robustness pass
+  `9563f47`. **First prod run STARTED 2026-08-28** (detached on cPanel,
+  `~/logs/probe-firstrun.log`). **Left:** (a) confirm the run finished +
+  spot-check facets, (b) add the quarterly cron (lines + confirmed paths in
+  `docs/handoff/2026-08-27-runbook.md` Phase 2), (c) tune thresholds during
+  Pass 2 calibration.
+- [~] **[M] Scheduled harvest (cron).** Unblocked — mipibu harvested against
+  prod 2026-08-28. **Left:** run the first prod **povos** harvest once, then
+  add the monthly harvest cron (mipibu `oai_dc` + `oai_ead` + povos
+  `oai_dc`; lines in runbook Phase 2).
 - [~] **[L] Phase 3 standards-native output.** OAI-PMH provider (`/oai`,
   `oai_dc` + `eag` formats) + EAG XML route **built + landed** 2026-08-27
   (`54367f7`). **Left:** EAC-CPF (no authority records yet), register at the
