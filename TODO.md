@@ -184,17 +184,16 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
 
 ## 6. Infrastructure not yet built
 
-- [~] **[L] Quarterly health probe.** Runner `d2b808d`, robustness pass
-  `9563f47`, `http_get` failure-mode fix `77a22ae` (junk/non-ASCII URL,
-  `ConnectionResetError`), **detail-page display** `3dbb3ac` ("Observed
-  signals" section). **First prod run done 2026-08-28** — 82 targets, all
-  now have data. **Left:** (a) add the quarterly cron (lines + confirmed
-  paths in `docs/handoff/2026-08-27-runbook.md` Phase 2), (b) tune
-  thresholds during Pass 2 calibration.
-- [~] **[M] Scheduled harvest (cron).** Unblocked — mipibu harvested against
-  prod 2026-08-28. **Left:** run the first prod **povos** harvest once, then
-  add the monthly harvest cron (mipibu `oai_dc` + `oai_ead` + povos
-  `oai_dc`; lines in runbook Phase 2).
+- [x] **[L] Quarterly health probe.** Runner `d2b808d`, robustness pass
+  `9563f47`, `http_get` failure-mode fix `77a22ae`, detail-page display
+  `3dbb3ac`. First prod run 2026-08-28 (82 targets). **Cron live** (verified
+  2026-08-31): `15 3 1 1,4,7,10 * … scripts.probe --all
+  --include-upgrade-projects --quiet`. Remaining: tune thresholds during a
+  future calibration pass (not blocking).
+- [x] **[M] Scheduled harvest (cron).** **Cron live** (verified 2026-08-31):
+  `30/33/36 2 1 * *` → `scripts.harvest` mipibu `oai_dc` + mipibu `oai_ead` +
+  povos `oai_dc`, all `--quiet` to `~/logs/harvest.log`. First prod povos
+  harvest done 2026-08-28 (145 records).
 - [~] **[L] Phase 3 standards-native output.** OAI-PMH provider (`/oai`,
   `oai_dc` + `eag` formats) + EAG XML route **built + landed** 2026-08-27
   (`54367f7`). **Left:** EAC-CPF (no authority records yet), register at the
@@ -260,32 +259,28 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
 
 ## Suggested next session
 
-**Pickup brief: `docs/handoff/2026-08-29-search-licensing-admin.md`.**
-Everything through the deep-link fix is built + deployed
-(brasil-archives `e2355c3`, povos `e73a892`, both cPanel-current). The
-scoped list (licensing + public-scores toggle + admin dashboard done
-2026-08-29):
+**Pickup brief: `docs/handoff/2026-08-31-infra-sync.md`** → §"Pick up here".
 
-1. **Archive-draft form** — lowest priority, confirm value first. Must
-   generate a reviewable markdown/YAML draft, never write the prod DB
-   (non-durable). Handoff §3 item 4.
+**Next task: SQLite → Supabase Postgres migration `[L]`** (specs in-repo:
+`docs/supabase-migration-spec.md` + `docs/partner-schema-design.md`). All §10
+decisions are locked. Entry point is **Phase 1a** (branch, no prod impact):
+add `psycopg[binary]`, PG `SQLALCHEMY_ENGINE_OPTIONS`, `env.py` schema support,
+a Postgres CI job — get both SQLite and PG suites green. Then 1b (per-source
+plumbing), then cutover.
 
-**Done this session (not yet deployed):**
-
-- **Public-scores visibility toggle** — `BRASIL_ARCHIVES_PUBLIC_SCORES`
-  (default off), independent of `BRASIL_ARCHIVES_ADMIN`. Hides the score
-  profile / axis / quadrant / dimension table (detail), the score columns
-  + sorts (list), and the score-ranked Featured block (home) from the
-  public until greenlit. `app/visibility.py`,
-  `tests/test_public_scores_gate.py`, `docs/DEPLOY.md`. **Leave the env
-  var unset on the cPanel host.**
-- **Read-only admin dashboard** — `GET /admin/` behind the existing
-  `BRASIL_ARCHIVES_ADMIN` gate (404 when unset). One page: scoring
-  coverage, probe status, live federation health, recent harvest runs +
-  errors. No forms, no write paths. `app/blueprints/admin/`,
-  `app/templates/admin/index.html`, `tests/test_admin_dashboard.py`.
+Deployed to cPanel prod 2026-08-31 (`1e3462d`): licensing, the
+`BRASIL_ARCHIVES_PUBLIC_SCORES` gate (env unset — scores hidden), the
+read-only `/admin/` dashboard. supabase-keepalive is live (Mon/Thu cron,
+covers media-pipeline-agent + brasil-archives). All four repos synced
+local↔GitHub↔cPanel. Probe + harvest crons verified present.
 
 **Still open, unscheduled:**
+
+- **Revoke the 2 exposed GitHub PATs** + decide the app-dashboard vault
+  `GITHUB_PAT` fate (handoff §"Open items" #1).
+- **Archive-draft form** — lowest priority, confirm value first. Must
+  generate a reviewable markdown/YAML draft, never write the prod DB
+  (non-durable — though the Postgres migration removes that constraint).
 
 - **OAI-PMH registry registration** — `docs/oai-pmh-provider.md` §6; set
   `OAI_PAGE_SIZE=50` on the cPanel host first. User-driven.
