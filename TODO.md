@@ -11,6 +11,12 @@ Legend: **[S]** small (<1h) · **[M]** medium (1–3h) · **[L]** large / multi-
 
 ## SQLite → Supabase Postgres — spec written 2026-08-30 `[L]`
 
+**▶ ORDERED CHECKLIST TO "app tested on the Supabase connection":
+[`docs/handoff/2026-08-31-postgres-migration-runbook.md`](docs/handoff/2026-08-31-postgres-migration-runbook.md)**
+— Phase 0 setup → 1a core+CI → 1b per-source schemas → 2 Supabase project +
+connect test. Wasabi backup + privacy posture + housekeeping folded in at the
+right points. Work on branch `postgres-migration`, commit + push per milestone.
+
 Specs: **[`docs/supabase-migration-spec.md`](docs/supabase-migration-spec.md)**
 (the backend move) + **[`docs/partner-schema-design.md`](docs/partner-schema-design.md)**
 (per-source schemas). A free Supabase slot opened up; moving the prod DB
@@ -30,6 +36,22 @@ job; (1b) per-source plumbing — `{"schema":"source"}` on the 4 models,
 `load_upgrade_projects`, dual-backend tests green; (2) cutover — create
 project, flip `DATABASE_URL`, `flask db upgrade` + seed, verify; (3+,
 deferred) `jsonb`, SQL search. Sub-decisions P1–P5 in partner-schema-design §12.
+
+**Privacy posture (spec §9.2.1 / D10, decided 2026-08-31):** Supabase exposes
+`public` via its Data API by default — turn it OFF at project creation or the
+non-public scored judgments leak. `DATABASE_URL` is the sole access boundary.
+
+**Off-site backup (spec §9.4 / D8) — BUILT + verified 2026-08-31:**
+`scripts/backup_to_wasabi.py` (default = pure-Python logical dump; cPanel
+`pg_dump` is only `10.23`, too old) + `requirements-backup.txt` +
+`tests/test_backup_to_wasabi.py` (30, green). Full loop verified against the
+live `brasil-archives` bucket (us-west-1) with real SQLite prod data.
+[`docs/wasabi-backup.md`](docs/wasabi-backup.md). **Remaining (not blocked on
+cutover — the logical dump works on SQLite prod too):** (a) decide cron
+start-now vs at-cutover (leaning now); (b) cPanel: `pip install -r
+requirements-backup.txt`, append `WASABI_*`/`BACKUP_*`/key to `~/flask/brasil-archives/.env`,
+weekly cron `0 4 * * 0`; (c) Wasabi lifecycle rule (~90d) + versioning;
+(d) restore-drill step in `docs/DEPLOY.md`; (e) backup key → Proton Pass.
 
 ---
 
@@ -259,14 +281,16 @@ Ref: `docs/algorithm-v1.md` §"Change log", `docs/adr-0001-two-axis-aggregation.
 
 ## Suggested next session
 
-**Pickup brief: `docs/handoff/2026-08-31-infra-sync.md`** → §"Pick up here".
+**▶ Work the runbook:
+[`docs/handoff/2026-08-31-postgres-migration-runbook.md`](docs/handoff/2026-08-31-postgres-migration-runbook.md)**
+— ordered checklist from a clean branch to "app tested on the Supabase
+connection" (Phase 0 → 1a core+CI → 1b per-source schemas → 2 project +
+connect). Prior context: `docs/handoff/2026-08-31-infra-sync.md`.
 
-**Next task: SQLite → Supabase Postgres migration `[L]`** (specs in-repo:
-`docs/supabase-migration-spec.md` + `docs/partner-schema-design.md`). All §10
-decisions are locked. Entry point is **Phase 1a** (branch, no prod impact):
-add `psycopg[binary]`, PG `SQLALCHEMY_ENGINE_OPTIONS`, `env.py` schema support,
-a Postgres CI job — get both SQLite and PG suites green. Then 1b (per-source
-plumbing), then cutover.
+Since the infra-sync handoff: the **Wasabi off-site backup is built + verified**
+(`scripts/backup_to_wasabi.py`, `docs/wasabi-backup.md`), the **privacy posture
+is decided** (D10 — Supabase Data API OFF), and the **backup key is rotated +
+in Proton Pass**. Those are folded into the runbook at the right steps.
 
 Deployed to cPanel prod 2026-08-31 (`1e3462d`): licensing, the
 `BRASIL_ARCHIVES_PUBLIC_SCORES` gate (env unset — scores hidden), the

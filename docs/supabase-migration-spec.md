@@ -429,6 +429,64 @@ No functional gain; skip.
    see `docs/supabase-keepalive.md`. (Active site traffic also keeps it warm,
    but belt-and-suspenders.)
 
+### 9.2.1 Privacy posture — lock this down at project creation
+
+Moving off SQLite is the first time the data can be protected **at the storage
+layer** rather than by "nobody reads the file." But Postgres does not make
+anything private on its own, and Supabase's defaults are *more* exposed than a
+cPanel SQLite file. Three config choices turn the migration into a privacy
+gain instead of a privacy regression — do them when the project is created,
+before any real data is loaded.
+
+**Why this matters here:** the scored judgments (`dimension_scores`,
+`dimension_lifts`, `facet_values`, the axis totals / quadrant) are
+deliberately **not published** (`LICENSING.md` — non-public, unlicensed; the
+`BRASIL_ARCHIVES_PUBLIC_SCORES` gate in `app/visibility.py`). Today that data
+still sits in a world-readable file and only the app's refusal to render it
+keeps it back. After cutover it should be unreachable without the app's own
+credentials.
+
+1. **Turn the Data API OFF (or remove `public` from Exposed schemas).**
+   Supabase exposes the `public` schema through PostgREST with the `anon` key
+   **by default**. brasil-archives does not use the Data API at all — the Flask
+   app connects straight through the session pooler. Supabase → Settings → API
+   → either disable the Data API entirely, or set *Exposed schemas* to empty /
+   remove `public`. **Verify** in §9.3: an unauthenticated
+   `curl https://<ref>.supabase.co/rest/v1/dimension_scores?apikey=<anon>`
+   must return a 404 / "schema must be one of" error, not rows.
+   *If this step is skipped, the migration leaks the scored judgments that
+   were previously only file-readable.*
+
+2. **App connects as a dedicated role, not `postgres`, if practical.** The
+   pooler user is `postgres.<ref>` (effectively superuser — bypasses RLS and
+   every GRANT). For a low-traffic single-app deployment this is acceptable
+   (the connection string is the secret boundary), but if a restricted role is
+   cheap to maintain, create `brasil_app` with `GRANT`s only on the schemas it
+   needs and point `DATABASE_URL` at that. Either way: **`DATABASE_URL` is a
+   secret** — it is the whole access-control boundary for `public`. It lives
+   only in cPanel's *Setup Python App → Environment variables*, never in the
+   repo, never in a handoff doc, never pasted in a screenshot.
+
+3. **Per-source schemas are the API-exposure unit (future).** If a partner is
+   ever given a read-only endpoint over their own harvested corpus, expose
+   **only** their `src_<slug>` schema — never `public`. A read-only analytics
+   consumer gets a role with `GRANT USAGE ON SCHEMA src_<slug>` and nothing
+   else. This mirrors the existing public-scores gate philosophy: "ours, with
+   the judgments" stays private; "what we harvested from them" can be shared.
+   Not doing this now — noting that the boundary exists and which side each
+   schema is on (see §12 "Schema ownership at a glance").
+
+**Also inherited for free (no config needed):** TLS in transit
+(`sslmode=require` — the SQLite file traveled in the clear in every backup);
+`pg_dump --schema=public` backups carry only the sensitive core (§9.4);
+network/IP allow-lists are available on the Supabase project if ever wanted.
+
+**New trust boundary to record:** liability-sensitive scoring data now lives
+with Supabase (AWS underneath) rather than in a file we hold. Their
+encryption-at-rest and access controls beat cPanel shared hosting, but this is
+a processor relationship that did not exist before — add a line to
+`LICENSING.md` / a data-handling note (§9.4).
+
 ### 9.3 Flip cPanel
 1. `github-pull` (brings the psycopg dep; `pip install` runs because
    `requirements.txt` changed).
@@ -454,6 +512,14 @@ No functional gain; skip.
    select count(*) from harvest.aggregated_records;
    select relname, n_live_tup from pg_stat_user_tables order by 1;
    ```
+   **Privacy check (§9.2.1 step 1):** confirm the scored judgments are NOT
+   reachable over the Data API —
+   ```bash
+   curl -s "https://<ref>.supabase.co/rest/v1/dimension_scores?select=id&limit=1" \
+        -H "apikey: <anon-key>"
+   ```
+   must return an error (`"The schema must be one of the following"` / 404),
+   not a JSON array of rows.
 5. Rename the old SQLite file: `mv instance/brasil_archives.db instance/brasil_archives.db.pre-pg-$(date +%F)`. Keep it a few weeks.
 
 ### 9.4 Docs / cleanup
@@ -464,9 +530,19 @@ No functional gain; skip.
   that prod is Supabase Postgres, durable.
 - `docs/handoff/2026-08-27-master.md` standing-constraints: update the storage
   line.
-- Add a `pg_dump` backup: a weekly cPanel cron —
-  `pg_dump "$DATABASE_URL" --schema=public --no-owner -Fc -f ~/backups/brasil-$(date +%F).dump`
-  (exclude `harvest`; it re-harvests). Rotate ~8 weeks.
+- **Privacy / data-handling note** (§9.2.1): record in `LICENSING.md` (or a
+  new `docs/data-handling.md`) that the non-public scored judgments now live
+  in a Supabase-hosted Postgres (AWS), that `public` is withheld from the Data
+  API, and that `DATABASE_URL` is the sole access-control boundary. Confirm the
+  Data API check from §9.3 is still green as part of any future Supabase
+  dashboard change.
+- Add the encrypted **Wasabi off-site backup** — weekly logical dump of the
+  core tables (`scripts/backup_to_wasabi.py`, `python` mode — cPanel has only
+  `pg_dump 10`), client-side AES-GCM, to a dedicated `brasil-archives` bucket,
+  retention via a Wasabi lifecycle rule (~12 weeks). BUILT + verified
+  2026-08-31; can run against SQLite prod *before* cutover too. Full design:
+  **[`wasabi-backup.md`](wasabi-backup.md)** (resolves D8). Supabase free's own
+  daily backup (1-day retention, no PITR) is the thin first layer.
 
 ### 9.5 Rollback
 Unset `DATABASE_URL` (or restore the saved SQLite value) → restart. If the
@@ -487,8 +563,9 @@ safe and fast. Keep the SQLite fallback path working until you're confident.
 | **D5** | App-side pooling on cPanel | **`NullPool`**, let Supavisor pool — sidesteps Passenger fork-safety. |
 | **D6** | Phase 2 (jsonb, SQL search) timing | **Defer.** Ship the durable backend first; do search/`jsonb` as separate PRs. |
 | **D7** | `upgrade_projects` schema | **`public`** — it's curated config loaded from `configs/`, not derived data. |
-| **D8** | Free-tier backup strategy | `pg_dump --schema=public` weekly cron + the seed scripts. Supabase free has daily backups (1-day retention) but no PITR. |
+| **D8** | Free-tier backup strategy | **RESOLVED + BUILT 2026-08-31:** `scripts/backup_to_wasabi.py` — weekly **Python logical dump** of the core tables (cPanel `pg_dump` is only `10.23`), client-side AES-256-GCM, to the `brasil-archives` Wasabi bucket (us-west-1); retention = Wasabi lifecycle rule (~12 weeks); seed scripts remain the re-derivation fallback. Verified end-to-end against the live bucket. Runs on cPanel via the venv + a weekly cron. Full design → `docs/wasabi-backup.md`. |
 | **D9** | Do we also move `media-pipeline-agent`'s DB or leave it? | Out of scope — that's a separate app on its own Supabase project. |
+| **D10** | Data privacy posture on Supabase | **RESOLVED 2026-08-31:** Data API OFF / `public` not exposed (the scored judgments must not be reachable with the anon key — Supabase exposes `public` by default); `DATABASE_URL` is the sole access boundary and stays secret; `src_<slug>` is the only unit ever exposed to a partner, never `public`. Full checklist in §9.2.1. |
 
 ---
 

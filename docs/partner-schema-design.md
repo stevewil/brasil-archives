@@ -368,7 +368,9 @@ Plus targeted tests:
   individually to Settings → API → *Exposed schemas* to give that partner a
   read-only PostgREST endpoint over only their own aggregated data. `public`
   (with the scored judgments) stays private. Not doing this now — noting the
-  capability.
+  capability. **See `docs/supabase-migration-spec.md` §9.2.1 (D10) for the
+  privacy posture — the Data API must be OFF / `public` unexposed from
+  project creation, since Supabase exposes `public` by default.**
 - **RLS:** the app connects as the project's `postgres` role (bypasses RLS).
   Only relevant if a `src_*` schema is API-exposed later — then add
   `anon`-facing RLS or withhold grants.
