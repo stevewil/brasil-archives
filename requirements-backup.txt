@@ -1,0 +1,8 @@
+# Dependencies for scripts/backup_to_wasabi.py ONLY (the weekly off-site
+# pg_dump → Wasabi cron). Deliberately NOT in requirements.txt — the Flask
+# app never touches Wasabi. Install where the backup job runs:
+#   - cPanel: into the app venv
+#   - GitHub Actions: a `pip install -r requirements-backup.txt` step
+# See docs/wasabi-backup.md.
+boto3>=1.34,<2.0
+cryptography>=42,<46
