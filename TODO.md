@@ -9,19 +9,45 @@ Legend: **[S]** small (<1h) · **[M]** medium (1–3h) · **[L]** large / multi-
 
 ---
 
-## ⏳ IN FLIGHT — Supabase keep-alive cron (parked 2026-08-29)
+## SQLite → Supabase Postgres — spec written 2026-08-30 `[L]`
 
-Full plan: **[`docs/supabase-keepalive.md`](docs/supabase-keepalive.md)** —
-script, secrets file, wrapper, cPanel cron line, test steps, all captured.
+Specs: **[`docs/supabase-migration-spec.md`](docs/supabase-migration-spec.md)**
+(the backend move) + **[`docs/partner-schema-design.md`](docs/partner-schema-design.md)**
+(per-source schemas). A free Supabase slot opened up; moving the prod DB
+there ends the reseed-on-redeploy problem permanently. Core migration is
+low risk (code is already near-dialect-agnostic; "the reseed IS the
+migration").
 
-Parked mid-design to resolve an unrelated Supabase issue first. **Resume:**
-create the `keepalive` table + RLS policy, drop the script + env file +
-wrapper on the cPanel host (`fromuagq`), add the `0 6 * * 1,4` cron, test
-both branches (ping + restore).
+**Decided 2026-08-30:** each partner source (mipibu, povos, future) gets
+its own Postgres schema (`src_<slug>`) from one identical table template —
+onboarding a source = stamp a schema; retiring one = `DROP SCHEMA CASCADE`.
+Cross-source reads go through `*_all` UNION views. Core catalog stays in
+`public`.
 
-Why: Free-plan Supabase projects pause after 7 days idle; a twice-weekly
-request to the project's own endpoint prevents it, with an optional
-Management-API status-check + `/restore` fallback.
+**Phases:** (1a) core prep — psycopg dep, PG engine opts, `env.py`, PG CI
+job; (1b) per-source plumbing — `{"schema":"source"}` on the 4 models,
+`app/services/sources.py`, view models, fold schema-sync into
+`load_upgrade_projects`, dual-backend tests green; (2) cutover — create
+project, flip `DATABASE_URL`, `flask db upgrade` + seed, verify; (3+,
+deferred) `jsonb`, SQL search. Sub-decisions P1–P5 in partner-schema-design §12.
+
+---
+
+## Supabase keep-alive cron — DEPLOYED 2026-08-31 ✅
+
+Standalone tool, now git-tracked at `github.com/stevewil/supabase-keepalive`
+(private). Live on cPanel (`fromuagq@premium32`): cron `0 6 * * 1,4` →
+`keepalive.sh ping`, covering `media-pipeline-agent` + `brasil-archives` (the
+latter's Supabase project, created for the Postgres migration). Interpreter
+pinned to `/opt/alt/python313/bin/python3` via `SUPABASE_KEEPALIVE_PYTHON` in
+the cron line. Context + canonical record:
+[`docs/supabase-keepalive.md`](docs/supabase-keepalive.md) + that repo's
+`README.md` §"Live deployment".
+
+**Optional follow-ups (not blocking):** add a `sbp_` `management_pat` for
+auto-restore of an already-paused project; revoke the two fine-grained GitHub
+PATs exposed while debugging the clone (rotate the app-dashboard vault's
+`GITHUB_PAT` first if it's one of them).
 
 ---
 
