@@ -9,6 +9,37 @@ was interrupted here.
 
 ---
 
+## UPDATE 2026-09-01 (later) — pooler-safe connect landed, awaiting cPanel run
+
+Studied `stevewil/media-pipeline-agent`'s Supabase usage. Two transferable
+fixes shipped in `5441194` (pushed to `main`, CI pending):
+
+- **`_engine_options`**: dropped the psycopg `options` startup packet
+  (Supavisor drops all but the first `-c` — verified: `statement_timeout`
+  never took). Added **`prepare_threshold: None`** (psycopg3 prepared-stmt
+  collisions across pooled backends — mpa sets this on every connect).
+- **`connect` event listener** in `app/config.py` issues `SET search_path` +
+  `SET statement_timeout` per connection instead. No-op on SQLite.
+- **`/healthz` now runs `SELECT 1`** → 503 + `database_error` when the DB
+  can't answer (was a misleading 200 — that's why the 500 was a surprise).
+- **`BRASIL_ARCHIVES_DB_CHECK=1`** (opt-in) fail-fast in `create_app()`.
+
+Verified from a workstation against the Supabase pooler: all pages 200,
+`search_path='public, extensions'`, `statement_timeout=15s`. Full suite
+356 passed.
+
+**Next on cPanel:**
+1. `./github-pull` (pulls `5441194` + `scripts/pg_diagnose.py`).
+2. Add `BRASIL_ARCHIVES_DB_CHECK=1` to `~/flask/brasil-archives/.env`.
+3. `touch tmp/restart.txt`; `curl -s .../healthz` — now a real check.
+   - 200 `"database_connected": true` → cutover likely done, verify pages.
+   - 503 / still 500 → `source` the venv, run `python -m scripts.pg_diagnose`,
+     paste output. `[1] FAILED` = outbound 5432 firewalled (open a ticket
+     or move to the `:6543` transaction pooler — already `prepare_threshold`-
+     safe and NullPool). `[3]/[4] FAILED` = app-side, grab the traceback.
+
+---
+
 ## What's done
 
 ### Code — merged to `main`
