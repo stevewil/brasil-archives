@@ -32,13 +32,15 @@ now `load_dotenv()` on import. After `./github-pull`, the reseed was
 re-run and landed in Postgres correctly (508+508+145 harvested, all
 loaders `insert N`).
 
-## Resume here — decommission Supabase + SQLite, wire the backup
+**SQLite retired 2026-09-01 ~18:35 UTC:** the cPanel
+`instance/brasil_archives.db` was renamed to `...pre-pg-2026-09-01`;
+Passenger restarted and the site kept serving (proves zero SQLite
+dependency). The `.env` fallback comment was updated to point at the
+renamed snapshot.
 
-1. **Cut ties with SQLite**: on cPanel,
-   `mv instance/brasil_archives.db instance/brasil_archives.db.pre-pg-2026-09-01`.
-   It still holds the pre-cutover copy (80/168/2/1161) — keep it as a
-   belt-and-suspenders snapshot, just get it out of the fallback path.
-2. **Cut ties with Supabase** (Steve decided 2026-09-01: **delete** the
+## Resume here — decommission Supabase, wire the backup
+
+1. **Cut ties with Supabase** (Steve decided 2026-09-01: **delete** the
    project, not pause):
    - Delete the `mwdjvwdpvdpscoxrzcwf` project in the Supabase dashboard.
      Its DB password is already in public git history (`b3f9b69`) — once
@@ -53,7 +55,7 @@ loaders `insert N`).
      `docs/handoff/2026-08-31-postgres-migration-runbook.md` (check off
      Phase 2, note the host pivot), `docs/DEPLOY.md` DB section (describe
      cPanel-local Postgres, not Supabase pooler URLs).
-3. **Fix the backup before trusting it** — `scripts/backup_to_wasabi.py`
+2. **Fix the backup before trusting it** — `scripts/backup_to_wasabi.py`
    `python_dump()` only reads the `_target_schema(engine)` schema
    (`public` on Postgres). The harvested records live in
    `src_mipibu` / `src_povos_indigenas_rn`, which it currently **misses
@@ -64,14 +66,14 @@ loaders `insert N`).
    extend `python_dump`/`python_restore` to loop every registered
    `src_<slug>` schema. Then wire the cron (`0 4 * * 0`) and test one
    restore.
-4. **Rotate the remaining secrets** (see [[secrets-in-handoff-docs]]):
+3. **Rotate the remaining secrets** (see [[secrets-in-handoff-docs]]):
    Wasabi key pair (leaked ID), and — good hygiene, not leaked —
    the cPanel PG password + `SECRET_KEY`. After each, update BOTH the
    cPanel `.env` and the local repo `.env`, plus Proton Pass.
-5. Update `LICENSING.md` (spec §9.4) with the data-handling note — the
+4. Update `LICENSING.md` (spec §9.4) with the data-handling note — the
    privacy posture is simpler now (no Data API / PostgREST layer to
    misconfigure; the DB is `localhost`-only, never network-exposed).
-6. Delete the now-resolved [[prod-db-gets-reseeded]] memory once the
+5. Delete the now-resolved [[prod-db-gets-reseeded]] memory once the
    Wasabi backup is verified working — the root cause (scripts not
    loading `.env`) is fixed in `de44665`.
 
