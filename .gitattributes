@@ -8,5 +8,5 @@ github-pull       text eol=lf
 passenger_wsgi.py text eol=lf
 .githooks/*       text eol=lf
 
-# Windows batch file — keep CRLF.
-app.bat           text eol=crlf
+# Windows batch files — keep CRLF (cmd.exe mis-parses LF-ending .bat).
+*.bat             text eol=crlf

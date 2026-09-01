@@ -71,7 +71,8 @@ docker compose down                # add -v to wipe the volume
 To run the **app** against a snapshot of real production data:
 
 ```bash
-./database-update.sh              # starts Docker PG, pulls a fresh pg_dump of prod over SSH
+./database-update.sh              # Git Bash  (PowerShell/cmd: .\database-update.bat)
+# starts Docker PG, pulls a fresh pg_dump of prod over SSH into the local `app` db
 # then in .env:  DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/app
 .venv/bin/flask run
 ```
