@@ -71,36 +71,40 @@ No behaviour change; SQLite stays the default.
 
 ---
 
-## Phase 1b — per-source `src_<slug>` schemas  ·  partner-schema-design §11
+## Phase 1b — per-source `src_<slug>` schemas  ·  DONE 2026-09-01 (commit `5fea758`)
 
-- [ ] **1b-1** `{"schema": "source"}` on `AggregatedRecord`, `HarvestRun`,
-      `HarvestError`, `FederationCache`; schema-qualify their FKs
-      (`public.upgrade_projects`, `source.harvest_runs`) — design §4.1.
-- [ ] **1b-2** `app/services/sources.py` (new) — `source_schema(slug)`,
-      `bind_source(slug)`, `ensure_source_schema(engine, slug)`,
-      `drop_source_schema(engine, slug)`, `rebuild_source_views(engine)` —
-      design §4.2, §6.
-- [ ] **1b-3** `app/models/_views.py` (new) — read-only `AggregatedRecordView`
-      / `HarvestRunView` / `HarvestErrorView` with a `source_slug` column,
-      `info={"is_view": True}` — design §5.2.
-- [ ] **1b-4** `migrations/env.py` — finish `include_object` (skip the `*_all`
-      views + anything in `src_*` / `"source"`) — design §7.2.
-- [ ] **1b-5** Swap read call-sites to the view models — design §5.3:
-      `app/services/federated_search.py`, `app/blueprints/harvest/routes.py`,
-      `app/blueprints/admin/routes.py`, `app/blueprints/main.py`,
-      `scripts/reextract.py`. Write paths keep the base models + `bind_source()`.
-- [ ] **1b-6** Fold `ensure_source_schema` + `rebuild_source_views` into
-      `scripts/load_upgrade_projects.py` (add `--skip-schema-sync`) — design §6.4.
-- [ ] **1b-7** `tests/conftest.py` — `schema_translate_map={"source": None}` on
-      the test engine; call `rebuild_source_views(db.engine)` in the `app`
-      fixture after `create_all` — design §8.1.
-- [ ] **1b-8** Add the PG-only targeted tests from design §8.2
-      (`ensure_source_schema` idempotent, 3rd-source view rebuild, `bind_source`
-      write lands in `src_mipibu.*` and shows in `aggregated_records_all`,
-      cross-schema FK to `public`).
-- [ ] **1b-9** Both CI jobs green (the PG job's `load_upgrade_projects` now also
-      stamps `src_mipibu` / `src_povos_indigenas_rn` + the views). **Commit + push.**
-- [ ] **1b-10** Open PR `postgres-migration` → `main`, self-review, merge. ✅ *Milestone: dual-backend green, per-source schemas in.*
+- [x] **1b-1** `{"schema": "source"}` on the 4 models; within-source FKs
+      `"source."`-qualified, the FK to `upgrade_projects` left bare (matches
+      the mapper, resolves via `search_path=public`).
+- [x] **1b-2** `app/services/sources.py` — `source_schema`, `bind_source`,
+      `ensure_source_schema`, `drop_source_schema`, `rebuild_source_views`,
+      `reset_source`. `bind_source` uses a **contextvar + `engine_connect`
+      listener** so the binding survives the commits a harvest / fetch does
+      mid-operation (the plain `Session.connection(execution_options=…)` from
+      the design only applies at first procure — doesn't survive a commit).
+- [x] **1b-3** `app/models/_views.py` — the 3 view models on a **separate
+      `DeclarativeBase`** (keeps them out of `db.metadata` entirely — cleaner
+      than an `is_view` filter on every `create_all`). Composite PK
+      `(source_slug, id)`.
+- [x] **1b-4** `env.py` `include_object` — done in 1a, unchanged.
+- [x] **1b-5** Read call-sites swapped: `federated_search`, `main`, admin
+      dashboard, and the whole `/harvest` blueprint (run/record detail now
+      `(source_slug, id)` — routes + `harvest/{index,run_detail,record_detail}.html`
+      + `admin/index.html`). Write paths bind: `harvest.run_harvest`,
+      `federation._fetch`, `reextract`.
+- [x] **1b-6** `load_upgrade_projects` stamps `src_<slug>` per config +
+      rebuilds views; `--skip-schema-sync` opt-out.
+- [x] **1b-7** `conftest` pins `src_test`, rebuilds views, scrubs stale
+      `src_*` on Postgres; the 4 bespoke fixtures do the same.
+- [x] **1b-8** `tests/test_source_schemas.py` — 11 tests (slug safety +
+      PG-gated: `ensure_source_schema` idempotent/4-tables, UNION view,
+      `drop_source_schema`).
+- [x] **1b-9** Full suite green on **both** SQLite and Postgres locally
+      (`docker postgres:16`). A fresh `flask db upgrade` + full seed + app
+      click-through verified against local Postgres. **Committed `5fea758`.**
+      ⚠️ push + watch CI.
+- [ ] **1b-10** Open PR `postgres-migration` → `main`, self-review, merge.
+      ✅ *Milestone: dual-backend green, per-source schemas in.*
 
 ---
 
