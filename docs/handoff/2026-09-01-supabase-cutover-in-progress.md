@@ -1,54 +1,51 @@
-# Handoff — 2026-09-01 · Postgres cutover LIVE (cPanel-local, not Supabase)
+# Handoff — 2026-09-01 · Postgres cutover DONE (cPanel-local, not Supabase)
 
-**Status: prod is on Postgres.** Not Supabase — the Namecheap shared box
-only allows outbound `:443`, so the Supabase pooler was permanently
-unreachable (see History below). Pivoted to the **PostgreSQL 10.23
-instance cPanel itself offers** (`fromuagq_brasil-archives` db, localhost,
-no firewall in the way). `flask db upgrade` applied all 6 migrations
-clean, every loader + all 3 harvests ran, `/healthz` →
-`{"database":"postgresql","database_connected":true}`.
+**Status: prod is LIVE on Postgres, data verified.** Not Supabase — the
+Namecheap shared box only allows outbound `:443`, so the Supabase pooler
+is permanently unreachable (see History). Prod runs the **PostgreSQL
+10.23 instance cPanel itself provides** on localhost (`fromuagq_brasil-archives`
+db). Verified 2026-09-01 ~18:05 UTC directly against the DB:
 
-**Open question, not yet confirmed:** the loaders/harvest all reported
-insert 0 / unchanged, which means `fromuagq_brasil-archives` already held
-a full dataset *before* this run (from an earlier attempt) — the row
-counts below need one query to confirm they're right, not assumed.
+| | Postgres | target |
+|---|---|---|
+| archives | 80 | 80 |
+| dimension_scores (active) | 168 | 168 |
+| upgrade_projects | 2 | 2 |
+| facet_values (active) | 47 | 47 |
+| aggregated_records_all | 1161 | 1161 |
+| schemas | `public, src_mipibu, src_povos_indigenas_rn` | ✓ |
+| `*_all` views | all 3 present | ✓ |
 
-## Resume here — finish the data, then cut ties with Supabase + SQLite
+Live site: `/healthz` → `database_connected: true`, `/` renders "Archives
+cataloged", `/archives/` shows 51, `/search?q=terra` → 8 results, `/oai`
+Identify + ListRecords OK.
 
-Steve's ask: get all necessary data into the new Postgres DB, then fully
-decommission both Supabase and SQLite for this app.
+### What went wrong first (fixed — commit `de44665`)
 
-1. **Verify the data is actually complete** — run on cPanel:
-   ```bash
-   PGPASSWORD="$(grep DATABASE_URL .env | sed -E 's#.*:([^:@]+)@.*#\1#')" psql -h localhost \
-     -U 'fromuagq_brasil-archives-user' -d 'fromuagq_brasil-archives' -c "
-   select 'archives' t, count(*) from archives
-   union all select 'dimension_scores (active)', count(*) from dimension_scores where superseded_at is null
-   union all select 'upgrade_projects', count(*) from upgrade_projects
-   union all select 'facet_values (active)', count(*) from facet_values where superseded_at is null
-   union all select 'aggregated_records_all', count(*) from aggregated_records_all;"
-   psql ... -c "\dn"   # expect public, src_mipibu, src_povos_indigenas_rn
-   ```
-   Target (matches the earlier Supabase verification): archives **80**,
-   dimension_scores **168**, upgrade_projects **2**, facet_values **47**,
-   aggregated_records_all **1161**. If short, re-run the specific loader —
-   they're all idempotent (`scripts/load_*`, `scripts/harvest.py`).
-2. **Browser spot-check**: `/`, `/search?q=terra`, `/search?q=Potiguara`,
-   `/archives/?q=jornal`, `/oai?verb=Identify`,
-   `/oai?verb=ListRecords&metadataPrefix=oai_dc`. Confirm scores stay
-   hidden (`BRASIL_ARCHIVES_PUBLIC_SCORES` unset).
-3. **Cut ties with SQLite**:
-   `mv instance/brasil_archives.db instance/brasil_archives.db.pre-pg-2026-09-01`
-   — confirms nothing can silently fall back to it. Old file already
-   untouched/unused since `DATABASE_URL` points at Postgres.
-4. **Cut ties with Supabase**:
-   - Stop pinging it: remove/disable the `brasil-archives` entry in
+`flask db upgrade` (Flask CLI, auto-loads `.env`) built the Postgres
+schema, but `python -m scripts.load_* / harvest` **did not load `.env`**,
+so with `DATABASE_URL` only in the file (not exported) they silently ran
+against the SQLite fallback — leaving Postgres with an empty schema while
+the site served "No archives". This is almost certainly the real cause of
+the historical `prod-db-gets-reseeded` incident too. Fix: `scripts/__init__.py`
+now `load_dotenv()` on import. After `./github-pull`, the reseed was
+re-run and landed in Postgres correctly (508+508+145 harvested, all
+loaders `insert N`).
+
+## Resume here — decommission Supabase + SQLite, wire the backup
+
+1. **Cut ties with SQLite**: on cPanel,
+   `mv instance/brasil_archives.db instance/brasil_archives.db.pre-pg-2026-09-01`.
+   It still holds the pre-cutover copy (80/168/2/1161) — keep it as a
+   belt-and-suspenders snapshot, just get it out of the fallback path.
+2. **Cut ties with Supabase** (Steve decided 2026-09-01: **delete** the
+   project, not pause):
+   - Delete the `mwdjvwdpvdpscoxrzcwf` project in the Supabase dashboard.
+     Its DB password is already in public git history (`b3f9b69`) — once
+     deleted that's fully moot.
+   - Remove the `brasil-archives` entry from
      `C:\DEV\supabase-keepalive\keepalive.config.json` (leave the *other*
      kept-warm project alone). See [[supabase-keepalive-deployed]].
-   - Decide fate of the `mwdjvwdpvdpscoxrzcwf` project — **pause, don't
-     delete** is the default recommendation (free, reversible, keeps the
-     already-verified seed as a reference/escape hatch); ask Steve to
-     confirm before deleting anything with real data in it.
    - Sweep docs that still describe Supabase as the live-DB plan and mark
      them superseded: `docs/supabase-migration-spec.md`,
      `docs/partner-schema-design.md` (mechanism doc stays accurate — it's
@@ -56,7 +53,7 @@ decommission both Supabase and SQLite for this app.
      `docs/handoff/2026-08-31-postgres-migration-runbook.md` (check off
      Phase 2, note the host pivot), `docs/DEPLOY.md` DB section (describe
      cPanel-local Postgres, not Supabase pooler URLs).
-5. **Fix the backup before trusting it** — `scripts/backup_to_wasabi.py`
+3. **Fix the backup before trusting it** — `scripts/backup_to_wasabi.py`
    `python_dump()` only reads the `_target_schema(engine)` schema
    (`public` on Postgres). The harvested records live in
    `src_mipibu` / `src_povos_indigenas_rn`, which it currently **misses
@@ -67,14 +64,26 @@ decommission both Supabase and SQLite for this app.
    extend `python_dump`/`python_restore` to loop every registered
    `src_<slug>` schema. Then wire the cron (`0 4 * * 0`) and test one
    restore.
-6. Update `LICENSING.md` (spec §9.4) with the data-handling note — the
-   privacy posture is actually simpler now (no Data API / PostgREST layer
-   to misconfigure; the DB isn't network-exposed at all, only
-   `localhost`).
-7. Delete the now-resolved [[prod-db-gets-reseeded]] memory once the
-   Wasabi backup is verified working — the durability problem it
-   describes is fixed either way (Postgres survives a `git clean`; the
-   backup gives an off-site copy too).
+4. **Rotate the remaining secrets** (see [[secrets-in-handoff-docs]]):
+   Wasabi key pair (leaked ID), and — good hygiene, not leaked —
+   the cPanel PG password + `SECRET_KEY`. After each, update BOTH the
+   cPanel `.env` and the local repo `.env`, plus Proton Pass.
+5. Update `LICENSING.md` (spec §9.4) with the data-handling note — the
+   privacy posture is simpler now (no Data API / PostgREST layer to
+   misconfigure; the DB is `localhost`-only, never network-exposed).
+6. Delete the now-resolved [[prod-db-gets-reseeded]] memory once the
+   Wasabi backup is verified working — the root cause (scripts not
+   loading `.env`) is fixed in `de44665`.
+
+## Local dev access to the prod DB — WORKING
+
+SSH set up 2026-09-01: key `~/.ssh/brasil_cpanel_ed25519`, `brasil-cpanel`
+in `~/.ssh/config` (`premium32.web-hosting.com:21098`), pubkey authorized.
+Tunnel verified: `scripts/dev/pg-tunnel.sh` → `localhost:5433` → a real
+`psycopg` query returned the right counts. (First attempt failed on a
+stale background `ssh` holding 5433 — kill `ssh` and retry if it closes
+unexpectedly.) Guide: `docs/dev-postgres.md`. Reminder: tunnel = psql/GUI
+only, never `TEST_DATABASE_URL`.
 
 ---
 
