@@ -1,11 +1,43 @@
-# Handoff — 2026-09-01 · Supabase cutover IN PROGRESS (blocked on cPanel 500s)
+# Handoff — 2026-09-01 · Supabase cutover BLOCKED (host firewall)
 
-**Status:** Phases 1a + 1b merged to `main` and CI-green. Supabase project
-fully migrated + seeded + verified. **cPanel cutover started but every page
-500s** — `/healthz` connects to Postgres fine, real queries fail. Debugging
-was interrupted here.
+**Status: cutover cannot complete on the current host.** The Namecheap
+shared box (`fromuagq@premium32`) permits **only outbound TCP :443**.
+Confirmed 2026-09-01 by socket test: the Supabase pooler is REFUSED on
+both `:5432` (session) and `:6543` (transaction) — CSF `TCP_OUT` allowlist,
+`Connection refused` (active reject, not a timeout). Direct Postgres from
+this host is not possible.
 
-**Resume at:** § "Pick up here — the 500".
+**Site is back on SQLite** (rollback applied: sqlite `DATABASE_URL`
+un-commented, postgres line + `BRASIL_ARCHIVES_DB_CHECK=1` removed,
+restarted). Old `.db` was never touched.
+
+The code + Supabase project are fully ready (see UPDATE below) — this is
+purely a hosting-egress wall.
+
+## Recommended path — durability without Postgres
+
+Stay on SQLite; wire the weekly encrypted Wasabi backup. Wasabi S3 is on
+:443, so it works through the firewall, and `scripts/backup_to_wasabi.py`
+`BACKUP_MODE=python` **already handles SQLite** (SQLAlchemy logical dump →
+gzip → AES-256-GCM → Wasabi). That solves the `prod-db-gets-reseeded`
+problem directly: recovery becomes "restore the last Wasabi dump", not
+"re-run every seed script + 2 harvests".
+
+- `pip install -r requirements-backup.txt` in the venv
+- append `WASABI_*` + `BRASIL_ARCHIVES_BACKUP_KEY` + `BACKUP_PREFIX=pg/` +
+  `BACKUP_MODE=python` to `~/flask/brasil-archives/.env` (values in the
+  repo's local `.env`)
+- `DATABASE_URL` stays the sqlite path (the dump reads it)
+- cron: `0 4 * * 0  cd ~/flask/brasil-archives && <venv>/bin/python -m scripts.backup_to_wasabi`
+- test a restore into a scratch file once (`--restore` / see `docs/wasabi-backup.md`)
+
+Move the live DB to Supabase only if the whole app later moves to a host
+with unrestricted outbound (a small VPS — Fly/Render/Hetzner). Nothing in
+the migration work is wasted; it just waits.
+
+Optional, low expectations: a Namecheap ticket asking to allow outbound
+:5432/:6543 to `aws-0-us-west-2.pooler.supabase.com`. Shared plans
+usually decline.
 
 ---
 
