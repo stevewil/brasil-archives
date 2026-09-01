@@ -36,10 +36,18 @@ _AUX_TABLES = (
 
 
 def upgrade():
-    if op.get_bind().dialect.name != "postgresql":
-        return
-    for table in _AUX_TABLES:
-        op.execute(f'DROP TABLE IF EXISTS public."{table}" CASCADE')
+    bind = op.get_bind()
+    if bind.dialect.name == "postgresql":
+        for table in _AUX_TABLES:
+            op.execute(f'DROP TABLE IF EXISTS public."{table}" CASCADE')
+
+    # Create the cross-source *_all views so a bare `flask db upgrade`
+    # leaves a working app. On SQLite this is the JOIN form over the shared
+    # tables; on Postgres it's the empty stub, replaced with the real UNION
+    # by `scripts/load_upgrade_projects` after the sources are registered.
+    from app.services.sources import rebuild_source_views
+
+    rebuild_source_views(bind, slugs=[])
 
 
 def downgrade():

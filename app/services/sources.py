@@ -23,8 +23,10 @@ from __future__ import annotations
 import contextvars
 import re
 
+from contextlib import nullcontext
+
 from sqlalchemy import event, text
-from sqlalchemy.engine import Engine
+from sqlalchemy.engine import Connection, Engine
 
 from ..extensions import db
 from ..models import AggregatedRecord, FederationCache, HarvestError, HarvestRun
@@ -194,27 +196,32 @@ def _union_body(view: str, slugs: list[str]) -> str:
     )
 
 
-def rebuild_source_views(engine: Engine, slugs: list[str] | None = None) -> None:
+def rebuild_source_views(
+    bind: Engine | Connection, slugs: list[str] | None = None
+) -> None:
     """(Re)create the three ``public.*_all`` views. Idempotent. Call after any
     change to the registered source list (folded into
-    ``scripts/load_upgrade_projects``) and in the test fixture.
+    ``scripts/load_upgrade_projects``), from the initial migration, and in
+    the test fixture.
 
-    ``slugs`` — the registered source slugs for the Postgres-runtime UNION;
-    defaults to reading them from ``public.upgrade_projects`` (needs an app
-    context). Ignored on SQLite / the fixed-schema test mode.
+    ``bind`` may be an Engine or an already-open Connection (migrations pass
+    ``op.get_bind()``). ``slugs`` — the registered source slugs for the
+    Postgres-runtime UNION; defaults to reading them from
+    ``public.upgrade_projects`` (needs an app context). Ignored on SQLite /
+    the fixed-schema test mode.
     """
-    fixed = _fixed_source_schema(engine)
-    is_pg = _is_pg(engine)
+    fixed = _fixed_source_schema(bind)
+    is_pg = _is_pg(bind)
 
     def _body(view: str) -> str:
         if fixed is False:  # Postgres runtime — per-source UNION
-            return _union_body(
-                view, slugs if slugs is not None else _registered_slugs()
-            )
+            resolved = slugs if slugs is not None else _registered_slugs()
+            return _union_body(view, resolved)
         prefix = f'"{fixed}".' if fixed else ""  # 'src_test' or SQLite bare
         return _join_body(view, prefix)
 
-    with engine.begin() as conn:
+    ctx = bind.begin() if isinstance(bind, Engine) else nullcontext(bind)
+    with ctx as conn:
         for view in _VIEWS:
             name = f'public."{view}_all"' if is_pg else f'"{view}_all"'
             # DROP + CREATE (not CREATE OR REPLACE) so a column-type change
