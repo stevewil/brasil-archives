@@ -57,10 +57,10 @@ Instance data (SQLite DB) lives under `instance/` and is git-ignored.
 
 ### Testing against Postgres
 
-The default loop is SQLite. Production runs PostgreSQL **10** (the instance
-the cPanel host provides on localhost), so anything touching schema,
-migrations, or the per-source `src_<slug>` views should also be checked
-against a matching Postgres before pushing:
+The default loop is SQLite. Production runs PostgreSQL **10** (the cPanel
+host's local instance), so anything touching schema, migrations, or the
+per-source `src_<slug>` views should also be checked against a matching
+Postgres before pushing:
 
 ```bash
 docker compose up -d db            # postgres:10, creates app / app_test / migrate_check
@@ -68,10 +68,9 @@ TEST_DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/app_test
 docker compose down                # add -v to wipe the volume
 ```
 
-To run the app itself on Postgres, point `DATABASE_URL` at
-`postgresql+psycopg://postgres:postgres@localhost:5432/app` and re-run
-`flask db upgrade` + the loaders. CI runs the full suite on `postgres:10`
-on every push.
+CI runs the full suite on `postgres:10` on every push. For running the app
+on Postgres and for an SSH tunnel to inspect real production data, see
+[docs/dev-postgres.md](docs/dev-postgres.md).
 
 ## Related
 
