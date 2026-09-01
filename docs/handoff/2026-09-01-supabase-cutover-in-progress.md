@@ -65,15 +65,20 @@ matched prod. Still TODO: the Wasabi bucket **lifecycle rule** (retention
      Phase 2, note the host pivot), `docs/DEPLOY.md` DB section (describe
      cPanel-local Postgres, not Supabase pooler URLs).
 2. **Rotate the remaining secrets** (see [[secrets-in-handoff-docs]]):
-   Wasabi key pair (leaked ID), and — good hygiene, not leaked —
-   the cPanel PG password + `SECRET_KEY` + `BRASIL_ARCHIVES_BACKUP_KEY`
-   (bucket has exactly 1 backup, made 2026-09-01 19:42 — rotating the
-   encryption key now costs only that one). After each, update the cPanel
-   `.env` (and local `.env` for the Wasabi + backup keys), plus Proton
-   Pass. Then re-run `python -m scripts.backup_to_wasabi` so a backup
-   exists under the new keys.
+   - **Wasabi — DONE.** brasil-archives now uses a scoped sub-user key
+     (`grp-brasil-archives-backup` / `srv-brasil-archives-backup`, `pg/*`
+     only, no delete — `docs/wasabi-iam-plan.md`). Root key out of both
+     `.env`s. → still needs a Proton Pass record.
+   - **cPanel PG password** + **`SECRET_KEY`** — not leaked, good hygiene.
+     cPanel `.env` + restart + Proton Pass.
+   - **`BRASIL_ARCHIVES_BACKUP_KEY`** — optional (chat-only exposure). If
+     rotated, re-run `backup_to_wasabi` so a backup exists under it.
+   - **The two root keys** (`MMR…` leaked, `PJD…` new) — retire per
+     `docs/wasabi-iam-plan.md` §6 once mpa/ajme move off `MMR…` and
+     `srv-ops-admin` exists.
 3. **Wasabi lifecycle rule** — `docs/wasabi-backup.md` §6 (retention +
-   versioning), a Wasabi-console task.
+   versioning), a Wasabi-console task. Bucket currently has 3 objects
+   (2 real backups + 1 undeleteable selftest probe).
 4. Update `LICENSING.md` (spec §9.4) with the data-handling note — the
    privacy posture is simpler now (no Data API / PostgREST layer to
    misconfigure; the DB is `localhost`-only, never network-exposed).
