@@ -43,3 +43,6 @@ Thumbs.db
 
 # Operational architecture doc kept locally only
 docs/project-state-and-roadmap.md
+
+# Claude Code personal overrides
+.claude/settings.local.json
