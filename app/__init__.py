@@ -78,6 +78,15 @@ def create_app(config_name: str | None = None) -> Flask:
     # Import here (not at module top) to avoid circular imports.
     from . import models  # noqa: F401
 
+    # Per-source schema routing (docs/partner-schema-design.md): clear any
+    # ``bind_source()`` binding when the app context tears down so it can't
+    # leak from one request into the next on a reused worker thread.
+    from .services.sources import reset_source
+
+    @app.teardown_appcontext
+    def _reset_source(_exc: BaseException | None) -> None:
+        reset_source()
+
     # Blueprints
     from .blueprints.main import bp as main_bp
     from .blueprints.archives import bp as archives_bp

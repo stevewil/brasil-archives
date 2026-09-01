@@ -16,11 +16,10 @@ from ...models import (
     DIMENSIONS,
     Archive,
     DimensionScore,
-    HarvestError,
-    HarvestRun,
     ProbeResult,
     UpgradeProject,
 )
+from ...models._views import HarvestErrorView, HarvestRunView
 from ...services import federation as fed
 from .._admin_gate import admin_only
 
@@ -115,21 +114,21 @@ def _probe_status() -> dict[str, Any]:
     }
 
 
-def _recent_harvest_runs() -> list[HarvestRun]:
+def _recent_harvest_runs() -> list[HarvestRunView]:
     return list(
         db.session.scalars(
-            select(HarvestRun)
-            .order_by(HarvestRun.started_at.desc(), HarvestRun.id.desc())
+            select(HarvestRunView)
+            .order_by(HarvestRunView.started_at.desc(), HarvestRunView.id.desc())
             .limit(_RECENT_LIMIT)
         )
     )
 
 
-def _recent_harvest_errors() -> list[HarvestError]:
+def _recent_harvest_errors() -> list[HarvestErrorView]:
     return list(
         db.session.scalars(
-            select(HarvestError)
-            .order_by(HarvestError.id.desc())
+            select(HarvestErrorView)
+            .order_by(HarvestErrorView.id.desc())
             .limit(_RECENT_LIMIT)
         )
     )

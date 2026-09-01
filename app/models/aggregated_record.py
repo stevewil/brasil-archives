@@ -31,6 +31,10 @@ class AggregatedRecord(db.Model):
     """One harvested OAI-PMH record from an upgrade project."""
 
     __tablename__ = "aggregated_records"
+    # Per-source schema: "source" is a symbolic placeholder, rewritten at
+    # runtime to src_<slug> on Postgres and collapsed to the single
+    # namespace on SQLite. See app/services/sources.py and
+    # docs/partner-schema-design.md.
     __table_args__ = (
         UniqueConstraint(
             "upgrade_project_id",
@@ -44,9 +48,13 @@ class AggregatedRecord(db.Model):
             "datestamp",
         ),
         Index("ix_aggregated_records_sha", "raw_xml_sha256"),
+        {"schema": "source"},
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    # Cross-schema FK to the registry — left unqualified so it matches the
+    # UpgradeProject mapper (schema None) and resolves via search_path=public
+    # on Postgres. Within-source FKs below use the "source." prefix.
     upgrade_project_id: Mapped[int] = mapped_column(
         Integer,
         ForeignKey("upgrade_projects.id", ondelete="CASCADE"),
@@ -70,7 +78,7 @@ class AggregatedRecord(db.Model):
 
     harvest_run_id: Mapped[int] = mapped_column(
         Integer,
-        ForeignKey("harvest_runs.id", ondelete="RESTRICT"),
+        ForeignKey("source.harvest_runs.id", ondelete="RESTRICT"),
         nullable=False,
     )
 

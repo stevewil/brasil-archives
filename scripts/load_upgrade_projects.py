@@ -33,6 +33,7 @@ from app.models import (
     RecordType,
     UpgradeProject,
 )
+from app.services.sources import ensure_source_schema, rebuild_source_views
 
 CONFIG_DIR = Path(__file__).resolve().parent.parent / "configs" / "upgrade_projects"
 
@@ -188,37 +189,61 @@ def _upsert_lifts(project: UpgradeProject, lifts: dict[str, dict[str, Any]]) -> 
     return touched
 
 
-def load(yaml_dir: Path | None = None, *, dry_run: bool = False) -> dict[str, int]:
+def load(
+    yaml_dir: Path | None = None,
+    *,
+    dry_run: bool = False,
+    skip_schema_sync: bool = False,
+) -> dict[str, int]:
     """Load every YAML under ``yaml_dir``. Returns counts per project.
 
     ``yaml_dir`` defaults to :data:`CONFIG_DIR` — resolved at call time
     so tests can monkeypatch the module-level constant.
+
+    After the upsert (unless ``dry_run`` or ``skip_schema_sync``), stamps a
+    ``src_<slug>`` Postgres schema for each registered source and rebuilds
+    the cross-source ``*_all`` views — so onboarding a partner stays one
+    command. Both are no-ops on SQLite. See docs/partner-schema-design.md.
     """
     if yaml_dir is None:
         yaml_dir = CONFIG_DIR
     counts: dict[str, int] = {}
+    slugs: list[str] = []
     for path in sorted(yaml_dir.glob("*.yaml")):
         with path.open(encoding="utf-8") as fh:
             cfg = yaml.safe_load(fh) or {}
         project = _upsert_project(cfg, path)
         lifts_touched = _upsert_lifts(project, cfg.get("lifts") or {})
         counts[cfg.get("slug", path.stem)] = lifts_touched
+        slugs.append(cfg.get("slug", path.stem))
 
     if dry_run:
         db.session.rollback()
-    else:
-        db.session.commit()
+        return counts
+
+    db.session.commit()
+    if not skip_schema_sync:
+        for slug in slugs:
+            ensure_source_schema(db.engine, slug)
+        rebuild_source_views(db.engine, slugs)
     return counts
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--skip-schema-sync",
+        action="store_true",
+        help="upsert the rows but don't stamp src_<slug> schemas / rebuild views",
+    )
     args = parser.parse_args()
 
     app = create_app()
     with app.app_context():
-        counts = load(dry_run=args.dry_run)
+        counts = load(
+            dry_run=args.dry_run, skip_schema_sync=args.skip_schema_sync
+        )
 
     verb = "would have" if args.dry_run else "did"
     for slug, lifts in counts.items():

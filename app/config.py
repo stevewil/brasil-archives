@@ -14,30 +14,46 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 INSTANCE_DIR = BASE_DIR / "instance"
 
 
-def _engine_options(uri: str) -> dict:
-    """SQLAlchemy engine options, Postgres only.
+def _engine_options(uri: str, *, for_tests: bool = False) -> dict:
+    """SQLAlchemy engine options.
 
-    On cPanel the app runs under Passenger prefork; a socket-based
-    connection pool inherited across a fork is a hazard. The robust
-    answer for a low-traffic catalog site is to not pool in the app and
-    let Supabase's Supavisor pooler do it — hence ``NullPool`` by
-    default whenever the URL is Postgres. Set ``DB_NULLPOOL=0`` to keep
-    normal pooling (useful against a local Postgres in dev).
+    **Per-source schemas** (docs/partner-schema-design.md): the four
+    harvested-data models declare a symbolic schema ``"source"``.
 
-    ``pool_pre_ping`` recycles connections dropped by the pooler; the
-    ``connect_args`` cap a hung connect and a runaway query. TLS comes
-    from ``?sslmode=require`` in ``DATABASE_URL`` (see
-    docs/supabase-migration-spec.md §4).
+    * SQLite — a global ``schema_translate_map`` collapses ``"source"`` to
+      the one namespace (``src_test`` becomes bare too). Same behaviour as
+      before the per-source split.
+    * Postgres, app runtime — **no** global map; ``sources.bind_source()``
+      sets it per operation to ``src_<slug>``. ``search_path=public`` keeps
+      unqualified names (the registry, the ``*_all`` views) resolving to
+      ``public``.
+    * Postgres, tests — a global map to a single ``src_test`` schema, so the
+      suite exercises one source namespace exactly like SQLite does.
+
+    **Pooling** (Postgres): ``NullPool`` by default — on cPanel the app runs
+    under Passenger prefork and a socket pool across a fork is a hazard;
+    Supabase's Supavisor pools instead. ``DB_NULLPOOL=0`` keeps normal
+    pooling for local dev. ``pool_pre_ping`` recycles dropped connections;
+    ``connect_args`` cap a hung connect and a runaway query. TLS is
+    ``?sslmode=require`` in ``DATABASE_URL``.
     """
-    if not uri.startswith("postgresql"):
-        return {}
+    is_pg = uri.startswith("postgresql")
+
+    if not is_pg:
+        return {"execution_options": {"schema_translate_map": {"source": None}}}
+
     opts: dict = {
         "pool_pre_ping": True,
         "connect_args": {
             "connect_timeout": 10,
-            "options": "-c statement_timeout=15000",
+            "options": "-c search_path=public -c statement_timeout=15000",
         },
     }
+    if for_tests:
+        opts["execution_options"] = {
+            "schema_translate_map": {"source": "src_test"}
+        }
+        return opts  # keep normal pooling for a fast test loop
     if os.environ.get("DB_NULLPOOL", "1") != "0":
         import sqlalchemy.pool
 
@@ -112,7 +128,9 @@ class TestingConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "TEST_DATABASE_URL", "sqlite:///:memory:"
     )
-    SQLALCHEMY_ENGINE_OPTIONS: dict = {}
+    SQLALCHEMY_ENGINE_OPTIONS = _engine_options(
+        SQLALCHEMY_DATABASE_URI, for_tests=True
+    )
     WTF_CSRF_ENABLED = False
     SECRET_KEY = "testing-secret"
     # Exercise the full internal UI by default; the gate itself is

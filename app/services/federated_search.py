@@ -29,10 +29,10 @@ from dataclasses import dataclass, field
 from urllib.parse import urlsplit
 
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 
 from ..extensions import db
-from ..models import AggregatedRecord, UpgradeProject
+from ..models import UpgradeProject
+from ..models._views import AggregatedRecordView
 from ..text import fold as _fold
 
 log = logging.getLogger(__name__)
@@ -165,21 +165,26 @@ def search(
         )
 
     needle = _fold(q)
+    by_slug = {p.slug: p for p in projects}
     records = db.session.scalars(
-        select(AggregatedRecord)
-        .where(AggregatedRecord.metadata_prefix == SEARCH_PREFIX)
-        .options(selectinload(AggregatedRecord.upgrade_project))
+        select(AggregatedRecordView)
+        .where(AggregatedRecordView.metadata_prefix == SEARCH_PREFIX)
     )
 
     hits: list[SearchHit] = []
     for rec in records:
+        project = by_slug.get(rec.source_slug)
+        if project is None:  # a source with harvested rows but no registry row
+            continue
         canonical = _canonical(rec.extracted_json)
         if canonical is None:
             continue
         strength = _match_strength(canonical, needle)
         if strength is None:
             continue
-        hits.append(_build_hit(rec, canonical, strong=(strength == "strong")))
+        hits.append(
+            _build_hit(rec, project, canonical, strong=(strength == "strong"))
+        )
 
     facet_counts: dict[str, int] = {}
     for hit in hits:
@@ -254,9 +259,12 @@ def _canonical(extracted_json: str | None) -> dict | None:
 
 
 def _build_hit(
-    rec: AggregatedRecord, canonical: dict, *, strong: bool
+    rec: AggregatedRecordView,
+    project: UpgradeProject,
+    canonical: dict,
+    *,
+    strong: bool,
 ) -> SearchHit:
-    project = rec.upgrade_project
     title = (canonical.get("title") or "").strip() or "(untitled)"
     description = canonical.get("description")
     if isinstance(description, str) and len(description) > DESCRIPTION_SNIPPET_CHARS:

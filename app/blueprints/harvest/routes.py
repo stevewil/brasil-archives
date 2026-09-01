@@ -1,8 +1,10 @@
 """Harvest views: run index, run detail, record detail.
 
-All routes are read-only. The blueprint is a debugging/sanity-check
-surface, not a production data-editing surface — write paths still live
-in ``scripts/harvest.py``.
+All routes are read-only and admin-gated. They read the cross-source
+``*_all`` views (``app/models/_views.py``) — on Postgres each harvested
+source lives in its own ``src_<slug>`` schema, so a run / record is
+addressed by ``(source_slug, id)``, not ``id`` alone. Write paths live in
+``app/services/harvest.py``.
 """
 from __future__ import annotations
 
@@ -11,15 +13,14 @@ from typing import Any
 
 from flask import Blueprint, abort, render_template, request
 from flask_babel import lazy_gettext as _l
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
+from sqlalchemy import func, select
 
 from ...extensions import db
-from ...models import (
-    AggregatedRecord,
-    HarvestError,
-    HarvestRun,
-    UpgradeProject,
+from ...models import UpgradeProject
+from ...models._views import (
+    AggregatedRecordView,
+    HarvestErrorView,
+    HarvestRunView,
 )
 from .._admin_gate import admin_only
 
@@ -64,7 +65,7 @@ def _json_or_none(text: str | None) -> Any:
 @bp.route("/", endpoint="index")
 @admin_only
 def index():
-    """List every harvest run, newest first, with per-project rollups."""
+    """List every harvest run, newest first, with per-source rollups."""
     page = _parse_int(request.args.get("page"), default=1, minimum=1)
     page_size = _parse_int(
         request.args.get("page_size"),
@@ -74,32 +75,37 @@ def index():
     )
     offset = (page - 1) * page_size
 
-    total = db.session.execute(
-        select(db.func.count(HarvestRun.id))
-    ).scalar_one()
-
-    stmt = (
-        select(HarvestRun)
-        .options(selectinload(HarvestRun.upgrade_project))
-        .order_by(HarvestRun.started_at.desc(), HarvestRun.id.desc())
-        .offset(offset)
-        .limit(page_size)
+    total = db.session.scalar(
+        select(func.count()).select_from(HarvestRunView)
     )
-    runs = list(db.session.execute(stmt).scalars())
 
-    # Per-(project, prefix) latest snapshot for the summary cards at top.
-    latest_stmt = (
-        select(
-            UpgradeProject.slug.label("slug"),
-            AggregatedRecord.metadata_prefix.label("prefix"),
-            db.func.count(AggregatedRecord.id).label("record_count"),
+    runs = list(
+        db.session.scalars(
+            select(HarvestRunView)
+            .order_by(HarvestRunView.started_at.desc(), HarvestRunView.id.desc())
+            .offset(offset)
+            .limit(page_size)
         )
-        .join(UpgradeProject,
-              UpgradeProject.id == AggregatedRecord.upgrade_project_id)
-        .group_by(UpgradeProject.slug, AggregatedRecord.metadata_prefix)
-        .order_by(UpgradeProject.slug, AggregatedRecord.metadata_prefix)
     )
-    rollups = list(db.session.execute(latest_stmt))
+
+    # Per-(source, prefix) record counts for the summary cards.
+    rollups = list(
+        db.session.execute(
+            select(
+                AggregatedRecordView.source_slug.label("slug"),
+                AggregatedRecordView.metadata_prefix.label("prefix"),
+                func.count().label("record_count"),
+            )
+            .group_by(
+                AggregatedRecordView.source_slug,
+                AggregatedRecordView.metadata_prefix,
+            )
+            .order_by(
+                AggregatedRecordView.source_slug,
+                AggregatedRecordView.metadata_prefix,
+            )
+        )
+    )
 
     return render_template(
         "harvest/index.html",
@@ -114,11 +120,11 @@ def index():
     )
 
 
-@bp.route("/runs/<int:run_id>", endpoint="run_detail")
+@bp.route("/runs/<source_slug>/<int:run_id>", endpoint="run_detail")
 @admin_only
-def run_detail(run_id: int):
+def run_detail(source_slug: str, run_id: int):
     """Single harvest run — metadata, error rows, and record page."""
-    run = db.session.get(HarvestRun, run_id)
+    run = db.session.get(HarvestRunView, (source_slug, run_id))
     if run is None:
         abort(404)
 
@@ -131,27 +137,30 @@ def run_detail(run_id: int):
     )
     offset = (page - 1) * page_size
 
-    records_total = db.session.execute(
-        select(db.func.count(AggregatedRecord.id))
-        .where(AggregatedRecord.harvest_run_id == run_id)
-    ).scalar_one()
-
-    records_stmt = (
-        select(AggregatedRecord)
-        .where(AggregatedRecord.harvest_run_id == run_id)
-        .order_by(AggregatedRecord.oai_identifier)
-        .offset(offset)
-        .limit(page_size)
+    _rec_where = (
+        (AggregatedRecordView.source_slug == source_slug)
+        & (AggregatedRecordView.harvest_run_id == run_id)
     )
-    records = list(db.session.execute(records_stmt).scalars())
+    records_total = db.session.scalar(
+        select(func.count()).select_from(AggregatedRecordView).where(_rec_where)
+    )
+    records = list(
+        db.session.scalars(
+            select(AggregatedRecordView)
+            .where(_rec_where)
+            .order_by(AggregatedRecordView.oai_identifier)
+            .offset(offset)
+            .limit(page_size)
+        )
+    )
 
-    # Decorate rows with a lightweight canonical title (best-effort).
     record_rows: list[dict[str, Any]] = []
     for rec in records:
         extracted = _json_or_none(rec.extracted_json) or {}
         canonical = extracted.get("canonical", {}) if isinstance(extracted, dict) else {}
         record_rows.append({
             "id": rec.id,
+            "source_slug": rec.source_slug,
             "oai_identifier": rec.oai_identifier,
             "datestamp": rec.datestamp,
             "title": canonical.get("title"),
@@ -159,13 +168,17 @@ def run_detail(run_id: int):
             "year_end": canonical.get("year_end"),
         })
 
-    errors_stmt = (
-        select(HarvestError)
-        .where(HarvestError.harvest_run_id == run_id)
-        .order_by(HarvestError.id)
-        .limit(50)
+    errors = list(
+        db.session.scalars(
+            select(HarvestErrorView)
+            .where(
+                (HarvestErrorView.source_slug == source_slug)
+                & (HarvestErrorView.harvest_run_id == run_id)
+            )
+            .order_by(HarvestErrorView.id)
+            .limit(50)
+        )
     )
-    errors = list(db.session.execute(errors_stmt).scalars())
 
     return render_template(
         "harvest/run_detail.html",
@@ -181,15 +194,17 @@ def run_detail(run_id: int):
     )
 
 
-@bp.route("/records/<int:record_id>", endpoint="record_detail")
+@bp.route("/records/<source_slug>/<int:record_id>", endpoint="record_detail")
 @admin_only
-def record_detail(record_id: int):
+def record_detail(source_slug: str, record_id: int):
     """One aggregated_record — canonical, sets, raw XML."""
-    rec = db.session.get(AggregatedRecord, record_id)
+    rec = db.session.get(AggregatedRecordView, (source_slug, record_id))
     if rec is None:
         abort(404)
 
-    project = db.session.get(UpgradeProject, rec.upgrade_project_id)
+    project = db.session.scalar(
+        select(UpgradeProject).where(UpgradeProject.slug == rec.source_slug)
+    )
     extracted = _json_or_none(rec.extracted_json) or {}
     canonical = (
         extracted.get("canonical", {})

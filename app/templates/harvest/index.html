@@ -54,9 +54,9 @@
       {% for run in runs %}
         <tr>
           <td>
-            <a href="{{ url_for('harvest.run_detail', run_id=run.id) }}">#{{ run.id }}</a>
+            <a href="{{ url_for('harvest.run_detail', source_slug=run.source_slug, run_id=run.id) }}">#{{ run.id }}</a>
           </td>
-          <td>{% if run.upgrade_project %}<code>{{ run.upgrade_project.slug }}</code>{% else %}—{% endif %}</td>
+          <td><code>{{ run.source_slug }}</code></td>
           <td><code>{{ run.metadata_prefix }}</code></td>
           <td>
             <span class="status status--{{ run.status }}">{{ run.status }}</span>

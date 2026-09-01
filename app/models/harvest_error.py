@@ -27,11 +27,13 @@ class HarvestError(db.Model):
     """One per-record error during a harvest run."""
 
     __tablename__ = "harvest_errors"
+    # Per-source schema — see AggregatedRecord / docs/partner-schema-design.md.
+    __table_args__ = ({"schema": "source"},)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     harvest_run_id: Mapped[int] = mapped_column(
         Integer,
-        ForeignKey("harvest_runs.id", ondelete="CASCADE"),
+        ForeignKey("source.harvest_runs.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )

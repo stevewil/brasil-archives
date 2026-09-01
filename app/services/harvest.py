@@ -39,6 +39,7 @@ from ..models.harvest_run import (
 )
 from . import oai_client
 from .oai_extractors import extract as extract_metadata
+from .sources import bind_source
 
 
 log = logging.getLogger(__name__)
@@ -140,6 +141,9 @@ def run_harvest(
     try:
         project = _load_project(project_slug)
         summary.upgrade_project_id = project.id
+        # Route every source.* write below into this source's schema
+        # (src_<slug> on Postgres; no-op on SQLite / the test suite).
+        bind_source(project_slug)
         _validate_prefix(project, metadata_prefix)
 
         base_url = project.oai_pmh_base_url

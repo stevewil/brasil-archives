@@ -14,6 +14,7 @@ from app import create_app
 from app.extensions import db as _db
 from app.models import Archive, InstitutionalType
 from app.services import scoring as svc
+from app.services.sources import drop_source_views, rebuild_source_views
 from scripts import load_vocabularies
 
 
@@ -23,6 +24,7 @@ def public_app():
     app.config["ADMIN_UI_ENABLED"] = False
     with app.app_context():
         _db.create_all()
+        rebuild_source_views(_db.engine)
         load_vocabularies.load_all()
         federal = _db.session.scalar(
             select(InstitutionalType).where(
@@ -44,6 +46,7 @@ def public_app():
         _db.session.commit()
         yield app
         _db.session.remove()
+        drop_source_views(_db.engine)
         _db.drop_all()
 
 
@@ -58,7 +61,7 @@ def public_client(public_app):
 
 @pytest.mark.parametrize(
     "path",
-    ["/harvest/", "/harvest/runs/1", "/harvest/records/1"],
+    ["/harvest/", "/harvest/runs/mipibu/1", "/harvest/records/mipibu/1"],
 )
 def test_harvest_routes_404_without_admin(public_client, path):
     assert public_client.get(path).status_code == 404

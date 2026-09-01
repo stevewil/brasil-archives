@@ -36,6 +36,7 @@ import urllib.request
 
 from ..extensions import db
 from ..models import FederationCache, UpgradeProject
+from .sources import bind_source
 
 
 log = logging.getLogger(__name__)
@@ -234,6 +235,9 @@ def _fetch(
         raise FederationUnavailable(
             f"project {project.slug!r} has no json_api_base_url configured"
         )
+
+    # Route federation_cache reads/writes into this source's schema.
+    bind_source(project.slug)
 
     base = project.json_api_base_url.rstrip("/")
     url = _build_url(base, path, params)
