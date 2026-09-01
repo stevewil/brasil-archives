@@ -21,13 +21,27 @@ Run the suite against it:
 TEST_DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/app_test .venv/bin/pytest
 ```
 
-Run the app against it:
+Run the app against it — with a **snapshot of real production data**:
+
+```bash
+scripts/dev/refresh-local-db.sh          # pg_dump prod over SSH -> local `app` db
+# then in .env:
+#   DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/app
+.venv/bin/flask run
+```
+
+`refresh-local-db.sh` is read-only on prod (`pg_dump` only). It drops and
+recreates the local `app` database and loads a point-in-time copy —
+schema, all data, every schema including `src_<slug>`, and the
+`alembic_version` stamp (so `flask db upgrade` is a no-op against the
+copy). It's a **snapshot, not a live link** — re-run the script whenever
+you want fresher data. Needs the SSH setup in §2.
+
+Or start from an empty schema instead of a prod copy:
 
 ```bash
 export DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/app
-.venv/bin/flask db upgrade
-.venv/bin/python -m scripts.load_vocabularies   # ...and the rest of the loaders
-.venv/bin/flask run
+.venv/bin/flask db upgrade && .venv/bin/python -m scripts.load_vocabularies   # + the rest
 ```
 
 CI's `tests-postgres` job runs the full suite on `postgres:10` on every push.
@@ -75,14 +89,8 @@ of the Docker PG on 5432.
 
 ### Refreshing local Docker with real prod data
 
-```bash
-# on cPanel (venv active): pg_dump 10 matches the server
-pg_dump --no-owner --no-privileges -Fc \
-  --dbname="$(grep DATABASE_URL .env | sed 's/^DATABASE_URL=//')" -f /tmp/prod.dump
-# download it, then locally:
-docker compose up -d db
-docker exec -i ba-pg10 pg_restore --no-owner --clean --if-exists -d app < prod.dump
-```
+`scripts/dev/refresh-local-db.sh` (see §1) does the whole dump-over-SSH →
+restore-into-`app` in one command. Nothing in it can write to prod.
 
 ## ⚠️ Never point the test suite at the tunnel
 
