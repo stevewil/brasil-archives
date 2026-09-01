@@ -207,10 +207,19 @@ endpoint, created date, rotation-due date.
 
 ---
 
-## 9. Concrete: brasil-archives  *(do this first — it unblocks the current backup work)*
+## 9. Concrete: brasil-archives  —  **DONE 2026-09-01**
+
+Provisioned with `scripts/ops/wasabi_provisioner.py` (admin cred = the root
+key then in `.env`):
+
+```
+python scripts/ops/wasabi_provisioner.py provision \
+  --group grp-brasil-archives-backup --user srv-brasil-archives-backup \
+  --buckets brasil-archives --prefix pg --no-delete
+```
 
 - **Group** `grp-brasil-archives-backup`
-- **User** `srv-brasil-archives-backup`
+- **User** `srv-brasil-archives-backup` (key id `DAD…`)
 - **Policy** `grp-brasil-archives-backup-policy`:
 
 ```json
@@ -228,24 +237,25 @@ endpoint, created date, rotation-due date.
 }
 ```
 
-- New key pair → **cPanel `.env`** + **local `.env`** (`WASABI_ACCESS_KEY_ID`,
-  `WASABI_SECRET_ACCESS_KEY`) + **Proton Pass**.
-- Verify: `python -m scripts.backup_to_wasabi --selftest`, then one real
-  `python -m scripts.backup_to_wasabi` run so a backup exists under the new
-  key. (`--selftest` will log that it couldn't delete its probe — expected,
-  no Delete; the lifecycle rule expires it.)
+**Verified 2026-09-01:** key pair swapped into cPanel `.env` + local `.env`
+(root key no longer in either). `--selftest` PASSED. Scope checks:
+`DeleteObject` → AccessDenied ✓, listing the bucket outside `pg/` →
+AccessDenied ✓, `pg/*` put/list/get → OK ✓. One real `pgdump` backup made
+under the new key (`pg/brasil-public-2026-09-01T23-15-20Z.dump.enc`).
+Still **→ Proton Pass** (record "Wasabi — srv-brasil-archives-backup").
 
 ---
 
 ## 10. Rollout checklist
 
+- [x] `wasabi_provisioner.py` → `scripts/ops/` (with `--prefix` + `--no-delete` + `rotate`)
+- [x] **brasil-archives** identity provisioned, cut over (cPanel + local `.env`), `--selftest` + scope checks green, real backup made
+- [ ] Proton Pass record "Wasabi — srv-brasil-archives-backup"
 - [ ] Complete the §3 inventory (mpa + ajme bucket names / regions / needs)
 - [ ] Phase 0: `srv-ops-admin` + `grp-iam-admin`
-- [ ] `wasabi_provisioner.py` → `scripts/ops/`, add `--prefix` + `--no-delete`
-- [ ] **brasil-archives** identity provisioned, cut over, `--selftest` green  ← current work
 - [ ] media-pipeline-agent identities provisioned + cut over
 - [ ] ajme identity provisioned + cut over
-- [ ] shared portfolio key deleted
+- [ ] shared portfolio key (`MMR…`) deleted — after mpa/ajme move
+- [ ] second root key (`PJD…`) deleted once `srv-ops-admin` exists
 - [ ] root account: `0` access keys, TOTP MFA enabled
-- [ ] Proton Pass record for every identity
 - [ ] each backup bucket: lifecycle rule for retention (see `docs/wasabi-backup.md` §6)

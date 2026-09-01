@@ -526,9 +526,19 @@ def object_key(cfg: Config, *, selftest: bool = False) -> str:
 # commands
 # --------------------------------------------------------------------------- #
 
+def _looks_local(url: str) -> bool:
+    return any(h in url for h in ("@localhost", "@127.0.0.1", "@::1", "@db:", "@db/"))
+
+
 def cmd_run(cfg: Config, *, dry_run: bool, keep: str | None) -> int:
     if cfg.mode not in ("python", "pgdump"):
         _die(f"BACKUP_MODE must be 'python' or 'pgdump', got {cfg.mode!r}")
+    if (not dry_run and _looks_local(cfg.database_url)
+            and os.environ.get("BACKUP_ALLOW_LOCAL") != "1"):
+        _die(f"DATABASE_URL points at a local/dev database "
+             f"({cfg.database_url.split('@', 1)[-1][:40]}…) — refusing to upload "
+             "it as a production backup. Use --dry-run, or set BACKUP_ALLOW_LOCAL=1 "
+             "if you really mean to.")
     if not dry_run:
         cfg.require_wasabi()
     dump = python_dump(cfg) if cfg.mode == "python" else pg_dump(cfg)

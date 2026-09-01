@@ -123,6 +123,16 @@ def test_pg_dump_requires_postgres(cfg, monkeypatch):
         b.pg_dump(b.Config())
 
 
+def test_cmd_run_refuses_local_db(monkeypatch):
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://p:p@localhost:5432/app")
+    monkeypatch.delenv("BACKUP_ALLOW_LOCAL", raising=False)
+    with pytest.raises(SystemExit):
+        b.cmd_run(b.Config(), dry_run=False, keep=None)
+    # opt-out env var lets it through the guard (fails later on real Wasabi/pg_dump)
+    assert b._looks_local("postgresql://p:p@127.0.0.1/app")
+    assert not b._looks_local("postgresql://p:p@aws-0.pooler.example.com/db")
+
+
 # --------------------------------------------------------------------------- #
 # upload — boto3 stubbed
 # --------------------------------------------------------------------------- #
