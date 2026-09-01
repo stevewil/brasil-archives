@@ -68,8 +68,17 @@ TEST_DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/app_test
 docker compose down                # add -v to wipe the volume
 ```
 
-CI runs the full suite on `postgres:10` on every push. For running the app
-on Postgres and for an SSH tunnel to inspect real production data, see
+To run the **app** against a snapshot of real production data:
+
+```bash
+./database-update.sh              # starts Docker PG, pulls a fresh pg_dump of prod over SSH
+# then in .env:  DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/app
+.venv/bin/flask run
+```
+
+`./database-update.sh` is read-only on production; re-run it whenever the
+local copy feels stale. CI runs the full suite on `postgres:10` on every
+push. Full detail (SSH setup, tunnel for live `psql` inspection):
 [docs/dev-postgres.md](docs/dev-postgres.md).
 
 ## Related
