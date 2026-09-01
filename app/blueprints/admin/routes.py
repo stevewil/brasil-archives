@@ -9,7 +9,7 @@ from typing import Any
 
 from flask import Blueprint, render_template
 from flask_babel import lazy_gettext as _l
-from sqlalchemy import func, select
+from sqlalchemy import func, inspect, select, text
 
 from ...extensions import db
 from ...models import (
@@ -134,6 +134,36 @@ def _recent_harvest_errors() -> list[HarvestErrorView]:
     )
 
 
+def _storage_info() -> dict[str, Any]:
+    """Which database this app is actually talking to — the answer to
+    "are we on Supabase yet?". Host is shown without credentials."""
+    engine = db.engine
+    url = engine.url
+    info: dict[str, Any] = {
+        "dialect": engine.dialect.name,
+        "host": url.host or "(local file)",
+        "database": url.database,
+    }
+    # A failed query would poison the request's transaction on Postgres —
+    # check table existence first rather than catching.
+    insp = inspect(engine)
+    info["revision"] = (
+        db.session.scalar(text("select version_num from alembic_version"))
+        if insp.has_table("alembic_version")
+        else None
+    )
+    if engine.dialect.name == "postgresql":
+        info["source_schemas"] = list(
+            db.session.scalars(text(
+                "select schema_name from information_schema.schemata "
+                "where schema_name like 'src\\_%' order by 1"
+            ))
+        )
+    else:
+        info["source_schemas"] = []
+    return info
+
+
 def _federation_health() -> list[dict[str, Any]]:
     projects = db.session.scalars(
         select(UpgradeProject).order_by(UpgradeProject.name)
@@ -148,6 +178,7 @@ def index():
     return render_template(
         "admin/index.html",
         page_title=_l("Admin dashboard"),
+        storage=_storage_info(),
         coverage=_scoring_coverage(),
         probe=_probe_status(),
         harvest_runs=_recent_harvest_runs(),

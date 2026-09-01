@@ -107,6 +107,11 @@ def create_app(config_name: str | None = None) -> Flask:
     # Simple health check for deploy monitoring
     @app.get("/healthz")
     def healthz() -> dict[str, str]:
-        return {"status": "ok", "app": app.config["APP_NAME"], "version": app.config["APP_VERSION"]}
+        return {
+            "status": "ok",
+            "app": app.config["APP_NAME"],
+            "version": app.config["APP_VERSION"],
+            "database": db.engine.dialect.name,  # "sqlite" | "postgresql"
+        }
 
     return app

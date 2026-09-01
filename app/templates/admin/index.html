@@ -10,6 +10,29 @@
 </section>
 
 <section class="admin-panel">
+  <h2>{{ _("Storage") }}</h2>
+  <dl class="summary-grid">
+    <dt>{{ _("Database") }}</dt>
+    <dd>
+      <strong>{{ storage.dialect }}</strong>
+      {% if storage.dialect == 'postgresql' %}({{ _("Supabase / Postgres") }}){% else %}({{ _("local SQLite") }}){% endif %}
+    </dd>
+    <dt>{{ _("Host") }}</dt>
+    <dd><code>{{ storage.host }}</code></dd>
+    <dt>{{ _("Migration revision") }}</dt>
+    <dd><code>{{ storage.revision or '—' }}</code></dd>
+    {% if storage.dialect == 'postgresql' %}
+    <dt>{{ _("Per-source schemas") }}</dt>
+    <dd>
+      {% if storage.source_schemas %}
+        {% for s in storage.source_schemas %}<code>{{ s }}</code>{% if not loop.last %}, {% endif %}{% endfor %}
+      {% else %}—{% endif %}
+    </dd>
+    {% endif %}
+  </dl>
+</section>
+
+<section class="admin-panel">
   <h2>{{ _("Scoring coverage") }}</h2>
   <dl class="summary-grid">
     <dt>{{ _("Pipeline-viable archives") }}</dt>

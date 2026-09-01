@@ -15,6 +15,7 @@ def test_healthz(client):
     payload = r.get_json()
     assert payload["status"] == "ok"
     assert payload["app"] == "brasil-archives"
+    assert payload["database"] in ("sqlite", "postgresql")
 
 
 def test_index_renders_en(client):
