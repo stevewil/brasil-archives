@@ -1,4 +1,4 @@
-"""Off-site encrypted backup of the Supabase ``public`` schema to Wasabi.
+"""Off-site encrypted backup of the production database to Wasabi.
 
 Weekly cron (see ``docs/wasabi-backup.md``). Standalone — imports nothing
 from ``app``; the Flask app never touches Wasabi. Deps are in
@@ -7,12 +7,15 @@ from ``app``; the Flask app never touches Wasabi. Deps are in
 
 Two dump modes (``BACKUP_MODE`` env, or ``--python`` / ``--pgdump``):
 
-* ``python`` (default) — SQLAlchemy reflects ``public.*``, ``SELECT *`` every
-  table in FK order, serialise to gzipped JSON. No client binary; version-
-  proof. Restore via ``--restore``. This is "the reseed IS the migration"
-  with real current rows.
-* ``pgdump`` — ``pg_dump --schema=public --no-owner --no-privileges -Fc``.
-  Needs a ``pg_dump`` whose major >= the server's. Restore with ``pg_restore``.
+* ``pgdump`` — ``pg_dump --no-owner --no-privileges -Fc`` of the **whole
+  database**: every schema (``public`` + the per-source ``src_<slug>``),
+  views, sequences. This is the prod mode — the cPanel box ships
+  ``pg_dump`` matching its own PostgreSQL server. Restore with ``--restore``
+  (or ``--decrypt`` then ``pg_restore``).
+* ``python`` — SQLAlchemy reflects ``public.*`` only, ``SELECT *`` every
+  table in FK order, gzipped JSON. No client binary, version-proof, works
+  on SQLite. **Does NOT capture the ``src_<slug>`` schemas** — dev / local
+  convenience only, not a full backup of the per-source prod DB.
 
 Then either way::
 
@@ -31,7 +34,7 @@ Usage::
     python -m scripts.backup_to_wasabi --list
     python -m scripts.backup_to_wasabi --fetch <key> <outfile>
     python -m scripts.backup_to_wasabi --decrypt <in.enc> <out>          # raw decrypt
-    python -m scripts.backup_to_wasabi --restore <in.enc> --target-url <URL>   # python mode only
+    python -m scripts.backup_to_wasabi --restore <in.enc> --target-url <URL>   # either mode
 
 Exit non-zero on any failure so cron email fires. Silent-ish on success.
 """
@@ -185,26 +188,47 @@ def _pg_url(database_url: str) -> str:
     return database_url.replace("postgresql+psycopg://", "postgresql://", 1)
 
 
+def _libpq_conn(database_url: str) -> tuple[str, dict]:
+    """(libpq URL, extra env). ``sslmode`` is moved out of the URI into
+    ``PGSSLMODE`` — PostgreSQL 10's libpq rejects ``sslmode=disable`` in a
+    connection URI (verified on the cPanel box) but honours the env var."""
+    url = _pg_url(database_url)
+    env: dict = {}
+    if "?" in url:
+        base, _, query = url.partition("?")
+        kept = []
+        for part in query.split("&"):
+            if part.lower().startswith("sslmode="):
+                env["PGSSLMODE"] = part.split("=", 1)[1]
+            elif part:
+                kept.append(part)
+        url = base + ("?" + "&".join(kept) if kept else "")
+    return url, env
+
+
 def pg_dump(cfg: Config) -> bytes:
     if not cfg.database_url:
         _die("DATABASE_URL is not set (needed for pg_dump)")
     if not cfg.database_url.startswith("postgresql"):
         _die(f"DATABASE_URL is not Postgres ({cfg.database_url.split('://', 1)[0]}://…) "
              "— nothing to back up here")
+    url, extra_env = _libpq_conn(cfg.database_url)
     with tempfile.NamedTemporaryFile(suffix=".dump", delete=False) as tf:
         tmp = Path(tf.name)
     try:
         cmd = [
             "pg_dump",
-            "--schema=public",
             "--no-owner",
             "--no-privileges",
             "--format=custom",
             f"--file={tmp}",
-            f"--dbname={_pg_url(cfg.database_url)}",
+            f"--dbname={url}",
         ]
-        _log("running pg_dump --schema=public …")
-        proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        _log("running pg_dump (whole database — all schemas) …")
+        proc = subprocess.run(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            env={**os.environ, **extra_env},
+        )
         if proc.returncode != 0:
             _die(f"pg_dump failed: {proc.stderr.decode(errors='replace').strip()}")
         data = tmp.read_bytes()
@@ -212,6 +236,35 @@ def pg_dump(cfg: Config) -> bytes:
             _die("pg_dump produced an empty file")
         _log(f"pg_dump ok — {len(data):,} bytes (custom format)")
         return data
+    finally:
+        tmp.unlink(missing_ok=True)
+
+
+def pg_restore(cfg: Config, dump: bytes, target_url: str, *, force: bool) -> None:
+    if not target_url:
+        _die("--restore needs --target-url")
+    if target_url == cfg.database_url and not force:
+        _die("--target-url equals DATABASE_URL — pass --force to overwrite it")
+    url, extra_env = _libpq_conn(target_url)
+    with tempfile.NamedTemporaryFile(suffix=".dump", delete=False) as tf:
+        tmp = Path(tf.name)
+        tmp.write_bytes(dump)
+    try:
+        cmd = [
+            "pg_restore", "--no-owner", "--no-privileges",
+            "--clean", "--if-exists", f"--dbname={url}", str(tmp),
+        ]
+        _log(f"running pg_restore into {url.split('@')[-1]} …")
+        proc = subprocess.run(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            env={**os.environ, **extra_env},
+        )
+        # pg_restore exits non-zero on ignorable errors (e.g. DROP ... IF
+        # EXISTS on a fresh DB); surface stderr but only die on empty output.
+        err = proc.stderr.decode(errors="replace").strip()
+        if proc.returncode != 0 and err:
+            _log(f"pg_restore warnings:\n{err}")
+        _log("pg_restore done")
     finally:
         tmp.unlink(missing_ok=True)
 
@@ -496,11 +549,13 @@ def cmd_run(cfg: Config, *, dry_run: bool, keep: str | None) -> int:
 
 
 def cmd_restore(cfg: Config, infile: str, target_url: str, *, force: bool) -> int:
-    if cfg.mode != "python":
-        _die("--restore is for python-mode dumps; for pgdump mode use "
-             "`--decrypt <in> <out>` then `pg_restore --no-owner --dbname <db> <out>`")
     blob = decrypt_bytes(cfg, Path(infile).read_bytes())
-    python_restore(cfg, blob, target_url, force=force)
+    # Detect the payload rather than trusting BACKUP_MODE — gzip magic
+    # 1f 8b => the python logical dump; anything else => a pg_dump archive.
+    if blob[:2] == b"\x1f\x8b":
+        python_restore(cfg, blob, target_url, force=force)
+    else:
+        pg_restore(cfg, blob, target_url, force=force)
     return 0
 
 

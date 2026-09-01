@@ -1,13 +1,20 @@
-# Wasabi off-site backup — encrypted logical dump of the `public` schema
+# Wasabi off-site backup — encrypted `pg_dump` of the production database
 
-**Status:** BUILT + fully verified from local (2026-08-31), incl. an end-to-end
-loop (dump → encrypt → upload → fetch → restore) against the live bucket using
-the **current SQLite prod data**. Not yet wired: the weekly cron, the bucket
-lifecycle rule, and (still open) whether to start the cron *now* against SQLite
-prod or wait for cutover.
+> **UPDATE 2026-09-01 — prod mode is now `pgdump`.** The cutover landed on
+> the cPanel host's own **PostgreSQL 10.23**, and its `pg_dump 10.23`
+> matches that server exactly. `BACKUP_MODE=pgdump` now dumps the **whole
+> database** (all schemas: `public` + `src_mipibu` + `src_povos_indigenas_rn`,
+> plus views and sequences) — verified 2026-09-01 by a dump → restore into a
+> scratch DB with every count matching prod. The old `python` logical-dump
+> mode reflects `public.*` only and **misses the `src_<slug>` schemas
+> entirely** — it's dev/SQLite convenience now, not a prod backup. Sections
+> below that describe `python` as the default are pre-cutover history.
+
+**Status:** code done + fidelity-verified. Not yet wired: the weekly cron
+and the bucket lifecycle rule.
 **Resolves:** migration-spec **D8** (free-tier backup strategy).
 
-## Approach (changed 2026-08-31)
+## Approach (pre-cutover history — see the UPDATE above)
 
 `pg_dump`'s major must be ≥ the server's. The cPanel box only has `pg_dump`
 `10.23` and no newer client is installable there. So the **default mode is a

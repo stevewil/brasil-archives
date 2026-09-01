@@ -103,6 +103,20 @@ def test_pg_url_strips_driver_tag():
     assert b._pg_url("postgresql://u@h/db") == "postgresql://u@h/db"
 
 
+def test_libpq_conn_moves_sslmode_to_env():
+    url, env = b._libpq_conn(
+        "postgresql+psycopg://u:p@localhost:5432/db?sslmode=disable"
+    )
+    assert url == "postgresql://u:p@localhost:5432/db"
+    assert env == {"PGSSLMODE": "disable"}
+    # other params kept, no query -> untouched
+    url, env = b._libpq_conn("postgresql://u@h/db?connect_timeout=5&sslmode=require")
+    assert url == "postgresql://u@h/db?connect_timeout=5"
+    assert env == {"PGSSLMODE": "require"}
+    url, env = b._libpq_conn("postgresql://u@h/db")
+    assert url == "postgresql://u@h/db" and env == {}
+
+
 def test_pg_dump_requires_postgres(cfg, monkeypatch):
     monkeypatch.setenv("DATABASE_URL", "sqlite:///instance/x.db")
     with pytest.raises(SystemExit):
