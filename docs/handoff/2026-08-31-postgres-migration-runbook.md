@@ -28,48 +28,46 @@ docker run -d --name ba-pg -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:1
 
 ---
 
-## Phase 0 — setup
+## Phase 0 — setup  ·  DONE 2026-08-31
 
-- [ ] `git switch -c postgres-migration`
-- [ ] `docker run … postgres:16` (above); confirm `psql`-less connect via
-      `python -c "import psycopg"` after step 1a-1.
-- [ ] Skim the two specs' decision tables so the rest is mechanical.
+- [x] `git switch -c postgres-migration`
+- [x] `docker run -d --name ba-pg -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:16`
+      (PostgreSQL 16.15). Local URL
+      `postgresql+psycopg://postgres:postgres@localhost:5432/brasil` (or `/test`).
+- [x] Specs skimmed.
 
 ---
 
-## Phase 1a — dialect-agnostic core + CI  ·  spec §9.1 (1–2, 6), §5
+## Phase 1a — dialect-agnostic core + CI  ·  DONE 2026-08-31 (commit `2d8513f`)
 
-No behaviour change; SQLite stays the default. Branch only, zero prod impact.
+No behaviour change; SQLite stays the default.
 
-- [ ] **1a-1** `requirements.txt` += `psycopg[binary]>=3.1,<4.0`. `pip install -r requirements.txt` locally.
-- [ ] **1a-2** `app/config.py` — add `SQLALCHEMY_ENGINE_OPTIONS` **only when the
-      URL starts with `postgresql`** (spec §4.2): `poolclass=NullPool`
-      (gate on `DB_NULLPOOL` if you want local pooling), `pool_pre_ping=True`,
-      `connect_args={"connect_timeout": 10, "options": "-c statement_timeout=15000"}`.
-      Keep `TestingConfig` on `sqlite:///:memory:`.
-- [ ] **1a-3** `migrations/env.py` — `include_schemas=True`,
-      `version_table_schema="public"`, and when the bind is SQLite apply
-      `schema_translate_map` for the symbolic schema `"source"` → `None`
-      (spec §6.4 / partner-schema-design §7.2). Add a stub `include_object`
-      that already skips a `src_*` / `"source"` schema (finished in 1b).
-- [ ] **1a-4** Audit the 5 migrations — all use `op.batch_alter_table`. Confirm
-      each batch block is only index create/drop (no `recreate='always'`, no
-      column-copy semantics) → safe on PG as plain `ALTER TABLE` (spec §7.1).
-      Fix only if the audit finds a real SQLite-ism.
-- [ ] **1a-5** `.github/workflows/ci.yml` — **new file** (no `.github/` today).
-      Two jobs:
-      - `tests-sqlite`: `pip install -r requirements-dev.txt && pytest` (the
-        current default suite).
-      - `tests-postgres`: `services: postgres:16`,
-        `DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/test`,
-        `FLASK_APP=wsgi.py flask db upgrade` then `pytest`.
-      Trigger on push + PR.
-- [ ] **1a-6** Local PG run: `DATABASE_URL=…localhost… flask db upgrade` →
-      seed sequence (spec §7.2) → `pytest`. Fix dialect-difference failures —
-      expect result-order-without-`ORDER BY`, `LIKE` case sensitivity, id-reuse
-      assumptions, timestamp string asserts (spec §7.3). Keep the fixes
-      backend-neutral so the SQLite suite stays green.
-- [ ] **1a-7** Both CI jobs green. **Commit + push.** ✅ *Milestone: suite green on SQLite and Postgres.*
+- [x] **1a-1** `requirements.txt` += `psycopg[binary]>=3.1,<4.0`.
+- [x] **1a-2** `app/config.py` — `SQLALCHEMY_ENGINE_OPTIONS` for Postgres URLs
+      (NullPool by default, `DB_NULLPOOL=0` opts out; pre-ping; connect +
+      statement timeout). `TestingConfig` reads `TEST_DATABASE_URL` (else
+      `sqlite:///:memory:`), engine options forced empty.
+- [x] **1a-3** `migrations/env.py` — `include_schemas=True`,
+      `version_table_schema="public"` on PG, `schema_translate_map({"source":
+      None})` on SQLite, `include_object` skips `*_all` views + `src_*` /
+      `"source"` schema objects.
+- [x] **1a-4** Migrations audited — every `batch_alter_table` block is only
+      add/drop column or index → safe as plain `ALTER TABLE` on PG.
+      **No migration changes needed.**
+- [x] **1a-5** `.github/workflows/ci.yml` (new) — `tests-sqlite` +
+      `tests-postgres` (`services: postgres:16`; also runs `flask db upgrade`
+      + the seed sequence against a fresh PG database). `pybabel compile` step
+      in both (the `.mo` files are gitignored and the i18n tests need them).
+- [x] **1a-6** Local PG run green. Two dialect fixes:
+      `app/oai/queries.py::earliest_datestamp()` (SQLite `date()` → str,
+      PG `date()` → `datetime.date` — coerce); `tests/test_admin_dashboard.py`
+      `_seed_one_archive` made idempotent (the `admin_app` + `public_app`
+      fixtures share one DB on Postgres). No result-order / `LIKE` /
+      id-reuse failures surfaced.
+- [x] **1a-7** `pytest` green on **both** SQLite and Postgres (346 passed,
+      4 skipped, each backend). **Committed `2d8513f`.** ⚠️ push blocked in
+      this env — `git push -u origin postgres-migration` by hand.
+      ✅ *Milestone: suite green on SQLite and Postgres.*
 
 ---
 
