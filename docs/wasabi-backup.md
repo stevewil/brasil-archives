@@ -156,7 +156,7 @@ unreliable.
   charge). The script's Wasabi key therefore needs **no `DeleteObject`**.
 - **Versioning ON** — the corruption net (a bad dump overwriting a key still
   leaves the prior version for 30 days).
-- **Key scope:** the key in `.env` (`MMRUUUUIX2AJZFD85Y7P`) currently has
+- **Key scope:** the key in `.env` (`WASABI_ACCESS_KEY_ID`) currently has
   **`DeleteObject`** — the `--selftest` cleaned up its own probe. That's fine
   for `--selftest` but the backup cron never needs delete (retention is the
   lifecycle rule). A bucket-scoped sub-user (`Get`/`Put`/`List` only, no
