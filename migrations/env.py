@@ -51,6 +51,19 @@ def get_metadata():
     return target_db.metadata
 
 
+# Per-source partner schemas (docs/partner-schema-design.md): the four
+# per-source models carry a symbolic schema ``"source"`` that is rewritten
+# to ``src_<slug>`` at runtime, and the ``*_all`` views are not
+# Alembic-managed. Autogenerate must never diff any of those.
+def include_object(obj, name, type_, reflected, compare_to):
+    schema = getattr(obj, "schema", None)
+    if schema and (schema == "source" or schema.startswith("src_")):
+        return False
+    if type_ == "table" and getattr(obj, "info", {}).get("is_view"):
+        return False
+    return True
+
+
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
 
@@ -65,7 +78,11 @@ def run_migrations_offline():
     """
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
-        url=url, target_metadata=get_metadata(), literal_binds=True
+        url=url,
+        target_metadata=get_metadata(),
+        literal_binds=True,
+        include_schemas=True,
+        include_object=include_object,
     )
 
     with context.begin_transaction():
@@ -97,9 +114,19 @@ def run_migrations_online():
     connectable = get_engine()
 
     with connectable.connect() as connection:
+        is_sqlite = connection.dialect.name == "sqlite"
+        if is_sqlite:
+            # SQLite has no schemas: collapse the symbolic per-source
+            # namespace so "source.*" tables resolve to bare names.
+            connection = connection.execution_options(
+                schema_translate_map={"source": None}
+            )
         context.configure(
             connection=connection,
             target_metadata=get_metadata(),
+            include_schemas=True,
+            include_object=include_object,
+            version_table_schema=None if is_sqlite else "public",
             **conf_args
         )
 

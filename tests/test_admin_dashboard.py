@@ -19,6 +19,11 @@ def _seed_one_archive(app):
     with app.app_context():
         _db.create_all()
         load_vocabularies.load_all()
+        # Idempotent: on SQLite each app gets its own :memory: DB, but on a
+        # shared Postgres (TEST_DATABASE_URL) the admin_app + public_app
+        # fixtures hit the same DB, so the second seed would collide.
+        if _db.session.scalar(select(Archive).where(Archive.slug == "rn-labim-t1r1")):
+            return
         federal = _db.session.scalar(
             select(InstitutionalType).where(
                 InstitutionalType.slug == "federal-university"

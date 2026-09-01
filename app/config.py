@@ -14,6 +14,37 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 INSTANCE_DIR = BASE_DIR / "instance"
 
 
+def _engine_options(uri: str) -> dict:
+    """SQLAlchemy engine options, Postgres only.
+
+    On cPanel the app runs under Passenger prefork; a socket-based
+    connection pool inherited across a fork is a hazard. The robust
+    answer for a low-traffic catalog site is to not pool in the app and
+    let Supabase's Supavisor pooler do it — hence ``NullPool`` by
+    default whenever the URL is Postgres. Set ``DB_NULLPOOL=0`` to keep
+    normal pooling (useful against a local Postgres in dev).
+
+    ``pool_pre_ping`` recycles connections dropped by the pooler; the
+    ``connect_args`` cap a hung connect and a runaway query. TLS comes
+    from ``?sslmode=require`` in ``DATABASE_URL`` (see
+    docs/supabase-migration-spec.md §4).
+    """
+    if not uri.startswith("postgresql"):
+        return {}
+    opts: dict = {
+        "pool_pre_ping": True,
+        "connect_args": {
+            "connect_timeout": 10,
+            "options": "-c statement_timeout=15000",
+        },
+    }
+    if os.environ.get("DB_NULLPOOL", "1") != "0":
+        import sqlalchemy.pool
+
+        opts["poolclass"] = sqlalchemy.pool.NullPool
+    return opts
+
+
 class BaseConfig:
     """Shared defaults."""
 
@@ -25,6 +56,7 @@ class BaseConfig:
         f"sqlite:///{INSTANCE_DIR / 'brasil_archives.db'}",
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = _engine_options(SQLALCHEMY_DATABASE_URI)
 
     # Babel — bilingual PT/EN, translations added later
     BABEL_DEFAULT_LOCALE = os.environ.get("BABEL_DEFAULT_LOCALE", "en")
@@ -72,8 +104,15 @@ class DevelopmentConfig(BaseConfig):
 class TestingConfig(BaseConfig):
     TESTING = True
     DEBUG = False
-    # Isolated in-memory DB per test run
-    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    # Default: isolated in-memory SQLite per test run. Set TEST_DATABASE_URL
+    # to run the suite against a real Postgres (the CI fidelity job, or a
+    # local `docker run postgres`). Engine options are forced empty here —
+    # the base class computed them from DATABASE_URL, and NullPool /
+    # statement_timeout are wrong for a fast test loop.
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        "TEST_DATABASE_URL", "sqlite:///:memory:"
+    )
+    SQLALCHEMY_ENGINE_OPTIONS: dict = {}
     WTF_CSRF_ENABLED = False
     SECRET_KEY = "testing-secret"
     # Exercise the full internal UI by default; the gate itself is
