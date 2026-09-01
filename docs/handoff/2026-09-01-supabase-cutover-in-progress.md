@@ -38,7 +38,16 @@ Passenger restarted and the site kept serving (proves zero SQLite
 dependency). The `.env` fallback comment was updated to point at the
 renamed snapshot.
 
-## Resume here — decommission Supabase, wire the backup
+**Wasabi backup wired + DR-verified 2026-09-01 ~19:45 UTC** (`c9e557a`):
+`BACKUP_MODE=pgdump` now dumps the whole DB (all schemas). Deps installed
+on cPanel, first backup uploaded
+(`pg/brasil-public-2026-09-01T19-42-36Z.dump.enc`), weekly cron live
+(`0 4 * * 0` → `~/logs/wasabi-backup.log`). Full DR drill passed: fetch
+from Wasabi → decrypt → `pg_restore` into a scratch DB → every count
+matched prod. Still TODO: the Wasabi bucket **lifecycle rule** (retention
+— `docs/wasabi-backup.md` §6, a Wasabi-console task).
+
+## Resume here — rotate secrets, decommission Supabase
 
 1. **Cut ties with Supabase** (Steve decided 2026-09-01: **delete** the
    project, not pause):
@@ -55,27 +64,19 @@ renamed snapshot.
      `docs/handoff/2026-08-31-postgres-migration-runbook.md` (check off
      Phase 2, note the host pivot), `docs/DEPLOY.md` DB section (describe
      cPanel-local Postgres, not Supabase pooler URLs).
-2. **Fix the backup before trusting it** — `scripts/backup_to_wasabi.py`
-   `python_dump()` only reads the `_target_schema(engine)` schema
-   (`public` on Postgres). The harvested records live in
-   `src_mipibu` / `src_povos_indigenas_rn`, which it currently **misses
-   entirely**. Either switch `.env` to `BACKUP_MODE=pgdump` (pg_dump 10 on
-   the box matches this PG 10.23 server, so `--schema=public` still isn't
-   enough on its own — check `pg_dump`'s schema flags support multiple
-   `--schema` args or drop to no `--schema` filter for a full-DB dump) or
-   extend `python_dump`/`python_restore` to loop every registered
-   `src_<slug>` schema. Then wire the cron (`0 4 * * 0`) and test one
-   restore.
-3. **Rotate the remaining secrets** (see [[secrets-in-handoff-docs]]):
+2. **Rotate the remaining secrets** (see [[secrets-in-handoff-docs]]):
    Wasabi key pair (leaked ID), and — good hygiene, not leaked —
-   the cPanel PG password + `SECRET_KEY`. After each, update BOTH the
-   cPanel `.env` and the local repo `.env`, plus Proton Pass.
+   the cPanel PG password + `SECRET_KEY` + `BRASIL_ARCHIVES_BACKUP_KEY`
+   (bucket has exactly 1 backup, made 2026-09-01 19:42 — rotating the
+   encryption key now costs only that one). After each, update the cPanel
+   `.env` (and local `.env` for the Wasabi + backup keys), plus Proton
+   Pass. Then re-run `python -m scripts.backup_to_wasabi` so a backup
+   exists under the new keys.
+3. **Wasabi lifecycle rule** — `docs/wasabi-backup.md` §6 (retention +
+   versioning), a Wasabi-console task.
 4. Update `LICENSING.md` (spec §9.4) with the data-handling note — the
    privacy posture is simpler now (no Data API / PostgREST layer to
    misconfigure; the DB is `localhost`-only, never network-exposed).
-5. Delete the now-resolved [[prod-db-gets-reseeded]] memory once the
-   Wasabi backup is verified working — the root cause (scripts not
-   loading `.env`) is fixed in `de44665`.
 
 ## Local dev access to the prod DB — WORKING
 
