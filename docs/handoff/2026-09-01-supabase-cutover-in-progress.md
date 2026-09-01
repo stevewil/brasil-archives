@@ -1,45 +1,104 @@
-# Handoff — 2026-09-01 · Supabase cutover BLOCKED (host firewall)
+# Handoff — 2026-09-01 · Postgres cutover LIVE (cPanel-local, not Supabase)
 
-**Status: cutover cannot complete on the current host.** The Namecheap
-shared box (`fromuagq@premium32`) permits **only outbound TCP :443**.
-Confirmed 2026-09-01 by socket test: the Supabase pooler is REFUSED on
-both `:5432` (session) and `:6543` (transaction) — CSF `TCP_OUT` allowlist,
-`Connection refused` (active reject, not a timeout). Direct Postgres from
-this host is not possible.
+**Status: prod is on Postgres.** Not Supabase — the Namecheap shared box
+only allows outbound `:443`, so the Supabase pooler was permanently
+unreachable (see History below). Pivoted to the **PostgreSQL 10.23
+instance cPanel itself offers** (`fromuagq_brasil-archives` db, localhost,
+no firewall in the way). `flask db upgrade` applied all 6 migrations
+clean, every loader + all 3 harvests ran, `/healthz` →
+`{"database":"postgresql","database_connected":true}`.
 
-**Site is back on SQLite** (rollback applied: sqlite `DATABASE_URL`
-un-commented, postgres line + `BRASIL_ARCHIVES_DB_CHECK=1` removed,
-restarted). Old `.db` was never touched.
+**Open question, not yet confirmed:** the loaders/harvest all reported
+insert 0 / unchanged, which means `fromuagq_brasil-archives` already held
+a full dataset *before* this run (from an earlier attempt) — the row
+counts below need one query to confirm they're right, not assumed.
 
-The code + Supabase project are fully ready (see UPDATE below) — this is
-purely a hosting-egress wall.
+## Resume here — finish the data, then cut ties with Supabase + SQLite
 
-## Recommended path — durability without Postgres
+Steve's ask: get all necessary data into the new Postgres DB, then fully
+decommission both Supabase and SQLite for this app.
 
-Stay on SQLite; wire the weekly encrypted Wasabi backup. Wasabi S3 is on
-:443, so it works through the firewall, and `scripts/backup_to_wasabi.py`
-`BACKUP_MODE=python` **already handles SQLite** (SQLAlchemy logical dump →
-gzip → AES-256-GCM → Wasabi). That solves the `prod-db-gets-reseeded`
-problem directly: recovery becomes "restore the last Wasabi dump", not
-"re-run every seed script + 2 harvests".
-
-- `pip install -r requirements-backup.txt` in the venv
-- append `WASABI_*` + `BRASIL_ARCHIVES_BACKUP_KEY` + `BACKUP_PREFIX=pg/` +
-  `BACKUP_MODE=python` to `~/flask/brasil-archives/.env` (values in the
-  repo's local `.env`)
-- `DATABASE_URL` stays the sqlite path (the dump reads it)
-- cron: `0 4 * * 0  cd ~/flask/brasil-archives && <venv>/bin/python -m scripts.backup_to_wasabi`
-- test a restore into a scratch file once (`--restore` / see `docs/wasabi-backup.md`)
-
-Move the live DB to Supabase only if the whole app later moves to a host
-with unrestricted outbound (a small VPS — Fly/Render/Hetzner). Nothing in
-the migration work is wasted; it just waits.
-
-Optional, low expectations: a Namecheap ticket asking to allow outbound
-:5432/:6543 to `aws-0-us-west-2.pooler.supabase.com`. Shared plans
-usually decline.
+1. **Verify the data is actually complete** — run on cPanel:
+   ```bash
+   PGPASSWORD="$(grep DATABASE_URL .env | sed -E 's#.*:([^:@]+)@.*#\1#')" psql -h localhost \
+     -U 'fromuagq_brasil-archives-user' -d 'fromuagq_brasil-archives' -c "
+   select 'archives' t, count(*) from archives
+   union all select 'dimension_scores (active)', count(*) from dimension_scores where superseded_at is null
+   union all select 'upgrade_projects', count(*) from upgrade_projects
+   union all select 'facet_values (active)', count(*) from facet_values where superseded_at is null
+   union all select 'aggregated_records_all', count(*) from aggregated_records_all;"
+   psql ... -c "\dn"   # expect public, src_mipibu, src_povos_indigenas_rn
+   ```
+   Target (matches the earlier Supabase verification): archives **80**,
+   dimension_scores **168**, upgrade_projects **2**, facet_values **47**,
+   aggregated_records_all **1161**. If short, re-run the specific loader —
+   they're all idempotent (`scripts/load_*`, `scripts/harvest.py`).
+2. **Browser spot-check**: `/`, `/search?q=terra`, `/search?q=Potiguara`,
+   `/archives/?q=jornal`, `/oai?verb=Identify`,
+   `/oai?verb=ListRecords&metadataPrefix=oai_dc`. Confirm scores stay
+   hidden (`BRASIL_ARCHIVES_PUBLIC_SCORES` unset).
+3. **Cut ties with SQLite**:
+   `mv instance/brasil_archives.db instance/brasil_archives.db.pre-pg-2026-09-01`
+   — confirms nothing can silently fall back to it. Old file already
+   untouched/unused since `DATABASE_URL` points at Postgres.
+4. **Cut ties with Supabase**:
+   - Stop pinging it: remove/disable the `brasil-archives` entry in
+     `C:\DEV\supabase-keepalive\keepalive.config.json` (leave the *other*
+     kept-warm project alone). See [[supabase-keepalive-deployed]].
+   - Decide fate of the `mwdjvwdpvdpscoxrzcwf` project — **pause, don't
+     delete** is the default recommendation (free, reversible, keeps the
+     already-verified seed as a reference/escape hatch); ask Steve to
+     confirm before deleting anything with real data in it.
+   - Sweep docs that still describe Supabase as the live-DB plan and mark
+     them superseded: `docs/supabase-migration-spec.md`,
+     `docs/partner-schema-design.md` (mechanism doc stays accurate — it's
+     Postgres-generic, just correct the "Supabase" framing),
+     `docs/handoff/2026-08-31-postgres-migration-runbook.md` (check off
+     Phase 2, note the host pivot), `docs/DEPLOY.md` DB section (describe
+     cPanel-local Postgres, not Supabase pooler URLs).
+5. **Fix the backup before trusting it** — `scripts/backup_to_wasabi.py`
+   `python_dump()` only reads the `_target_schema(engine)` schema
+   (`public` on Postgres). The harvested records live in
+   `src_mipibu` / `src_povos_indigenas_rn`, which it currently **misses
+   entirely**. Either switch `.env` to `BACKUP_MODE=pgdump` (pg_dump 10 on
+   the box matches this PG 10.23 server, so `--schema=public` still isn't
+   enough on its own — check `pg_dump`'s schema flags support multiple
+   `--schema` args or drop to no `--schema` filter for a full-DB dump) or
+   extend `python_dump`/`python_restore` to loop every registered
+   `src_<slug>` schema. Then wire the cron (`0 4 * * 0`) and test one
+   restore.
+6. Update `LICENSING.md` (spec §9.4) with the data-handling note — the
+   privacy posture is actually simpler now (no Data API / PostgREST layer
+   to misconfigure; the DB isn't network-exposed at all, only
+   `localhost`).
+7. Delete the now-resolved [[prod-db-gets-reseeded]] memory once the
+   Wasabi backup is verified working — the durability problem it
+   describes is fixed either way (Postgres survives a `git clean`; the
+   backup gives an off-site copy too).
 
 ---
+
+## History — the Supabase attempt (superseded)
+
+Kept for the record; none of this is the current plan.
+
+**Blocker discovered:** the Namecheap shared box (`fromuagq@premium32`)
+permits **only outbound TCP :443**. Confirmed by socket test: the
+Supabase pooler was REFUSED on both `:5432` (session) and `:6543`
+(transaction) — CSF `TCP_OUT` allowlist, `Connection refused` (active
+reject, not a timeout). Direct Postgres to Supabase from this host is not
+possible, full stop — no `.env` or code change fixes it.
+
+`supabase-py` (PostgREST over :443) was considered and rejected: it would
+require turning the Data API back on (undoing the D10 privacy decision
+that keeps the non-public scored judgments out of `public`'s REST
+surface), and the app's per-source-schema/ORM/migration code doesn't map
+onto PostgREST's query model — a rewrite, not a fix. See
+[[public-scores-and-admin-gates]], [[licensing-2026-08-29]].
+
+The pooler-safe connect fix (below) is still correct and still shipped —
+it's dialect-generic, not Supabase-specific, and is exactly what made the
+cPanel-local Postgres path work cleanly.
 
 ## UPDATE 2026-09-01 (later) — pooler-safe connect landed, awaiting cPanel run
 
