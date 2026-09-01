@@ -36,6 +36,7 @@ Phase 1 scaffolding — Flask app + SQLAlchemy models + Alembic migration in pla
 python -m venv .venv
 .venv/bin/pip install -r requirements-dev.txt
 cp .env.example .env
+git config core.hooksPath .githooks   # blocks committing a secret from your .env
 
 export FLASK_APP=wsgi.py
 .venv/bin/flask db upgrade                # create/migrate SQLite DB
