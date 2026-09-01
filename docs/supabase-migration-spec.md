@@ -350,7 +350,8 @@ manually.
 
 - **Unit suite stays on SQLite** (`sqlite:///:memory:`) — fast, no external
   service, 317 tests. The `schema_translate_map` keeps `harvest.*` working.
-- **New CI job — full suite on Postgres.** GitHub Actions `services: postgres:16`,
+- **New CI job — full suite on Postgres.** GitHub Actions `services: postgres:10`
+  (pinned to the production major — see the 2026-09-01 cutover handoff),
   `DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/test`,
   `flask db upgrade` then `pytest`. Runs on every push (it's ~1 min).
 - **Likely dialect-difference failures to expect and fix:**

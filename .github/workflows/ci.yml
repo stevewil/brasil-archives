@@ -23,7 +23,11 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16
+        # Pinned to 10 to match production: brasil-archives runs on the
+        # PostgreSQL 10.23 instance the cPanel host provides on localhost
+        # (the Supabase pooler is unreachable from that box). Testing on a
+        # newer major could pass a migration that then breaks prod.
+        image: postgres:10
         env:
           POSTGRES_PASSWORD: postgres
         ports:

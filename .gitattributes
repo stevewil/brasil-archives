@@ -4,6 +4,7 @@
 venv              text eol=lf
 github-pull       text eol=lf
 *.sh              text eol=lf
+*.sql             text eol=lf
 passenger_wsgi.py text eol=lf
 .githooks/*       text eol=lf
 

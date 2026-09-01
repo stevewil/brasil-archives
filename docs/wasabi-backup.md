@@ -313,8 +313,9 @@ SQLite prod data (dump → upload → fetch → restore, 1781 rows equal).
 3. **Regenerate `BRASIL_ARCHIVES_BACKUP_KEY`?** The generated value appeared in
    a chat transcript. If that matters, rotate it before the first real upload
    (nothing's encrypted with it yet that we'd lose).
-4. **Restore-drill scratch DB** — local Docker `postgres:16` vs SQLite vs a
-   Supabase branch (paid). SQLite is enough to prove the loop.
+4. **Restore-drill scratch DB** — local Docker `postgres:10`
+   (`docker compose up -d db`) vs SQLite. SQLite is enough to prove the loop;
+   PG 10 matches production.
 
 RESOLVED: bucket (`brasil-archives`, us-west-1); dump approach (`python`
 logical dump — cPanel has only `pg_dump 10`); encryption (built-in AES-256-GCM,

@@ -1,31 +1,38 @@
 #!/usr/bin/env bash
 # Pre-commit guard: block a commit that contains the literal value of any
-# secret currently sitting in a local .env* file.
+# SECRET-shaped variable in a local .env* file.
 #
 # Why this exists: two real secrets (a DB password, a Wasabi access key)
-# were hand-pasted into markdown handoff/design docs for "here's the exact
-# command to resume with" convenience, and committed straight to this
-# PUBLIC repo before anyone noticed. .env is gitignored specifically so
-# secrets never face commit pressure; this hook extends that same
-# protection to every other file in the diff, including docs. See the
-# secrets-in-handoff-docs project memory for the incident this closes.
+# reached this PUBLIC repo via hand-pasted values in handoff/design docs
+# before anyone noticed. .env is gitignored so secrets never face commit
+# pressure; this extends that protection to every other file in the diff,
+# including docs and the commit message. See the secrets-in-handoff-docs
+# project memory for the incident this closes.
 #
 # Enable once per clone:  git config core.hooksPath .githooks
 #
-# Deliberately dependency-free (portable sh, no npm/pip package) so it
-# runs the same on a fresh clone as on cPanel or CI.
+# Scope: only values whose VARIABLE NAME looks like a credential
+# (SECRET / PASSWORD / TOKEN / *_KEY / ACCESS_KEY / API_KEY / DATABASE_URL
+# / DSN / PRIVATE). Non-secret config (bucket names, endpoint URLs, locale
+# strings) is ignored so legitimate doc prose doesn't trip it. Throwaway
+# localhost credentials and values copied straight from .env.example are
+# also skipped.
+#
+# Dependency-free (portable sh) so it runs the same on a fresh clone, on
+# cPanel, and in CI.
 
 set -euo pipefail
 
-# Any KEY=VALUE line across every .env* file except templates. A real
-# .env is gitignored (never staged) but this also catches a `git add -f`.
+SECRET_NAME_RE='(SECRET|PASSWORD|PASSWD|_TOKEN|TOKEN_|^TOKEN$|_KEY$|_KEY_ID$|ACCESS_KEY|API_KEY|DATABASE_URL|_DSN$|PRIVATE)'
+
 env_files=$(find . -maxdepth 2 -name '.env*' \
     ! -name '.env.example' ! -name '.env.sample' ! -name '*.template' \
     2>/dev/null || true)
+[ -z "$env_files" ] && exit 0
 
-if [ -z "$env_files" ]; then
-    exit 0
-fi
+# Values present in the committed template are placeholders, never real.
+template_vals=""
+[ -f .env.example ] && template_vals=$(sed -n 's/^[A-Za-z_][A-Za-z0-9_]*=//p' .env.example)
 
 staged_diff=$(git diff --cached -U0 -- . ':(exclude).githooks/pre-commit')
 [ -z "$staged_diff" ] && exit 0
@@ -34,20 +41,23 @@ hit=0
 while IFS= read -r envfile; do
     [ -f "$envfile" ] || continue
     while IFS='=' read -r key value; do
-        # skip blanks/comments/keys with no value
         case "$key" in ''|'#'*) continue ;; esac
-        value="${value%%$'\r'}"   # strip a trailing CR (CRLF-saved .env)
-        # Only check values that look like a real secret, not a short
-        # flag/mode string (e.g. "production", "1", "en") that would just
-        # be noise and false-positive on legitimate doc prose.
-        if [ "${#value}" -lt 12 ]; then
+        # secret-shaped name only
+        printf '%s' "$key" | grep -qE "$SECRET_NAME_RE" || continue
+        value="${value%%$'\r'}"
+        [ "${#value}" -lt 12 ] && continue
+        # skip throwaway local creds and template placeholders
+        case "$value" in
+            *localhost*|*127.0.0.1*) continue ;;
+        esac
+        if [ -n "$template_vals" ] && printf '%s\n' "$template_vals" | grep -qxF -- "$value"; then
             continue
         fi
         if printf '%s' "$staged_diff" | grep -qF -- "$value"; then
-            echo "pre-commit: BLOCKED — the staged diff contains the literal value" >&2
-            echo "  of $key (from $envfile)." >&2
-            echo "  Reference the variable name instead of the value in anything" >&2
-            echo "  that gets committed (docs, code, commit messages)." >&2
+            echo "pre-commit: BLOCKED - staged diff contains the literal value of" >&2
+            echo "  $key (from $envfile)." >&2
+            echo "  Use the variable NAME, not the value, in anything committed" >&2
+            echo "  (docs, code, commit messages)." >&2
             hit=1
         fi
     done < "$envfile"
@@ -55,9 +65,8 @@ done <<< "$env_files"
 
 if [ "$hit" -ne 0 ]; then
     echo >&2
-    echo "pre-commit: fix the diff and re-commit, or in a real emergency:" >&2
-    echo "  git commit --no-verify   (only if you are CERTAIN this is a false positive)" >&2
+    echo "pre-commit: fix the diff and re-commit. Real false positive only:" >&2
+    echo "  git commit --no-verify" >&2
     exit 1
 fi
-
 exit 0

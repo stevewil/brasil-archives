@@ -343,7 +343,8 @@ the model covers new ones. Keep them in the same commit.
 
 ### 8.2 Postgres CI job (fidelity)
 
-New GitHub Actions job, `services: postgres:16`:
+New GitHub Actions job, `services: postgres:10` (pinned to match the
+cPanel-local production Postgres):
 ```
 flask db upgrade
 python -m scripts.load_vocabularies && … && python -m scripts.load_upgrade_projects

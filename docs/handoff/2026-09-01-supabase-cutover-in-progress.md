@@ -307,4 +307,4 @@ for label, ca in [('no-options', {'connect_timeout': 10}),
 | Supabase | ref `mwdjvwdpvdpscoxrzcwf`, PG 17.6, us-west-2, session pooler :5432, Data API OFF |
 | Rollback | in cPanel `.env`: un-comment the sqlite `DATABASE_URL` line, comment line 6, `touch tmp/restart.txt`. Old SQLite file untouched at `instance/brasil_archives.db`. |
 | Local test cmd | `DATABASE_URL="postgresql+psycopg://postgres.mwdjvwdpvdpscoxrzcwf:<PW>@aws-0-us-west-2.pooler.supabase.com:5432/postgres?sslmode=require" .venv/Scripts/python.exe -m pytest` etc. |
-| Docker PG for local dual-backend testing | `docker run -d --name ba-pg -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:16` then `TEST_DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/test` |
+| Local Postgres (matches prod major) | `docker compose up -d db` (PG 10) then `TEST_DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/app_test pytest`. CI (`postgres:10`) + full suite verified green on PG 10.21. |
