@@ -12,6 +12,7 @@ import pytest
 from sqlalchemy import select
 
 from app.extensions import db as _db
+from app.services.sources import drop_source_views
 from app.models import Archive, InstitutionalType, RecordType, UpgradeProject
 from scripts import load_vocabularies
 
@@ -427,4 +428,5 @@ def test_provider_is_public_without_admin():
             assert resp.status_code == 200
         finally:
             _db.session.remove()
+            drop_source_views(_db.engine)
             _db.drop_all()

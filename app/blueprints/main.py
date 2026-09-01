@@ -59,10 +59,10 @@ def search() -> str:
 
 
 def _aggregated_record_count() -> int:
-    from ..models import AggregatedRecord
+    from ..models._views import AggregatedRecordView
 
     return db.session.scalar(
-        select(func.count()).select_from(AggregatedRecord)
+        select(func.count()).select_from(AggregatedRecordView)
     ) or 0
 
 

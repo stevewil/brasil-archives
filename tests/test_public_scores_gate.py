@@ -20,6 +20,7 @@ from app import create_app
 from app.extensions import db as _db
 from app.models import Archive, InstitutionalType
 from app.services import scoring as svc
+from app.services.sources import drop_source_views, rebuild_source_views
 from scripts import load_vocabularies
 
 
@@ -33,6 +34,7 @@ def _make_app(*, public_scores: bool, admin: bool):
 def _seed(app):
     with app.app_context():
         _db.create_all()
+        rebuild_source_views(_db.engine)
         load_vocabularies.load_all()
         federal = _db.session.scalar(
             select(InstitutionalType).where(
@@ -75,6 +77,7 @@ def gated_app():
     yield app
     with app.app_context():
         _db.session.remove()
+        drop_source_views(_db.engine)
         _db.drop_all()
 
 
@@ -144,4 +147,5 @@ def test_scores_visible_when_either_flag_on(public_scores, admin):
     finally:
         with app.app_context():
             _db.session.remove()
+            drop_source_views(_db.engine)
             _db.drop_all()

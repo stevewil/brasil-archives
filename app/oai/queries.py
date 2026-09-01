@@ -121,7 +121,8 @@ def earliest_datestamp() -> str:
     value = db.session.scalar(
         _public_filter(select(func.min(func.date(Archive.updated_at))))
     )
-    return value or DATESTAMP_FLOOR
+    # SQLite's date() returns a str; Postgres' returns a datetime.date.
+    return str(value)[:10] if value else DATESTAMP_FLOOR
 
 
 def distinct_states() -> list[str]:

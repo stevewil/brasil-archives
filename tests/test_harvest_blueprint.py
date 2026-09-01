@@ -140,7 +140,7 @@ def test_index_shows_runs_and_rollups(client, sample_run):
     assert "mipibu" in body
     assert "oai_dc" in body
     # Run row link
-    assert f"/harvest/runs/{sample_run.id}" in body
+    assert f"/harvest/runs/mipibu/{sample_run.id}" in body
     assert "status--ok" in body
 
 
@@ -151,7 +151,7 @@ def test_index_when_empty(client, project):
 
 
 def test_run_detail_lists_records_and_errors(client, sample_run):
-    resp = client.get(f"/harvest/runs/{sample_run.id}")
+    resp = client.get(f"/harvest/runs/mipibu/{sample_run.id}")
     assert resp.status_code == 200
     body = resp.get_data(as_text=True)
     assert "oai:x:1" in body
@@ -165,7 +165,7 @@ def test_run_detail_lists_records_and_errors(client, sample_run):
 
 
 def test_run_detail_404_for_missing(client, project):
-    resp = client.get("/harvest/runs/99999")
+    resp = client.get("/harvest/runs/mipibu/99999")
     assert resp.status_code == 404
 
 
@@ -173,7 +173,7 @@ def test_record_detail_renders_canonical_and_raw(client, sample_run):
     rec = db.session.query(AggregatedRecord).filter_by(
         oai_identifier="oai:x:1"
     ).one()
-    resp = client.get(f"/harvest/records/{rec.id}")
+    resp = client.get(f"/harvest/records/mipibu/{rec.id}")
     assert resp.status_code == 200
     body = resp.get_data(as_text=True)
     assert "Sumário Crime 001" in body
@@ -184,7 +184,7 @@ def test_record_detail_renders_canonical_and_raw(client, sample_run):
 
 
 def test_record_detail_404_for_missing(client, project):
-    resp = client.get("/harvest/records/99999")
+    resp = client.get("/harvest/records/mipibu/99999")
     assert resp.status_code == 404
 
 

@@ -33,12 +33,14 @@ class FederationCache(db.Model):
     """One cached federation-v1 HTTP response."""
 
     __tablename__ = "federation_cache"
+    # Per-source schema — see AggregatedRecord / docs/partner-schema-design.md.
     __table_args__ = (
         UniqueConstraint(
             "upgrade_project_id",
             "cache_key",
             name="uq_federation_cache_project_key",
         ),
+        {"schema": "source"},
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)

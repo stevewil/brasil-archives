@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests-sqlite:
+    name: tests (SQLite)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      - run: pybabel compile -d app/translations
+      - run: pytest
+
+  tests-postgres:
+    name: tests + migrations (Postgres)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      FLASK_APP: wsgi.py
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      - run: pybabel compile -d app/translations
+
+      - name: create databases
+        run: |
+          createdb app_test
+          createdb migrate_check
+
+      - name: migrations + seed apply cleanly on Postgres
+        env:
+          DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/migrate_check
+        run: |
+          flask db upgrade
+          python -m scripts.load_vocabularies
+          python -m scripts.load_survey
+          python -m scripts.seed_povos_archive
+          python -m scripts.load_upgrade_projects
+          python -m scripts.load_calibration
+          python -m scripts.load_calibration --path configs/calibration/pass3.yaml
+
+      - name: pytest against Postgres
+        env:
+          TEST_DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/app_test
+        run: pytest

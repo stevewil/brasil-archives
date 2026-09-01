@@ -4,7 +4,7 @@
 {% block content %}
 <section class="page-header">
   <p>
-    <a href="{{ url_for('harvest.run_detail', run_id=record.harvest_run_id) }}">{{ _("← Harvest run #%(id)s", id=record.harvest_run_id) }}</a>
+    <a href="{{ url_for('harvest.run_detail', source_slug=record.source_slug, run_id=record.harvest_run_id) }}">{{ _("← Harvest run #%(id)s", id=record.harvest_run_id) }}</a>
   </p>
   <h1><code>{{ record.oai_identifier }}</code></h1>
   {% if canonical.title %}<p class="page-header__lede">{{ canonical.title }}</p>{% endif %}

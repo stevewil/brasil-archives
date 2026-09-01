@@ -35,6 +35,7 @@ from app.extensions import db  # noqa: E402
 from app.models import AggregatedRecord, UpgradeProject  # noqa: E402
 from app.services import oai_client  # noqa: E402
 from app.services.oai_extractors import extract as extract_metadata  # noqa: E402
+from app.services.sources import bind_source  # noqa: E402
 
 EXIT_USAGE = 64
 
@@ -67,6 +68,7 @@ def _metadata_element(raw_xml: str) -> ET.Element | None:
 
 
 def _reextract(project: UpgradeProject, prefix: str | None, dry_run: bool) -> tuple[int, int, int]:
+    bind_source(project.slug)  # route source.* into this source's schema (PG)
     q = db.session.query(AggregatedRecord).filter(
         AggregatedRecord.upgrade_project_id == project.id
     )
@@ -102,6 +104,7 @@ def main(argv: list[str] | None = None) -> int:
     with app.app_context():
         if args.list:
             for p in db.session.query(UpgradeProject).order_by(UpgradeProject.slug):
+                bind_source(p.slug)
                 n = db.session.query(AggregatedRecord).filter_by(
                     upgrade_project_id=p.id
                 ).count()

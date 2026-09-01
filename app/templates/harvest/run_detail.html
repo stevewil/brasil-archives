@@ -10,7 +10,7 @@
 <section class="run-meta">
   <dl class="kv">
     <dt>{{ _("Project") }}</dt>
-    <dd>{% if run.upgrade_project %}<code>{{ run.upgrade_project.slug }}</code>{% else %}—{% endif %}</dd>
+    <dd><code>{{ run.source_slug }}</code></dd>
     <dt>metadataPrefix</dt>
     <dd><code>{{ run.metadata_prefix }}</code></dd>
     <dt>{{ _("Status") }}</dt>
@@ -75,7 +75,7 @@
     <tbody>
       {% for row in record_rows %}
         <tr>
-          <td><a href="{{ url_for('harvest.record_detail', record_id=row.id) }}"><code>{{ row.oai_identifier }}</code></a></td>
+          <td><a href="{{ url_for('harvest.record_detail', source_slug=row.source_slug, record_id=row.id) }}"><code>{{ row.oai_identifier }}</code></a></td>
           <td>{{ row.title or '—' }}</td>
           <td>
             {% if row.year_start and row.year_end and row.year_start != row.year_end %}
@@ -92,11 +92,11 @@
 
   <nav class="pager">
     {% if has_prev %}
-      <a href="{{ url_for('harvest.run_detail', run_id=run.id, page=page - 1, page_size=page_size) }}">{{ _("← previous") }}</a>
+      <a href="{{ url_for('harvest.run_detail', source_slug=run.source_slug, run_id=run.id, page=page - 1, page_size=page_size) }}">{{ _("← previous") }}</a>
     {% endif %}
     <span>{{ _("page %(n)s", n=page) }}</span>
     {% if has_next %}
-      <a href="{{ url_for('harvest.run_detail', run_id=run.id, page=page + 1, page_size=page_size) }}">{{ _("next →") }}</a>
+      <a href="{{ url_for('harvest.run_detail', source_slug=run.source_slug, run_id=run.id, page=page + 1, page_size=page_size) }}">{{ _("next →") }}</a>
     {% endif %}
   </nav>
   {% else %}

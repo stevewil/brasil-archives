@@ -28,81 +28,83 @@ docker run -d --name ba-pg -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:1
 
 ---
 
-## Phase 0 — setup
+## Phase 0 — setup  ·  DONE 2026-08-31
 
-- [ ] `git switch -c postgres-migration`
-- [ ] `docker run … postgres:16` (above); confirm `psql`-less connect via
-      `python -c "import psycopg"` after step 1a-1.
-- [ ] Skim the two specs' decision tables so the rest is mechanical.
-
----
-
-## Phase 1a — dialect-agnostic core + CI  ·  spec §9.1 (1–2, 6), §5
-
-No behaviour change; SQLite stays the default. Branch only, zero prod impact.
-
-- [ ] **1a-1** `requirements.txt` += `psycopg[binary]>=3.1,<4.0`. `pip install -r requirements.txt` locally.
-- [ ] **1a-2** `app/config.py` — add `SQLALCHEMY_ENGINE_OPTIONS` **only when the
-      URL starts with `postgresql`** (spec §4.2): `poolclass=NullPool`
-      (gate on `DB_NULLPOOL` if you want local pooling), `pool_pre_ping=True`,
-      `connect_args={"connect_timeout": 10, "options": "-c statement_timeout=15000"}`.
-      Keep `TestingConfig` on `sqlite:///:memory:`.
-- [ ] **1a-3** `migrations/env.py` — `include_schemas=True`,
-      `version_table_schema="public"`, and when the bind is SQLite apply
-      `schema_translate_map` for the symbolic schema `"source"` → `None`
-      (spec §6.4 / partner-schema-design §7.2). Add a stub `include_object`
-      that already skips a `src_*` / `"source"` schema (finished in 1b).
-- [ ] **1a-4** Audit the 5 migrations — all use `op.batch_alter_table`. Confirm
-      each batch block is only index create/drop (no `recreate='always'`, no
-      column-copy semantics) → safe on PG as plain `ALTER TABLE` (spec §7.1).
-      Fix only if the audit finds a real SQLite-ism.
-- [ ] **1a-5** `.github/workflows/ci.yml` — **new file** (no `.github/` today).
-      Two jobs:
-      - `tests-sqlite`: `pip install -r requirements-dev.txt && pytest` (the
-        current default suite).
-      - `tests-postgres`: `services: postgres:16`,
-        `DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/test`,
-        `FLASK_APP=wsgi.py flask db upgrade` then `pytest`.
-      Trigger on push + PR.
-- [ ] **1a-6** Local PG run: `DATABASE_URL=…localhost… flask db upgrade` →
-      seed sequence (spec §7.2) → `pytest`. Fix dialect-difference failures —
-      expect result-order-without-`ORDER BY`, `LIKE` case sensitivity, id-reuse
-      assumptions, timestamp string asserts (spec §7.3). Keep the fixes
-      backend-neutral so the SQLite suite stays green.
-- [ ] **1a-7** Both CI jobs green. **Commit + push.** ✅ *Milestone: suite green on SQLite and Postgres.*
+- [x] `git switch -c postgres-migration`
+- [x] `docker run -d --name ba-pg -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:16`
+      (PostgreSQL 16.15). Local URL
+      `postgresql+psycopg://postgres:postgres@localhost:5432/brasil` (or `/test`).
+- [x] Specs skimmed.
 
 ---
 
-## Phase 1b — per-source `src_<slug>` schemas  ·  partner-schema-design §11
+## Phase 1a — dialect-agnostic core + CI  ·  DONE 2026-08-31 (commit `2d8513f`)
 
-- [ ] **1b-1** `{"schema": "source"}` on `AggregatedRecord`, `HarvestRun`,
-      `HarvestError`, `FederationCache`; schema-qualify their FKs
-      (`public.upgrade_projects`, `source.harvest_runs`) — design §4.1.
-- [ ] **1b-2** `app/services/sources.py` (new) — `source_schema(slug)`,
-      `bind_source(slug)`, `ensure_source_schema(engine, slug)`,
-      `drop_source_schema(engine, slug)`, `rebuild_source_views(engine)` —
-      design §4.2, §6.
-- [ ] **1b-3** `app/models/_views.py` (new) — read-only `AggregatedRecordView`
-      / `HarvestRunView` / `HarvestErrorView` with a `source_slug` column,
-      `info={"is_view": True}` — design §5.2.
-- [ ] **1b-4** `migrations/env.py` — finish `include_object` (skip the `*_all`
-      views + anything in `src_*` / `"source"`) — design §7.2.
-- [ ] **1b-5** Swap read call-sites to the view models — design §5.3:
-      `app/services/federated_search.py`, `app/blueprints/harvest/routes.py`,
-      `app/blueprints/admin/routes.py`, `app/blueprints/main.py`,
-      `scripts/reextract.py`. Write paths keep the base models + `bind_source()`.
-- [ ] **1b-6** Fold `ensure_source_schema` + `rebuild_source_views` into
-      `scripts/load_upgrade_projects.py` (add `--skip-schema-sync`) — design §6.4.
-- [ ] **1b-7** `tests/conftest.py` — `schema_translate_map={"source": None}` on
-      the test engine; call `rebuild_source_views(db.engine)` in the `app`
-      fixture after `create_all` — design §8.1.
-- [ ] **1b-8** Add the PG-only targeted tests from design §8.2
-      (`ensure_source_schema` idempotent, 3rd-source view rebuild, `bind_source`
-      write lands in `src_mipibu.*` and shows in `aggregated_records_all`,
-      cross-schema FK to `public`).
-- [ ] **1b-9** Both CI jobs green (the PG job's `load_upgrade_projects` now also
-      stamps `src_mipibu` / `src_povos_indigenas_rn` + the views). **Commit + push.**
-- [ ] **1b-10** Open PR `postgres-migration` → `main`, self-review, merge. ✅ *Milestone: dual-backend green, per-source schemas in.*
+No behaviour change; SQLite stays the default.
+
+- [x] **1a-1** `requirements.txt` += `psycopg[binary]>=3.1,<4.0`.
+- [x] **1a-2** `app/config.py` — `SQLALCHEMY_ENGINE_OPTIONS` for Postgres URLs
+      (NullPool by default, `DB_NULLPOOL=0` opts out; pre-ping; connect +
+      statement timeout). `TestingConfig` reads `TEST_DATABASE_URL` (else
+      `sqlite:///:memory:`), engine options forced empty.
+- [x] **1a-3** `migrations/env.py` — `include_schemas=True`,
+      `version_table_schema="public"` on PG, `schema_translate_map({"source":
+      None})` on SQLite, `include_object` skips `*_all` views + `src_*` /
+      `"source"` schema objects.
+- [x] **1a-4** Migrations audited — every `batch_alter_table` block is only
+      add/drop column or index → safe as plain `ALTER TABLE` on PG.
+      **No migration changes needed.**
+- [x] **1a-5** `.github/workflows/ci.yml` (new) — `tests-sqlite` +
+      `tests-postgres` (`services: postgres:16`; also runs `flask db upgrade`
+      + the seed sequence against a fresh PG database). `pybabel compile` step
+      in both (the `.mo` files are gitignored and the i18n tests need them).
+- [x] **1a-6** Local PG run green. Two dialect fixes:
+      `app/oai/queries.py::earliest_datestamp()` (SQLite `date()` → str,
+      PG `date()` → `datetime.date` — coerce); `tests/test_admin_dashboard.py`
+      `_seed_one_archive` made idempotent (the `admin_app` + `public_app`
+      fixtures share one DB on Postgres). No result-order / `LIKE` /
+      id-reuse failures surfaced.
+- [x] **1a-7** `pytest` green on **both** SQLite and Postgres (346 passed,
+      4 skipped, each backend). **Committed `2d8513f`.** ⚠️ push blocked in
+      this env — `git push -u origin postgres-migration` by hand.
+      ✅ *Milestone: suite green on SQLite and Postgres.*
+
+---
+
+## Phase 1b — per-source `src_<slug>` schemas  ·  DONE 2026-09-01 (commit `5fea758`)
+
+- [x] **1b-1** `{"schema": "source"}` on the 4 models; within-source FKs
+      `"source."`-qualified, the FK to `upgrade_projects` left bare (matches
+      the mapper, resolves via `search_path=public`).
+- [x] **1b-2** `app/services/sources.py` — `source_schema`, `bind_source`,
+      `ensure_source_schema`, `drop_source_schema`, `rebuild_source_views`,
+      `reset_source`. `bind_source` uses a **contextvar + `engine_connect`
+      listener** so the binding survives the commits a harvest / fetch does
+      mid-operation (the plain `Session.connection(execution_options=…)` from
+      the design only applies at first procure — doesn't survive a commit).
+- [x] **1b-3** `app/models/_views.py` — the 3 view models on a **separate
+      `DeclarativeBase`** (keeps them out of `db.metadata` entirely — cleaner
+      than an `is_view` filter on every `create_all`). Composite PK
+      `(source_slug, id)`.
+- [x] **1b-4** `env.py` `include_object` — done in 1a, unchanged.
+- [x] **1b-5** Read call-sites swapped: `federated_search`, `main`, admin
+      dashboard, and the whole `/harvest` blueprint (run/record detail now
+      `(source_slug, id)` — routes + `harvest/{index,run_detail,record_detail}.html`
+      + `admin/index.html`). Write paths bind: `harvest.run_harvest`,
+      `federation._fetch`, `reextract`.
+- [x] **1b-6** `load_upgrade_projects` stamps `src_<slug>` per config +
+      rebuilds views; `--skip-schema-sync` opt-out.
+- [x] **1b-7** `conftest` pins `src_test`, rebuilds views, scrubs stale
+      `src_*` on Postgres; the 4 bespoke fixtures do the same.
+- [x] **1b-8** `tests/test_source_schemas.py` — 11 tests (slug safety +
+      PG-gated: `ensure_source_schema` idempotent/4-tables, UNION view,
+      `drop_source_schema`).
+- [x] **1b-9** Full suite green on **both** SQLite and Postgres locally
+      (`docker postgres:16`). A fresh `flask db upgrade` + full seed + app
+      click-through verified against local Postgres. **Committed `5fea758`.**
+      ⚠️ push + watch CI.
+- [ ] **1b-10** Open PR `postgres-migration` → `main`, self-review, merge.
+      ✅ *Milestone: dual-backend green, per-source schemas in.*
 
 ---
 
