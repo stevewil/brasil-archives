@@ -16,6 +16,23 @@ def test_healthz(client):
     assert payload["status"] == "ok"
     assert payload["app"] == "brasil-archives"
     assert payload["database"] in ("sqlite", "postgresql")
+    assert payload["database_connected"] is True
+
+
+def test_healthz_degraded_when_db_unreachable(client, monkeypatch):
+    """A DATABASE_URL that parses but can't answer -> 503, not a green 200."""
+    from app.extensions import db
+
+    def _boom(*_a, **_k):
+        raise RuntimeError("connection refused")
+
+    monkeypatch.setattr(db.session, "execute", _boom)
+    r = client.get("/healthz")
+    assert r.status_code == 503
+    payload = r.get_json()
+    assert payload["status"] == "degraded"
+    assert payload["database_connected"] is False
+    assert "connection refused" in payload["database_error"]
 
 
 def test_index_renders_en(client):

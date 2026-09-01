@@ -9,9 +9,45 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 INSTANCE_DIR = BASE_DIR / "instance"
+
+
+# Session parameters that used to ride in the psycopg ``options`` startup
+# packet (``-c search_path=public -c statement_timeout=15000``). Supabase's
+# Supavisor pooler only honours the first ``-c`` and silently drops the
+# rest (verified 2026-09-01: statement_timeout stayed at the 2min default),
+# and some network paths reject the multi-flag packet outright. Issue them
+# as plain per-connection ``SET`` statements instead. See
+# docs/handoff/2026-09-01-supabase-cutover-in-progress.md.
+_PG_SESSION_SQL = (
+    "SET search_path TO public, extensions",
+    "SET statement_timeout TO 15000",
+)
+
+
+@event.listens_for(Engine, "connect")
+def _configure_pg_session(dbapi_connection, connection_record) -> None:
+    """Run the per-connection ``SET``s on every new Postgres connection.
+
+    A no-op on SQLite (dev + tests). Toggles autocommit for the duration so
+    the statements don't open a transaction SQLAlchemy doesn't know about,
+    per the SQLAlchemy cookbook's set-search-path recipe.
+    """
+    if not type(dbapi_connection).__module__.startswith("psycopg"):
+        return
+    prior_autocommit = dbapi_connection.autocommit
+    dbapi_connection.autocommit = True
+    try:
+        with dbapi_connection.cursor() as cur:
+            for stmt in _PG_SESSION_SQL:
+                cur.execute(stmt)
+    finally:
+        dbapi_connection.autocommit = prior_autocommit
 
 
 def _engine_options(uri: str, *, for_tests: bool = False) -> dict:
@@ -34,8 +70,11 @@ def _engine_options(uri: str, *, for_tests: bool = False) -> dict:
     under Passenger prefork and a socket pool across a fork is a hazard;
     Supabase's Supavisor pools instead. ``DB_NULLPOOL=0`` keeps normal
     pooling for local dev. ``pool_pre_ping`` recycles dropped connections;
-    ``connect_args`` cap a hung connect and a runaway query. TLS is
-    ``?sslmode=require`` in ``DATABASE_URL``.
+    ``connect_args`` cap a hung connect and disable psycopg's server-side
+    prepared statements (pooler-hostile). ``search_path`` and a
+    statement-timeout guard are applied per connection by
+    :func:`_configure_pg_session`. TLS is ``?sslmode=require`` in
+    ``DATABASE_URL``.
     """
     is_pg = uri.startswith("postgresql")
 
@@ -46,7 +85,14 @@ def _engine_options(uri: str, *, for_tests: bool = False) -> dict:
         "pool_pre_ping": True,
         "connect_args": {
             "connect_timeout": 10,
-            "options": "-c search_path=public -c statement_timeout=15000",
+            # Supabase's pooler can hand one logical connection to different
+            # backends; psycopg3's server-side prepared statements then
+            # collide (DuplicatePreparedStatement / InvalidSqlStatementName).
+            # None disables them — matches media-pipeline-agent's psycopg
+            # usage. search_path + statement_timeout are applied per
+            # connection by _configure_pg_session (the old ``options``
+            # startup packet was only partly honoured through the pooler).
+            "prepare_threshold": None,
         },
     }
     if for_tests:

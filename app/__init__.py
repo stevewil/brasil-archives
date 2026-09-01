@@ -104,14 +104,52 @@ def create_app(config_name: str | None = None) -> Flask:
     # so CSRF protection would only break conformant harvesters.
     csrf.exempt(oai_bp)
 
-    # Simple health check for deploy monitoring
+    # Health check for deploy monitoring. Runs a real ``SELECT 1`` so a
+    # DATABASE_URL that parses but can't be reached (a blocked outbound
+    # port, a dead pooler) fails here with 503 instead of only surfacing
+    # as a 500 on every content page.
     @app.get("/healthz")
-    def healthz() -> dict[str, str]:
-        return {
+    def healthz() -> tuple[dict[str, object], int] | dict[str, object]:
+        from sqlalchemy import text
+
+        payload: dict[str, object] = {
             "status": "ok",
             "app": app.config["APP_NAME"],
             "version": app.config["APP_VERSION"],
             "database": db.engine.dialect.name,  # "sqlite" | "postgresql"
         }
+        try:
+            db.session.execute(text("SELECT 1"))
+            payload["database_connected"] = True
+        except Exception as exc:  # noqa: BLE001 - report any failure to the caller
+            payload["status"] = "degraded"
+            payload["database_connected"] = False
+            payload["database_error"] = str(exc)[:200]
+            return payload, 503
+        return payload
+
+    # Optional fail-fast: verify the database answers before the app serves
+    # a single request. Off by default — it would break `flask db upgrade`
+    # against a not-yet-created DB and offline dev. Set
+    # BRASIL_ARCHIVES_DB_CHECK=1 in the cPanel .env so a bad DATABASE_URL
+    # lands in the Passenger startup log instead of as a per-request 500.
+    if os.environ.get("BRASIL_ARCHIVES_DB_CHECK") == "1":
+        import logging
+
+        from sqlalchemy import text
+
+        log = logging.getLogger("brasil_archives")
+        with app.app_context():
+            try:
+                db.session.execute(text("SELECT 1"))
+                log.info(
+                    "database connectivity OK (%s)", db.engine.dialect.name
+                )
+            except Exception:
+                log.exception(
+                    "database unreachable at startup — check DATABASE_URL "
+                    "and that the host can reach the Postgres pooler"
+                )
+                raise
 
     return app
