@@ -206,13 +206,10 @@ phase (§5 lays out the phases).
 ### 4.1 No canonical corpus-DB schema contract
 
 mipibu and povos converged on a backbone (§2.1) but each hand-rolled it.
-**Needed:**
+**Status:** [`corpus-db-contract.md`](corpus-db-contract.md) **drafted
+2026-09-02** — the required tables, column conventions, provenance model,
+integrity rules, and a `validate_corpus_db` spec. Still **needed:**
 
-- `docs/corpus-db-contract.md` — the required tables and column conventions:
-  `controlled_terms`, `source_assertions`, `audit_events`, `repositories`,
-  `external_identifiers`, `schema_version`, `fts_<kind>` naming, the
-  `_original` / `_normalized` rule, the `.sha256` sidecar, immutability
-  expectations.
 - A `create_corpus_db` helper that stamps the backbone + accepts a
   per-corpus **entity-kinds manifest** (see 4.5) to generate the entity
   tables and FTS tables.
@@ -404,8 +401,8 @@ Phase 7  Drift sync (ongoing)     ◄──────────────�
 | C3 | `load_upgrade_projects` + YAML registration | **known / shipped** | idempotent upsert |
 | C4 | Deploy boilerplate (`passenger_wsgi`, `app.bat`, `Dockerfile`, `github-pull`, `monitoring/`) | **known — copy verbatim** | identical across mipibu/povos |
 | C5 | Explorer app module skeleton (`__init__`, `config`, `db`) | **known — copy verbatim** | |
-| C6 | Convergent corpus-DB backbone | **known — undocumented** | needs `corpus-db-contract.md` + `create_corpus_db` (4.1) |
-| C7 | `source_assertions` evidence model | **known — undocumented** | povos schema is the reference |
+| C6 | Convergent corpus-DB backbone | **documented** — [`corpus-db-contract.md`](corpus-db-contract.md) v1 | still needs `create_corpus_db` + validator impl (4.1) |
+| C7 | `source_assertions` evidence model | **documented** — contract §3.1 | povos schema was the reference |
 | C8 | Entity-kinds manifest | **to build** | 4.5 — drives queries/presenters/views/templates/OAI sets |
 | C9 | Layer-2 scaffold generator | **to build** | 4.5 |
 | C10 | Shared `oai_pmh` + `federation_json` + `CorpusAdapter` lib | **to build** | 4.6 — N=3, the one shared dependency |
@@ -497,9 +494,9 @@ would lock in guesses; doing a third by hand — deliberately reusing the
 mipibu/povos patterns and writing down every seam — is how we learn what
 C6–C22 actually need to be. Concretely:
 
-1. **Now:** write `corpus-db-contract.md` (C6/C7) — this is pure
-   documentation of what mipibu + povos already prove, and it unblocks
-   everything else.
+1. **Done 2026-09-02:** [`corpus-db-contract.md`](corpus-db-contract.md)
+   (C6/C7) — pure documentation of what mipibu + povos already prove.
+   Next on this line: implement `create_corpus_db` + `validate_corpus_db`.
 2. **Phase 0 pass:** triage the ~80 catalog archives for buildability;
    confirm `jornais-digitalizados` is the right first target and capture
    why (C22, done as a one-off).
