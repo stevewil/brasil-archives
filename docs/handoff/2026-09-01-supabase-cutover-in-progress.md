@@ -60,31 +60,56 @@ matched prod. Still TODO: the Wasabi bucket **lifecycle rule** (retention
   `:5433` tunnel + the Docker db, not "any localhost" — prod is on
   `@localhost` now, so the old check would have blocked the cron.
 
-## Resume here — Supabase docs sweep, Proton Pass, lifecycle rule
+## Resume here
 
-1. **Supabase** — project **deleted** (Steve, 2026-09-01) and its
-   `keepalive.config.json` entry removed on cPanel + local. Remaining:
-   - Sweep docs that still describe Supabase as the live-DB plan and mark
-     them superseded: `docs/supabase-migration-spec.md`,
-     `docs/partner-schema-design.md` (mechanism doc stays accurate — it's
-     Postgres-generic, just correct the "Supabase" framing),
-     `docs/handoff/2026-08-31-postgres-migration-runbook.md` (check off
-     Phase 2, note the host pivot), `docs/DEPLOY.md` DB section (describe
-     cPanel-local Postgres, not Supabase pooler URLs).
-2. **Proton Pass records** still owed:
-   - "Wasabi — srv-brasil-archives-backup" (scoped sub-user, key `DAD…`)
-   - "brasil-archives — prod DB" (new PG password, in the `DATABASE_URL`)
-   - "brasil-archives — SECRET_KEY" (new)
-   `BRASIL_ARCHIVES_BACKUP_KEY` not rotated (chat-only exposure, optional).
-   The two Wasabi **root keys** (`MMR…` leaked, `PJD…` new) — retire per
-   `docs/wasabi-iam-plan.md` §6 once mpa/ajme move off `MMR…` and
-   `srv-ops-admin` exists.
-3. **Wasabi lifecycle rule** — `docs/wasabi-backup.md` §6 (retention +
-   versioning), a Wasabi-console task. Bucket currently has 3 objects
-   (2 real backups + 1 undeleteable selftest probe).
-4. Update `LICENSING.md` (spec §9.4) with the data-handling note — the
-   privacy posture is simpler now (no Data API / PostgREST layer to
-   misconfigure; the DB is `localhost`-only, never network-exposed).
+### 1. Re-verify both Postgres connections (Steve asked for a fresh check)
+
+**Local dev — Docker PG 10 snapshot:**
+```bash
+docker compose up -d db
+./database-update.sh                 # or .\database-update.bat  — refresh the snapshot from prod
+# .env line 15 should be: DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/app
+.venv/Scripts/python.exe -m flask run --port 9000
+curl -s http://127.0.0.1:9000/healthz     # expect "database":"postgresql","database_connected":true
+```
+Also run the PG test suite:
+`TEST_DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/app_test .venv/Scripts/python.exe -m pytest -q`
+
+**cPanel — production PostgreSQL 10.23:**
+```bash
+ssh brasil-cpanel 'curl -s https://brasil-archives.from-bottom-to.top/healthz'
+ssh brasil-cpanel 'cd ~/flask/brasil-archives && URL=$(grep "^DATABASE_URL=" .env | sed "s/^DATABASE_URL=//;s#postgresql+psycopg://#postgresql://#;s/[?].*$//") && PGSSLMODE=disable psql "$URL" -tAc "select current_database(), count(*) from archives"'
+```
+Expect `database_connected: true`, `fromuagq_brasil-archives | 80`.
+
+### 2. `LICENSING.md` data-handling note (spec §9.4)
+
+The privacy posture is simpler now — no Data API / PostgREST layer to
+misconfigure; prod DB is `localhost`-only, never network-exposed; scored
+judgments stay behind the two env gates (unset on the public host).
+
+### 3. Supabase docs sweep — mark the live-DB framing superseded
+
+- `docs/supabase-migration-spec.md`, `docs/partner-schema-design.md`
+  (mechanism is Postgres-generic — just fix the "Supabase" wording),
+- `docs/handoff/2026-08-31-postgres-migration-runbook.md` (Phase 2 done,
+  note the host pivot),
+- `docs/DEPLOY.md` DB section — describe cPanel-local Postgres, not
+  Supabase pooler URLs. Also the SQLite prerequisites (venv 3.11→3.13,
+  loader/harvest steps) — DEPLOY.md predates all of this.
+
+### 4. Steve's console tasks (not code)
+
+- **Proton Pass** — 2 records: "brasil-archives — cPanel prod"
+  (SECRET_KEY + DB password + SSH) and "Wasabi — srv-brasil-archives-backup"
+  (the `DAD…` key pair + scope). Pull values with:
+  `ssh brasil-cpanel 'cd ~/flask/brasil-archives && grep -oP "^SECRET_KEY=\K.*" .env; grep -oP "://[^:]+:\K[^@]+" .env | head -1; grep -oP "^WASABI_ACCESS_KEY_ID=\K.*" .env; grep -oP "^WASABI_SECRET_ACCESS_KEY=\K.*" .env'`
+- **Wasabi console** — bucket lifecycle rule to expire `pg/` after ~90d
+  (`docs/wasabi-backup.md` §6). Bucket has 4 objects now (3 backups + 1
+  undeleteable selftest probe).
+- **Portfolio, later** — move mpa/ajme off the `MMR…` Wasabi root key to
+  scoped sub-users, then delete both root keys (`MMR…` leaked / `PJD…`),
+  TOTP MFA on root (`docs/wasabi-iam-plan.md` §6).
 
 ## Local dev access to the prod DB — WORKING
 
