@@ -123,14 +123,31 @@ def test_pg_dump_requires_postgres(cfg, monkeypatch):
         b.pg_dump(b.Config())
 
 
-def test_cmd_run_refuses_local_db(monkeypatch):
-    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://p:p@localhost:5432/app")
+def test_dev_target_guard(monkeypatch):
+    monkeypatch.delenv("BRASIL_ARCHIVES_CONFIG", raising=False)
+    # tunnel port -> always flagged, even if config=production
+    monkeypatch.setenv("BRASIL_ARCHIVES_CONFIG", "production")
+    assert b._dev_target_reason("postgresql://u:pw@localhost:5433/prod")
+    # Docker default creds / db names
+    assert b._dev_target_reason("postgresql://postgres:postgres@localhost:5432/x")
+    assert b._dev_target_reason("postgresql://u:pw@localhost:5432/app_test")
+    # prod: localhost + config=production -> allowed
+    assert b._dev_target_reason(
+        "postgresql+psycopg://svc:pw@localhost:5432/fromuagq_brasil-archives?sslmode=disable"
+    ) is None
+    # localhost without config=production -> flagged
+    monkeypatch.delenv("BRASIL_ARCHIVES_CONFIG", raising=False)
+    assert b._dev_target_reason("postgresql://svc:pw@localhost:5432/fromuagq_brasil-archives")
+    # a real remote host -> never flagged
+    assert b._dev_target_reason("postgresql://u:pw@db.example.com:5432/prod") is None
+
+
+def test_cmd_run_refuses_dev_target(monkeypatch):
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://postgres:postgres@localhost:5432/app")
     monkeypatch.delenv("BACKUP_ALLOW_LOCAL", raising=False)
+    monkeypatch.delenv("BRASIL_ARCHIVES_CONFIG", raising=False)
     with pytest.raises(SystemExit):
         b.cmd_run(b.Config(), dry_run=False, keep=None)
-    # opt-out env var lets it through the guard (fails later on real Wasabi/pg_dump)
-    assert b._looks_local("postgresql://p:p@127.0.0.1/app")
-    assert not b._looks_local("postgresql://p:p@aws-0.pooler.example.com/db")
 
 
 # --------------------------------------------------------------------------- #

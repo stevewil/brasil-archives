@@ -526,19 +526,41 @@ def object_key(cfg: Config, *, selftest: bool = False) -> str:
 # commands
 # --------------------------------------------------------------------------- #
 
-def _looks_local(url: str) -> bool:
-    return any(h in url for h in ("@localhost", "@127.0.0.1", "@::1", "@db:", "@db/"))
+def _dev_target_reason(url: str) -> str | None:
+    """Why this DATABASE_URL looks like a dev target rather than prod, or None.
+
+    Production is explicitly ``BRASIL_ARCHIVES_CONFIG=production`` — and prod
+    here *is* on ``@localhost`` (the cPanel-local Postgres), so a bare
+    localhost check is not enough. What we actually guard against:
+
+    * the SSH tunnel to prod on ``:5433`` — pytest/backup against it is the
+      real footgun (see docs/dev-postgres.md);
+    * the local Docker dev db (``postgres:postgres@`` / db name ``app`` /
+      ``app_test`` / ``migrate_check``);
+    * any ``@localhost`` when ``BRASIL_ARCHIVES_CONFIG`` is *not* production.
+    """
+    if ":5433/" in url or ":5433?" in url:
+        return "port 5433 — the SSH tunnel to the production DB"
+    if "postgres:postgres@" in url:
+        return "user 'postgres' password 'postgres' — the local Docker db"
+    tail = url.rsplit("/", 1)[-1].split("?", 1)[0]
+    if tail in ("app", "app_test", "migrate_check"):
+        return f"database {tail!r} — a local Docker/CI db"
+    if os.environ.get("BRASIL_ARCHIVES_CONFIG") != "production" and any(
+        h in url for h in ("@localhost", "@127.0.0.1", "@::1")
+    ):
+        return "localhost, and BRASIL_ARCHIVES_CONFIG is not 'production'"
+    return None
 
 
 def cmd_run(cfg: Config, *, dry_run: bool, keep: str | None) -> int:
     if cfg.mode not in ("python", "pgdump"):
         _die(f"BACKUP_MODE must be 'python' or 'pgdump', got {cfg.mode!r}")
-    if (not dry_run and _looks_local(cfg.database_url)
-            and os.environ.get("BACKUP_ALLOW_LOCAL") != "1"):
-        _die(f"DATABASE_URL points at a local/dev database "
-             f"({cfg.database_url.split('@', 1)[-1][:40]}…) — refusing to upload "
-             "it as a production backup. Use --dry-run, or set BACKUP_ALLOW_LOCAL=1 "
-             "if you really mean to.")
+    reason = _dev_target_reason(cfg.database_url)
+    if not dry_run and reason and os.environ.get("BACKUP_ALLOW_LOCAL") != "1":
+        _die(f"DATABASE_URL looks like a dev target ({reason}) — refusing to "
+             "upload it as a production backup. Use --dry-run, or set "
+             "BACKUP_ALLOW_LOCAL=1 if you really mean to.")
     if not dry_run:
         cfg.require_wasabi()
     dump = python_dump(cfg) if cfg.mode == "python" else pg_dump(cfg)
