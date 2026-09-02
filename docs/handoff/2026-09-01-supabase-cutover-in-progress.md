@@ -47,16 +47,23 @@ from Wasabi → decrypt → `pg_restore` into a scratch DB → every count
 matched prod. Still TODO: the Wasabi bucket **lifecycle rule** (retention
 — `docs/wasabi-backup.md` §6, a Wasabi-console task).
 
-## Resume here — rotate secrets, decommission Supabase
+**Secrets rotated + canonical prod `.env` written 2026-09-01 ~20:05 UTC:**
+- cPanel PG role password + `SECRET_KEY` → fresh 32-char alphanumeric,
+  live (a `re.sub` `\1`+digits→octal bug mangled the URL mid-rotation;
+  recovered by reconstructing the pw from the mangled file — DB was never
+  broken, only the file). Values → Proton Pass via
+  `ssh brasil-cpanel "grep -E '^SECRET_KEY=|^DATABASE_URL=' .../.env"`.
+- cPanel `.env` rewritten as a **canonical production file** — sectioned,
+  every line annotated `[dev: …]`, 600 perms. Stray/stale `.env*` files on
+  the box shredded (`.envX`, `.env.pre-supabase-*`).
+- Backup guard fixed (`5fa2089`): `_dev_target_reason()` targets the
+  `:5433` tunnel + the Docker db, not "any localhost" — prod is on
+  `@localhost` now, so the old check would have blocked the cron.
 
-1. **Cut ties with Supabase** (Steve decided 2026-09-01: **delete** the
-   project, not pause):
-   - Delete the `mwdjvwdpvdpscoxrzcwf` project in the Supabase dashboard.
-     Its DB password is already in public git history (`b3f9b69`) — once
-     deleted that's fully moot.
-   - Remove the `brasil-archives` entry from
-     `C:\DEV\supabase-keepalive\keepalive.config.json` (leave the *other*
-     kept-warm project alone). See [[supabase-keepalive-deployed]].
+## Resume here — Supabase docs sweep, Proton Pass, lifecycle rule
+
+1. **Supabase** — project **deleted** (Steve, 2026-09-01) and its
+   `keepalive.config.json` entry removed on cPanel + local. Remaining:
    - Sweep docs that still describe Supabase as the live-DB plan and mark
      them superseded: `docs/supabase-migration-spec.md`,
      `docs/partner-schema-design.md` (mechanism doc stays accurate — it's
@@ -64,18 +71,14 @@ matched prod. Still TODO: the Wasabi bucket **lifecycle rule** (retention
      `docs/handoff/2026-08-31-postgres-migration-runbook.md` (check off
      Phase 2, note the host pivot), `docs/DEPLOY.md` DB section (describe
      cPanel-local Postgres, not Supabase pooler URLs).
-2. **Rotate the remaining secrets** (see [[secrets-in-handoff-docs]]):
-   - **Wasabi — DONE.** brasil-archives now uses a scoped sub-user key
-     (`grp-brasil-archives-backup` / `srv-brasil-archives-backup`, `pg/*`
-     only, no delete — `docs/wasabi-iam-plan.md`). Root key out of both
-     `.env`s. → still needs a Proton Pass record.
-   - **cPanel PG password** + **`SECRET_KEY`** — not leaked, good hygiene.
-     cPanel `.env` + restart + Proton Pass.
-   - **`BRASIL_ARCHIVES_BACKUP_KEY`** — optional (chat-only exposure). If
-     rotated, re-run `backup_to_wasabi` so a backup exists under it.
-   - **The two root keys** (`MMR…` leaked, `PJD…` new) — retire per
-     `docs/wasabi-iam-plan.md` §6 once mpa/ajme move off `MMR…` and
-     `srv-ops-admin` exists.
+2. **Proton Pass records** still owed:
+   - "Wasabi — srv-brasil-archives-backup" (scoped sub-user, key `DAD…`)
+   - "brasil-archives — prod DB" (new PG password, in the `DATABASE_URL`)
+   - "brasil-archives — SECRET_KEY" (new)
+   `BRASIL_ARCHIVES_BACKUP_KEY` not rotated (chat-only exposure, optional).
+   The two Wasabi **root keys** (`MMR…` leaked, `PJD…` new) — retire per
+   `docs/wasabi-iam-plan.md` §6 once mpa/ajme move off `MMR…` and
+   `srv-ops-admin` exists.
 3. **Wasabi lifecycle rule** — `docs/wasabi-backup.md` §6 (retention +
    versioning), a Wasabi-console task. Bucket currently has 3 objects
    (2 real backups + 1 undeleteable selftest probe).
