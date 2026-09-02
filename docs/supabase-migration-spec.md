@@ -1,5 +1,17 @@
 # Spec: brasil-archives storage — SQLite → Supabase Postgres
 
+> **SUPERSEDED 2026-09-01 — kept as design history.** The move to Postgres
+> shipped, but **not to Supabase**: the Namecheap shared host only permits
+> outbound `:443`, so the Supabase pooler is unreachable from it
+> (`Connection refused` on both `:5432` and `:6543`). Prod runs on the
+> **PostgreSQL 10.23 instance cPanel itself provides on `localhost`**.
+> Everything Postgres-shaped in this spec (the per-source `src_<slug>`
+> schema design, the seed-is-the-migration approach, the engine/pooling
+> config, the CI job) is still accurate and shipped; only the *host* and
+> the D10 Data-API privacy checklist (§9.2.1) do not apply — a
+> `localhost`-only DB has no anon/REST surface. Outcome + current state:
+> `docs/handoff/2026-09-01-supabase-cutover-in-progress.md`.
+
 **Status:** proposal / design. Nothing built. Written 2026-08-30.
 **Owner decision points:** §10.
 

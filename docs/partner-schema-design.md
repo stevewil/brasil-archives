@@ -1,5 +1,13 @@
 # Design: per-source Postgres schemas for partner-harvested data
 
+> **Shipped 2026-09-01 — this doc is still current.** The mechanism below
+> (`src_<slug>` schemas, `schema_translate_map`, the `public.*_all` views,
+> `ensure_source_schema` folded into `load_upgrade_projects`) is exactly
+> what runs in production. Only the *host* differs from the companion spec:
+> prod is the cPanel host's own PostgreSQL 10.23 on `localhost`, not
+> Supabase (unreachable — outbound `:443` only). Live: `src_mipibu` +
+> `src_povos_indigenas_rn`.
+
 **Status:** design. Companion to `docs/supabase-migration-spec.md` (read that
 first). Written 2026-08-30.
 **Decision made (Steve, 2026-08-30):** each partner source (mipibu, povos, and

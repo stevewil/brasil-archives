@@ -1,5 +1,12 @@
 # Runbook — SQLite → Supabase Postgres, to "app tested on the Supabase connection"
 
+> **OVERTAKEN 2026-09-01.** Phases 1a/1b (Postgres-ready core + per-source
+> schemas) shipped as written. Phase 2 (the Supabase connection) never
+> happened — the cPanel host can't reach Supabase (outbound `:443` only),
+> so prod cut over to cPanel's own local PostgreSQL 10.23 instead, and is
+> live + backed up. Current state:
+> `docs/handoff/2026-09-01-supabase-cutover-in-progress.md`.
+
 **Goal line:** the brasil-archives Flask app boots and passes a click-through
 (`/`, `/archives/`, `/search`, `/healthz`, `/oai?verb=Identify`) with
 `DATABASE_URL` pointed at the **Supabase session pooler**, seeded by the normal

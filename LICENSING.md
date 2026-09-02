@@ -54,6 +54,32 @@ on the public site** and are not covered by either license above. When the
 project is confident enough in these judgments to publish them, this
 section will name their license (expected: CC BY 4.0, same as the survey).
 
+## Where the non-public data lives
+
+The scored judgments above, the harvested partner records, and all catalog
+metadata live in a **PostgreSQL database on the production host's own
+`localhost`** — the cPanel account that runs the site. The database is not
+reachable over the network: no public port, no REST / Data-API layer, no
+anonymous credential. The only ways in are the application itself (via
+`DATABASE_URL`, which is secret) and an SSH shell on the host.
+
+On the public site the scored judgments are withheld by two independent
+environment flags — `BRASIL_ARCHIVES_ADMIN` and
+`BRASIL_ARCHIVES_PUBLIC_SCORES`, both unset on the public deployment;
+`app/visibility.py` enforces it. The catalog and federated search work
+without them.
+
+**Off-site backup.** A weekly `pg_dump` of the whole database — the
+non-public tables included — is encrypted on the host (AES-256-GCM) before
+it leaves, and stored in a private object-storage bucket. The encryption
+key lives only in the host's environment file and a password manager; it
+is the sole access boundary on that copy. See
+`scripts/backup_to_wasabi.py` and `docs/wasabi-backup.md`.
+
+(A cloud-hosted Postgres was prepared for this data but the host's network
+cannot reach it, so the local database above is what shipped. There is
+therefore no anon-key / Data-API surface to keep locked down.)
+
 ## What is *not* covered by anything here
 
 - **Harvested partner records.** The `aggregated_records` table holds
