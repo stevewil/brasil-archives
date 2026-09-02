@@ -47,6 +47,8 @@ WASABI_REGIONS = {
     "us-east-2": "https://s3.us-east-2.wasabisys.com",
     "us-central-1": "https://s3.us-central-1.wasabisys.com",
     "us-west-1": "https://s3.us-west-1.wasabisys.com",
+    "us-west-2": "https://s3.us-west-2.wasabisys.com",
+    "ca-central-1": "https://s3.ca-central-1.wasabisys.com",
     "eu-central-1": "https://s3.eu-central-1.wasabisys.com",
     "eu-central-2": "https://s3.eu-central-2.wasabisys.com",
     "eu-west-1": "https://s3.eu-west-1.wasabisys.com",
