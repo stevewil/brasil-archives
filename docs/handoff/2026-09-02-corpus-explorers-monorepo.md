@@ -1,3 +1,7 @@
+> **SUPERSEDED by [`2026-09-02-pg-live-and-jornais-plan.md`](2026-09-02-pg-live-and-jornais-plan.md).**
+> This doc froze mid-session, before the Postgres transition was executed.
+> The follow-on doc is the current state + resume plan. Kept for history.
+
 # Handoff — corpus-explorers monorepo + corpus-toolkit v0.1.0 + the Postgres pivot
 
 *Session 2026-09-02 (continued from `2026-09-02-partner-forge-and-harness.md`).
