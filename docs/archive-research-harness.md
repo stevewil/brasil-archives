@@ -35,12 +35,19 @@ than a fresh invention each time.
 
 ### The operating model (decided in discussion, 2026-09-02)
 
+> **Superseded in part, 2026-09-02 (same day):** the "independent monolith
+> per partner, scaffold-a-repo-and-hand-off" model below was replaced by a
+> **monorepo** — `corpus-explorers`, with `packages/corpus-toolkit`,
+> `packages/explorer-core`, and `partners/<slug>/` instance directories.
+> The forge now generates an instance *directory*, not a repo. See that
+> repo's `docs/MONOREPO.md`. Everything else here still holds.
+
 - brasil-archives is **both the aggregator and the forge**. It triages
   candidates, runs (or dispatches) the research agent, reviews the resulting
-  corpus, then **scaffolds the partner repo and hands off**.
-- After handoff the partner project is an **independent monolith**. The
-  developer opens it in VS Code and works there to bring it to public view.
-  brasil-archives does not manage it.
+  corpus, then **scaffolds the partner instance and hands off**.
+- After handoff the partner instance is worked independently in VS Code.
+  brasil-archives does not manage its day-to-day; a fix to the shared
+  `explorer-core` reaches every partner on its next deploy.
 - Build-time exchange between the forge and a partner is **git + HTTP only** —
   never a shared database connection. Steady state is the periodic OAI-PMH
   harvest, exactly as today.
@@ -206,15 +213,22 @@ phase (§5 lays out the phases).
 ### 4.1 No canonical corpus-DB schema contract
 
 mipibu and povos converged on a backbone (§2.1) but each hand-rolled it.
-**Status:** [`corpus-db-contract.md`](corpus-db-contract.md) **drafted
-2026-09-02** — the required tables, column conventions, provenance model,
-integrity rules, and a `validate_corpus_db` spec. Still **needed:**
+**Status: backbone + manifest + validator DONE 2026-09-02 (SQLite);
+reworking for Postgres.** [`corpus-db-contract.md`](corpus-db-contract.md)
+v1.1 + `corpus-explorers/packages/corpus-toolkit` shipped the backbone DDL,
+**manifest v0** (JSON; covers 4.5), and a MUST/SHOULD validator that both
+reference corpora pass. Building it forced the v1 → v1.1 relax (contract §11).
 
-- A `create_corpus_db` helper that stamps the backbone + accepts a
-  per-corpus **entity-kinds manifest** (see 4.5) to generate the entity
-  tables and FTS tables.
-- A validator: given a corpus DB, assert it satisfies the contract before
-  the forge will scaffold an app around it.
+Then the storage layer flipped to **Postgres** — SQLite retired everywhere.
+The contract needs a **v2** rewrite and the toolkit a `psycopg` rework
+(`create_corpus_schema` / `validate_corpus_schema` / `freeze_corpus` /
+`load_sqlite`). Backbone shapes + manifest carry over unchanged. Rules:
+`corpus-explorers/docs/POSTGRES.md`; transition sequence:
+`corpus-explorers/docs/POSTGRES-PLAN.md`.
+
+Remaining on this line: contract v2 + toolkit rework; then manifest v0 → v1
+(page/segment/OCR-run modelling),
+driven by `jornais-digitalizados`.
 
 ### 4.2 No corpus-build tooling at all
 
@@ -401,9 +415,9 @@ Phase 7  Drift sync (ongoing)     ◄──────────────�
 | C3 | `load_upgrade_projects` + YAML registration | **known / shipped** | idempotent upsert |
 | C4 | Deploy boilerplate (`passenger_wsgi`, `app.bat`, `Dockerfile`, `github-pull`, `monitoring/`) | **known — copy verbatim** | identical across mipibu/povos |
 | C5 | Explorer app module skeleton (`__init__`, `config`, `db`) | **known — copy verbatim** | |
-| C6 | Convergent corpus-DB backbone | **documented** — [`corpus-db-contract.md`](corpus-db-contract.md) v1 | still needs `create_corpus_db` + validator impl (4.1) |
+| C6 | Convergent corpus-DB backbone | **DONE** — contract v1.1 + `corpus-toolkit` (`create_corpus_db` / `validate_corpus_db` / `write_sidecar`) | 4.1; both reference corpora validate clean |
 | C7 | `source_assertions` evidence model | **documented** — contract §3.1 | povos schema was the reference |
-| C8 | Entity-kinds manifest | **to build** | 4.5 — drives queries/presenters/views/templates/OAI sets |
+| C8 | Entity-kinds manifest | **v0 DONE** — `corpus-toolkit/docs/manifest-v0.md` (JSON) | grows to v1 with `jornais-digitalizados`; still drives C9 |
 | C9 | Layer-2 scaffold generator | **to build** | 4.5 |
 | C10 | Shared `oai_pmh` + `federation_json` + `CorpusAdapter` lib | **to build** | 4.6 — N=3, the one shared dependency |
 | C11 | `SourceAdapter` interface + platform adapters | **to build** | 4.4 |
@@ -428,8 +442,8 @@ Three stores, each with a clear owner:
 
 | store | holds | lifecycle | lives in |
 |---|---|---|---|
-| **Build workspace DB** | raw fetches, candidate records, `source_assertions`, `audit_events`, crawl checkpoints, dedup candidates, OCR text — large, volatile, corpus-specific schema | ephemeral; discarded after freeze | the **partner build environment** (local Postgres, or SQLite if small). **Not** brasil-archives' catalog DB. |
-| **Frozen corpus DB** | the immutable SQLite the partner app serves | versioned, content-addressed | the **partner repo** (committed or Wasabi-synced) |
+| **`build` schema** | raw fetches, candidate records, `source_assertions`, `audit_events`, crawl checkpoints, dedup candidates, OCR text — large, volatile, corpus-specific | rebuilt freely; **local Docker PG / cloud runner only**, never cPanel | one Postgres **database per corpus** in the dedicated corpus cluster (`corpus-explorers/docs/POSTGRES-PLAN.md`). **Not** brasil-archives' catalog DB. |
+| **`corpus` schema** | the curated, frozen system of record the partner app serves | immutable between freezes; versioned by `corpus_meta.content_digest` | same database, `corpus` schema; ships to cPanel-local Postgres 10 via `pg_dump -Fc --schema=corpus`; Wasabi holds the digest-pinned artifact |
 | **`src_<slug>` schema** | brasil-archives' harvested index copy | refreshed by the harvest cron | brasil-archives Postgres — **already exists** |
 
 **Why the build workspace is not a schema in the catalog DB:**
@@ -467,11 +481,11 @@ belongs with the catalog.
 
 ## 8. Open questions / decisions needed
 
-1. **Where does `corpus_build` live?** (a) a new standalone repo the forge
-   invokes; (b) `scripts/corpus_build/` inside brasil-archives that the
-   scaffold *copies* into each partner at handoff; (c) the shared Layer-3
-   lib grows a `corpus_build` sibling. Leaning (b) — the partner owns its
-   build tooling after handoff, brasil-archives just seeds it.
+1. ~~**Where does `corpus_build` live?**~~ **Resolved 2026-09-02:** the new
+   `corpus-explorers` monorepo. `packages/corpus-toolkit` (DB build/validate)
+   exists now; `packages/corpus-build` (crawl/extract/OCR) is the next
+   package there. Every partner instance uses the same package — no
+   copy-at-handoff.
 2. **Does the forge admin ship in the deployed app or stay a local-only dev
    tool?** The long-running worker can't run on cPanel regardless. Option:
    the deployed `/admin/` shows read-only status; the *actions* (start
