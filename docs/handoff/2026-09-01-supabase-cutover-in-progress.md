@@ -1,4 +1,9 @@
-# Handoff — 2026-09-01 · Postgres cutover DONE (cPanel-local, not Supabase)
+# Handoff — Postgres cutover COMPLETE (cPanel-local, not Supabase)
+
+*Started 2026-09-01, code/doc work finished 2026-09-02. Only Steve's
+console tasks (Proton Pass, Wasabi lifecycle rule) remain — see "The only
+thing left" below.*
+
 
 **Status: prod is LIVE on Postgres, data verified.** Not Supabase — the
 Namecheap shared box only allows outbound `:443`, so the Supabase pooler
@@ -60,9 +65,30 @@ matched prod. Still TODO: the Wasabi bucket **lifecycle rule** (retention
   `:5433` tunnel + the Docker db, not "any localhost" — prod is on
   `@localhost` now, so the old check would have blocked the cron.
 
-## Resume here
+## DONE 2026-09-02 (resume session)
 
-### 1. Re-verify both Postgres connections (Steve asked for a fresh check)
+- **Both Postgres connections re-verified.** cPanel: `/healthz` green,
+  `psql` → `fromuagq_brasil-archives | archives=80`, records_all 1161, PG
+  10.23, all pages 200, backup cron present. Local: Docker PG 10.21, `app`
+  db has the full snapshot + both `src_` schemas, clean `flask run` →
+  `"database":"postgresql"`, PG test suite **362 passed, 4 skipped**.
+  (Incidental: stale flask processes on `:9000` from earlier runs were
+  serving SQLite — killed; not a config issue.)
+- **`LICENSING.md`** — new "Where the non-public data lives" section
+  (`1c23e88`).
+- **Supabase docs sweep** (`1c23e88`) — `DEPLOY.md` Database section
+  rewritten (cPanel-local PG, `.env` config mechanism, obsolete reseed
+  runbook, 3.11→3.13, pg troubleshooting); superseded banners on
+  `supabase-migration-spec.md`, `partner-schema-design.md`, the 2026-08-31
+  runbook, and the 2026-08-27 master handoff storage line.
+
+**Remaining = Steve's console tasks only** (see below). No code/doc work left.
+
+---
+
+## Superseded resume notes (kept for reference)
+
+### 1. Re-verify both Postgres connections — DONE (see above)
 
 **Local dev — Docker PG 10 snapshot:**
 ```bash
@@ -82,23 +108,11 @@ ssh brasil-cpanel 'cd ~/flask/brasil-archives && URL=$(grep "^DATABASE_URL=" .en
 ```
 Expect `database_connected: true`, `fromuagq_brasil-archives | 80`.
 
-### 2. `LICENSING.md` data-handling note (spec §9.4)
+### 2 + 3. LICENSING note + Supabase docs sweep — DONE (`1c23e88`)
 
-The privacy posture is simpler now — no Data API / PostgREST layer to
-misconfigure; prod DB is `localhost`-only, never network-exposed; scored
-judgments stay behind the two env gates (unset on the public host).
+---
 
-### 3. Supabase docs sweep — mark the live-DB framing superseded
-
-- `docs/supabase-migration-spec.md`, `docs/partner-schema-design.md`
-  (mechanism is Postgres-generic — just fix the "Supabase" wording),
-- `docs/handoff/2026-08-31-postgres-migration-runbook.md` (Phase 2 done,
-  note the host pivot),
-- `docs/DEPLOY.md` DB section — describe cPanel-local Postgres, not
-  Supabase pooler URLs. Also the SQLite prerequisites (venv 3.11→3.13,
-  loader/harvest steps) — DEPLOY.md predates all of this.
-
-### 4. Steve's console tasks (not code)
+## The only thing left — Steve's console tasks (not code)
 
 - **Proton Pass** — 2 records: "brasil-archives — cPanel prod"
   (SECRET_KEY + DB password + SSH) and "Wasabi — srv-brasil-archives-backup"
