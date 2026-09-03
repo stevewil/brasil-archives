@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block description %}{{ _("A federated, bilingual catalog that scores Brazilian digital archives for scholarly pipeline-building and aggregates partner corpus explorers.") }}{% endblock %}
+{% block description %}{{ _("A federated, bilingual catalog that scores Brazilian digital archives for scholarly pipeline-building and aggregates project corpus explorers.") }}{% endblock %}
 
 {% block content %}
 <section class="hero">
@@ -16,7 +16,7 @@
       <dd>{{ archive_count }}</dd>
     </div>
     <div>
-      <dt>{{ _("Partner projects") }}</dt>
+      <dt>{{ _("Projects") }}</dt>
       <dd>{{ upgrade_count }}</dd>
     </div>
     <div>
@@ -80,11 +80,11 @@
 </section>
 {% endif %}
 
-{% if partners %}
+{% if projects %}
 <section class="home-federation">
-  <h2>{{ _("Live from partner projects") }}</h2>
+  <h2>{{ _("Live from projects") }}</h2>
   <ul class="home-federation__list">
-    {% for p in partners %}
+    {% for p in projects %}
       <li class="home-federation__card">
         <div class="home-federation__head">
           <strong>{{ p.project.name }}</strong>

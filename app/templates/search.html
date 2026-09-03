@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% block title %}{{ _("Search partner records") }}{% endblock %}
-{% block description %}{{ _("Search across the records harvested from partner corpus explorers — Dublin Core metadata, attributed to each project and linking back to its viewer.") }}{% endblock %}
+{% block title %}{{ _("Search project records") }}{% endblock %}
+{% block description %}{{ _("Search across the records harvested from project corpus explorers — Dublin Core metadata, attributed to each project and linking back to its viewer.") }}{% endblock %}
 
 {% block content %}
 {% macro sample_chips(samples) %}
@@ -12,9 +12,9 @@
   {% endif %}
 {% endmacro %}
 <section class="page-header">
-  <h1>{{ _("Search partner records") }}</h1>
+  <h1>{{ _("Search project records") }}</h1>
   <p class="page-header__lede">
-    {{ _("One search box over every record harvested from a partner corpus explorer. Results link back to the partner's own viewer; freshness is bounded by the monthly harvest.") }}
+    {{ _("One search box over every record harvested from a project corpus explorer. Results link back to the project's own viewer; freshness is bounded by the monthly harvest.") }}
   </p>
 </section>
 
@@ -55,11 +55,11 @@
     {% endif %}
 
     {% if resp.facets %}
-      <nav class="fedsearch-facets" aria-label="{{ _('Filter by partner') }}">
+      <nav class="fedsearch-facets" aria-label="{{ _('Filter by project') }}">
         <a
           class="state-chip {% if not resp.source %}state-chip--all{% endif %}"
           href="{{ url_for('main.search', q=resp.query) }}">
-          {{ _("All partners") }}
+          {{ _("All projects") }}
           <span class="state-chip__count">{{ resp.facets | sum(attribute='count') }}</span>
         </a>
         {% for f in resp.facets %}

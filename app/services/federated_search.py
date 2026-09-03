@@ -1,18 +1,18 @@
-"""Federated search over harvested partner records — Phase 3.5.
+"""Federated search over harvested project records — Phase 3.5.
 
-brasil-archives harvests partner corpus-explorer records into
+brasil-archives harvests project corpus-explorer records into
 ``aggregated_records`` (see ``app/services/harvest.py``). This module
 makes that store searchable from one public page: a query runs over the
-harvested Dublin Core, and each hit is attributed back to its partner
-project and deep-links into the partner's own viewer.
+harvested Dublin Core, and each hit is attributed back to its project
+and deep-links into the project's own viewer.
 
 Scope (``docs/federation-v1.md`` §"IIIF Content Search" names the eventual
 live fan-out as Phase 4; this is the pragmatic precursor):
 
 * **Harvested snapshot, not a live fan-out.** We search the last harvest,
-  not the partner's live index. Freshness is bounded by the monthly
+  not the project's live index. Freshness is bounded by the monthly
   harvest cron.
-* **``oai_dc`` only.** Every partner exposes Dublin Core; the ``oai_ead``
+* **``oai_dc`` only.** Every project exposes Dublin Core; the ``oai_ead``
   records mipibu also provides describe the same cases and would only
   duplicate hits.
 * **Accent-insensitive.** Brazilian users type "sumario" for "Sumário".
@@ -44,7 +44,7 @@ SEARCH_PREFIX = "oai_dc"
 PAGE_SIZE_DEFAULT = 20
 PAGE_SIZE_MAX = 100
 # Below this a query is too broad to be useful; the page shows the form
-# and the list of partners instead of results.
+# and the list of projects instead of results.
 MIN_QUERY_LEN = 2
 DESCRIPTION_SNIPPET_CHARS = 280
 
@@ -87,7 +87,7 @@ class SearchHit:
     year_end: int | None
     description: str | None
     subjects: tuple[str, ...]
-    link: str | None          # deep link into the partner's own viewer
+    link: str | None          # deep link into the project's own viewer
     source_url: str | None    # external cited source (repository), if any
     oai_identifier: str
     strong: bool              # matched a title/creator/publisher/description field
@@ -95,7 +95,7 @@ class SearchHit:
 
 @dataclass(frozen=True)
 class SourceFacet:
-    """Per-partner hit count for the current query (drives the filter chips)."""
+    """Per-project hit count for the current query (drives the filter chips)."""
 
     slug: str
     name: str
@@ -138,7 +138,7 @@ def search(
 ) -> SearchResponse:
     """Run a federated search and return one page of attributed hits.
 
-    ``source`` restricts the returned page to one partner slug but does
+    ``source`` restricts the returned page to one project slug but does
     not change the facet counts — the chips always show the full spread
     so a visitor can widen back out.
     """
@@ -297,7 +297,7 @@ def _links(project: UpgradeProject, canonical: dict) -> tuple[str | None, str | 
 
     Preference for the primary link, best first:
 
-    1. an on-host URL — the partner's own record page (mipibu
+    1. an on-host URL — the project's own record page (mipibu
        ``…/cases/SJM-0001``; povos ``…/documents/N``, including the parent
        document a passage carries)
     2. an off-host URL from ``dc:identifier`` / ``dc:relation`` (povos

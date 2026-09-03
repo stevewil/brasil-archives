@@ -1,6 +1,6 @@
-"""Per-source Postgres schemas for partner-harvested data.
+"""Per-source Postgres schemas for project-harvested data.
 
-Each partner source (mipibu, povos-indigenas-rn, …) gets its own Postgres
+Each project source (mipibu, povos-indigenas-rn, …) gets its own Postgres
 schema ``src_<slug>`` holding an identical 4-table template
 (``aggregated_records``, ``harvest_runs``, ``harvest_errors``,
 ``federation_cache``). The models declare a symbolic schema ``"source"``

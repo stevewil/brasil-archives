@@ -111,7 +111,7 @@ def preview(project: UpgradeProject) -> dict[str, Any]:
 
     Never raises. Any failure yields ``{"available": False, "reason": ...}``
     so a downstream outage can't break the page that renders it. Consumed
-    by the archive detail page and the home page's partner-projects block.
+    by the archive detail page and the home page's projects block.
     """
     if not project.json_api_base_url:
         return {"available": False, "reason": "not_registered"}
@@ -181,13 +181,13 @@ def html_deep_link(
     """Return an absolute URL to the companion app's HTML browse view for a
     filter set.
 
-    The URL shape differs per partner (mipibu ``/cases?year_from=…``, povos
+    The URL shape differs per project (mipibu ``/cases?year_from=…``, povos
     ``/documents?q=…``), so we don't construct it — we ask. Every
     federation-v1 ``/api/records`` response carries ``links.html`` pointing
     at the equivalent HTML view with the filters already applied. This
     fetches that (cached 15 min like every federation call) and returns it.
 
-    Falls back to the partner's site root on any failure — a valid link is
+    Falls back to the project's site root on any failure — a valid link is
     always better than a 404. Returns ``None`` only when ``project`` has no
     primary URL at all.
     """

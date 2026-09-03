@@ -25,8 +25,8 @@ msgstr "Arquivos Digitais Brasileiros"
 
 #: app/blueprints/main.py:56 app/templates/search.html:2
 #: app/templates/search.html:15
-msgid "Search partner records"
-msgstr "Buscar registros dos parceiros"
+msgid "Search project records"
+msgstr "Buscar registros dos projetos"
 
 #: app/blueprints/admin/routes.py:151 app/templates/admin/index.html:2
 #: app/templates/admin/index.html:6
@@ -91,11 +91,11 @@ msgstr "Metadados abertos e federados de arquivos digitais brasileiros."
 #: app/templates/index.html:2
 msgid ""
 "A federated, bilingual catalog that scores Brazilian digital archives for"
-" scholarly pipeline-building and aggregates partner corpus explorers."
+" scholarly pipeline-building and aggregates project corpus explorers."
 msgstr ""
 "Um catálogo federado e bilíngue que avalia arquivos digitais brasileiros "
 "para a construção de pipelines acadêmicos e agrega exploradores de corpus"
-" parceiros."
+" dos projetos."
 
 #: app/templates/index.html:8
 msgid ""
@@ -112,8 +112,8 @@ msgid "Archives cataloged"
 msgstr "Arquivos catalogados"
 
 #: app/templates/index.html:19
-msgid "Partner projects"
-msgstr "Projetos parceiros"
+msgid "Projects"
+msgstr "Projetos"
 
 #: app/templates/index.html:23
 msgid "Federated records"
@@ -155,8 +155,8 @@ msgid "Not yet scored"
 msgstr "Ainda não avaliado"
 
 #: app/templates/index.html:85
-msgid "Live from partner projects"
-msgstr "Ao vivo dos projetos parceiros"
+msgid "Live from projects"
+msgstr "Ao vivo dos projetos"
 
 #: app/templates/index.html:95
 msgid "records available"
@@ -197,11 +197,11 @@ msgstr "Ver o catálogo completo"
 
 #: app/templates/search.html:3
 msgid ""
-"Search across the records harvested from partner corpus explorers — "
+"Search across the records harvested from project corpus explorers — "
 "Dublin Core metadata, attributed to each project and linking back to its "
 "viewer."
 msgstr ""
-"Busca nos registros coletados dos exploradores de acervos parceiros — "
+"Busca nos registros coletados dos exploradores de corpus dos projetos — "
 "metadados Dublin Core, atribuídos a cada projeto e com links de volta "
 "para o seu visualizador."
 
@@ -211,13 +211,13 @@ msgstr "Experimente:"
 
 #: app/templates/search.html:17
 msgid ""
-"One search box over every record harvested from a partner corpus "
-"explorer. Results link back to the partner's own viewer; freshness is "
+"One search box over every record harvested from a project corpus "
+"explorer. Results link back to the project's own viewer; freshness is "
 "bounded by the monthly harvest."
 msgstr ""
 "Uma única caixa de busca sobre todos os registros coletados de um "
-"explorador de acervo parceiro. Os resultados remetem ao visualizador do "
-"próprio parceiro; a atualização é limitada pela coleta mensal."
+"explorador de corpus de um projeto. Os resultados remetem ao visualizador "
+"do próprio projeto; a atualização é limitada pela coleta mensal."
 
 #: app/templates/search.html:26
 msgid "e.g. sumário crime, sesmaria, aldeia"
@@ -245,12 +245,12 @@ msgid "Try fewer or broader terms."
 msgstr "Tente termos mais curtos ou mais amplos."
 
 #: app/templates/search.html:58
-msgid "Filter by partner"
-msgstr "Filtrar por parceiro"
+msgid "Filter by project"
+msgstr "Filtrar por projeto"
 
 #: app/templates/search.html:62
-msgid "All partners"
-msgstr "Todos os parceiros"
+msgid "All projects"
+msgstr "Todos os projetos"
 
 #: app/templates/search.html:107
 msgid "Cited source"
@@ -434,11 +434,11 @@ msgstr "Nenhum erro de coleta registrado."
 
 #: app/templates/archives/detail.html:3
 msgid ""
-"Two-axis pipeline/research score, facets, and live partner-project "
-"federation preview."
+"Two-axis pipeline/research score, facets, and live project federation "
+"preview."
 msgstr ""
 "Pontuação de dois eixos (pipeline/pesquisa), facetas e pré-visualização "
-"ao vivo da federação de projetos parceiros."
+"ao vivo da federação de projetos."
 
 #: app/templates/archives/detail.html:7
 msgid "Accessibility"

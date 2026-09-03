@@ -96,7 +96,7 @@ def seeded_app(app):
 def test_index_renders_portuguese(seeded_app, client):
     body = client.get("/?lang=pt").get_data(as_text=True)
     assert "Arquivos catalogados" in body
-    assert "Projetos parceiros" in body
+    assert "Projetos" in body
     assert "Sobre o método" in body
 
 

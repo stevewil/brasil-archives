@@ -21,7 +21,7 @@ FEATURED_LIMIT = 6
 
 @bp.get("/")
 def index() -> str:
-    """Landing page: counts, featured archives, browse-by-state, partners."""
+    """Landing page: counts, featured archives, browse-by-state, projects."""
     archive_count = db.session.scalar(select(func.count()).select_from(Archive)) or 0
     upgrade_count = (
         db.session.scalar(select(func.count()).select_from(UpgradeProject)) or 0
@@ -35,16 +35,16 @@ def index() -> str:
         record_count=_aggregated_record_count(),
         featured=_featured_archives(),
         state_groups=_browse_by_state(),
-        partners=_partner_previews(),
+        projects=_project_previews(),
     )
 
 
 @bp.get("/search")
 def search() -> str:
-    """Public search across harvested partner records (Phase 3.5).
+    """Public search across harvested project records (Phase 3.5).
 
     Query params: ``q`` (the search string), ``source`` (restrict to one
-    partner slug), ``page``. See ``app/services/federated_search.py``.
+    project slug), ``page``. See ``app/services/federated_search.py``.
     """
     resp = fedsearch.search(
         q=request.args.get("q", ""),
@@ -53,7 +53,7 @@ def search() -> str:
     )
     return render_template(
         "search.html",
-        page_title=_l("Search partner records"),
+        page_title=_l("Search project records"),
         resp=resp,
     )
 
@@ -133,7 +133,7 @@ def _browse_by_state() -> list[dict]:
     return groups
 
 
-def _partner_previews() -> list[dict]:
+def _project_previews() -> list[dict]:
     """Live federation handshake per registered upgrade project."""
     projects = db.session.scalars(
         select(UpgradeProject).order_by(UpgradeProject.name)

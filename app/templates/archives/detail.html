@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}{{ archive.name }}{% endblock %}
-{% block description %}{{ archive.name }} — {{ vocab_label(archive.institutional_type) or _("archive") }}{% if archive.home_state_code %}, {{ archive.home_state_code }}{% endif %}. {{ _("Two-axis pipeline/research score, facets, and live partner-project federation preview.") }}{% endblock %}
+{% block description %}{{ archive.name }} — {{ vocab_label(archive.institutional_type) or _("archive") }}{% if archive.home_state_code %}, {{ archive.home_state_code }}{% endif %}. {{ _("Two-axis pipeline/research score, facets, and live project federation preview.") }}{% endblock %}
 
 {% macro dimension_label(dim) -%}
 {%- set names = {
