@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from .aggregated_record import AggregatedRecord
 from .archive import Archive
+from .build_job import BuildJob, BuildReport
 from .federation_cache import FederationCache
 from .harvest_error import HarvestError
 from .harvest_run import HarvestRun
@@ -44,6 +45,8 @@ DIMENSIONS: tuple[str, ...] = (
 __all__ = [
     "AggregatedRecord",
     "Archive",
+    "BuildJob",
+    "BuildReport",
     "FederationCache",
     "HarvestError",
     "HarvestRun",
