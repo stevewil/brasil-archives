@@ -38,14 +38,14 @@ scope:
     page_equivalents: null
 
 delivery:
-  primary_url: https://povos-indigenas-rn.from-bottom-to.top
-  source_repo: https://github.com/stevewil/povos-indigenas-rn
+  primary_url: https://corpus-explorers.from-bottom-to.top/projects/povos-indigenas-rn
+  source_repo: https://github.com/stevewil/corpus-explorers
   status: beta   # in-development | beta | stable | deprecated
 
 federation:
   contract_version: v1
-  json_api_base_url: https://povos-indigenas-rn.from-bottom-to.top/api
-  oai_pmh_base_url: https://povos-indigenas-rn.from-bottom-to.top/oai
+  json_api_base_url: https://corpus-explorers.from-bottom-to.top/projects/povos-indigenas-rn/api
+  oai_pmh_base_url: https://corpus-explorers.from-bottom-to.top/projects/povos-indigenas-rn/oai
   iiif_search_endpoint: null
   ead_export_url: null
   eac_cpf_export_url: null

@@ -35,18 +35,17 @@ scope:
     page_equivalents: 10000
 
 delivery:
-  primary_url: https://mipibu.from-bottom-to.top
-  source_repo: https://github.com/stevewil/mipibu
+  primary_url: https://corpus-explorers.from-bottom-to.top/projects/mipibu
+  source_repo: https://github.com/stevewil/corpus-explorers
   status: beta   # in-development | beta | stable | deprecated
 
 federation:
-  # Federation contract v1 lightweight JSON surface (Phase 2 prototype).
-  # Live and verified 2026-08-25 at commit ea7b49a on stevewil/mipibu.
-  # See mipibu's app/views/federation.py for the contract.
-  json_api_base_url: https://mipibu.from-bottom-to.top/api
-  # OAI-PMH endpoint deferred to Phase 3. Federation-v1 JSON contract
-  # carries the weight for Scenario 1 (see docs/federation-v1.md).
-  oai_pmh_base_url: https://mipibu.from-bottom-to.top/oai
+  # Federation contract v1 lightweight JSON surface.
+  # mipibu now ships in the consolidated corpus-explorers app, mounted at
+  # /projects/mipibu/ (was https://mipibu.from-bottom-to.top, retired
+  # 2026-09-03). See projects/mipibu/app/ in stevewil/corpus-explorers.
+  json_api_base_url: https://corpus-explorers.from-bottom-to.top/projects/mipibu/api
+  oai_pmh_base_url: https://corpus-explorers.from-bottom-to.top/projects/mipibu/oai
   iiif_search_endpoint: null
   ead_export_url: null
   eac_cpf_export_url: null
