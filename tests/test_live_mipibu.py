@@ -20,7 +20,7 @@ from app.services.oai_extractors import extract
 
 
 LIVE_ENABLED = os.environ.get("BRASIL_ARCHIVES_LIVE_MIPIBU") == "1"
-BASE_URL = "https://mipibu.from-bottom-to.top/oai"
+BASE_URL = "https://corpus-explorers.from-bottom-to.top/projects/mipibu/oai"
 
 
 pytestmark = pytest.mark.skipif(

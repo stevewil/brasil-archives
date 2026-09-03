@@ -60,8 +60,12 @@ def test_load_povos_upgrade_project(app, tmp_path, monkeypatch):
         assert proj.source_archive.slug == "povos-indigenas-rn-corpus"
         assert proj.delivery_status == "beta"
         assert proj.federation_contract_version == "v1"
-        assert proj.json_api_base_url == "https://povos-indigenas-rn.from-bottom-to.top/api"
-        assert proj.oai_pmh_base_url == "https://povos-indigenas-rn.from-bottom-to.top/oai"
+        assert proj.json_api_base_url == (
+            "https://corpus-explorers.from-bottom-to.top/projects/povos-indigenas-rn/api"
+        )
+        assert proj.oai_pmh_base_url == (
+            "https://corpus-explorers.from-bottom-to.top/projects/povos-indigenas-rn/oai"
+        )
         assert proj.approximate_document_count == 40
 
         period_slugs = {p.slug for p in proj.periods}
