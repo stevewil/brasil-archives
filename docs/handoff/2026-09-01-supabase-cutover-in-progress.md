@@ -79,7 +79,7 @@ matched prod. Still TODO: the Wasabi bucket **lifecycle rule** (retention
 - **Supabase docs sweep** (`1c23e88`) — `DEPLOY.md` Database section
   rewritten (cPanel-local PG, `.env` config mechanism, obsolete reseed
   runbook, 3.11→3.13, pg troubleshooting); superseded banners on
-  `supabase-migration-spec.md`, `partner-schema-design.md`, the 2026-08-31
+  `supabase-migration-spec.md`, `project-schema-design.md`, the 2026-08-31
   runbook, and the 2026-08-27 master handoff storage line.
 
 **Remaining = Steve's console tasks only** (see below). No code/doc work left.

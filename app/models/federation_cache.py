@@ -33,7 +33,7 @@ class FederationCache(db.Model):
     """One cached federation-v1 HTTP response."""
 
     __tablename__ = "federation_cache"
-    # Per-source schema — see AggregatedRecord / docs/partner-schema-design.md.
+    # Per-source schema — see AggregatedRecord / docs/project-schema-design.md.
     __table_args__ = (
         UniqueConstraint(
             "upgrade_project_id",

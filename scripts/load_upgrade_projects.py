@@ -203,7 +203,7 @@ def load(
     After the upsert (unless ``dry_run`` or ``skip_schema_sync``), stamps a
     ``src_<slug>`` Postgres schema for each registered source and rebuilds
     the cross-source ``*_all`` views — so onboarding a project stays one
-    command. Both are no-ops on SQLite. See docs/partner-schema-design.md.
+    command. Both are no-ops on SQLite. See docs/project-schema-design.md.
     """
     if yaml_dir is None:
         yaml_dir = CONFIG_DIR

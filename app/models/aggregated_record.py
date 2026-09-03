@@ -34,7 +34,7 @@ class AggregatedRecord(db.Model):
     # Per-source schema: "source" is a symbolic placeholder, rewritten at
     # runtime to src_<slug> on Postgres and collapsed to the single
     # namespace on SQLite. See app/services/sources.py and
-    # docs/partner-schema-design.md.
+    # docs/project-schema-design.md.
     __table_args__ = (
         UniqueConstraint(
             "upgrade_project_id",

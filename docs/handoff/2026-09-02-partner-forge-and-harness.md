@@ -198,7 +198,7 @@ natural staging spot). Confirm with Steve before picking the path.
 | The forge / harness spec | [`../archive-research-harness.md`](../archive-research-harness.md) |
 | Corpus-DB contract (resume target) | [`../corpus-db-contract.md`](../corpus-db-contract.md) |
 | Federation contract | [`../federation-v1.md`](../federation-v1.md) |
-| Per-source `src_<slug>` schemas | [`../partner-schema-design.md`](../partner-schema-design.md) |
+| Per-source `src_<slug>` schemas | [`../project-schema-design.md`](../project-schema-design.md) |
 | Postgres cutover (done; console tasks) | [`2026-09-01-supabase-cutover-in-progress.md`](2026-09-01-supabase-cutover-in-progress.md) |
 | Ecosystem overview | [`2026-08-27-master.md`](2026-08-27-master.md) |
 | Partner repos (local) | `c:\DEV\mipibu`, `c:\DEV\povos-indigenas-rn` (both at `origin/main`) |

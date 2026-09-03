@@ -191,7 +191,7 @@ scripts — is untouched by the core migration.
 > full mechanical design — model retargeting via `schema_translate_map`, the
 > `ensure_source_schema` stamper, the cross-source `*_all` views, the Alembic
 > fan-out pattern, dual-backend testing — is in
-> **`docs/partner-schema-design.md`**. Decisions D1/D7 are resolved there.
+> **`docs/project-schema-design.md`**. Decisions D1/D7 are resolved there.
 > §6.2–6.4 below are retained only as the analysis of the alternative.
 
 ### 6.1 Recommendation (SUPERSEDED — see the box above)
@@ -569,7 +569,7 @@ safe and fast. Keep the SQLite fallback path working until you're confident.
 
 | # | decision | recommendation |
 |---|---|---|
-| **D1** | Auxiliary data isolation | **RESOLVED 2026-08-30: per-source schemas** (`src_<slug>`), one identical table template each. Full design + sub-decisions P1–P5 in `docs/partner-schema-design.md`. |
+| **D1** | Auxiliary data isolation | **RESOLVED 2026-08-30: per-source schemas** (`src_<slug>`), one identical table template each. Full design + sub-decisions P1–P5 in `docs/project-schema-design.md`. |
 | **D2** | Alembic: fix the existing 5 migrations vs squash to a PG baseline | **Fix the 5** (they're nearly PG-ready). Squash later if desired. |
 | **D3** | Supabase region | Match the cPanel datacenter (confirm host location; probably `us-east-1`). |
 | **D4** | Keep SQLite for local dev + unit tests | **Yes** — fast tests, no infra. Add a PG CI job for fidelity. |

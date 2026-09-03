@@ -34,7 +34,7 @@ class HarvestRun(db.Model):
     """One harvest invocation against one upgrade project."""
 
     __tablename__ = "harvest_runs"
-    # Per-source schema — see AggregatedRecord / docs/partner-schema-design.md.
+    # Per-source schema — see AggregatedRecord / docs/project-schema-design.md.
     __table_args__ = ({"schema": "source"},)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)

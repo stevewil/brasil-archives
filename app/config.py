@@ -53,7 +53,7 @@ def _configure_pg_session(dbapi_connection, connection_record) -> None:
 def _engine_options(uri: str, *, for_tests: bool = False) -> dict:
     """SQLAlchemy engine options.
 
-    **Per-source schemas** (docs/partner-schema-design.md): the four
+    **Per-source schemas** (docs/project-schema-design.md): the four
     harvested-data models declare a symbolic schema ``"source"``.
 
     * SQLite — a global ``schema_translate_map`` collapses ``"source"`` to

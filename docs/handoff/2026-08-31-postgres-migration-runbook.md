@@ -16,7 +16,7 @@ goal line").
 **Specs (authoritative, don't duplicate):**
 [`docs/supabase-migration-spec.md`](../supabase-migration-spec.md) (backend
 move; §9.1 prep, §9.2.1 privacy/D10, §10 decisions) +
-[`docs/partner-schema-design.md`](../partner-schema-design.md) (per-source
+[`docs/project-schema-design.md`](../project-schema-design.md) (per-source
 `src_<slug>` schemas; §11 phased plan, §12 sub-decisions). All §10 / §12
 decisions are locked.
 

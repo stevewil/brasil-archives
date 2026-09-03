@@ -1,4 +1,4 @@
-"""Per-source schema machinery — docs/partner-schema-design.md.
+"""Per-source schema machinery — docs/project-schema-design.md.
 
 Pure-function checks run on any backend. The integration checks that
 stamp real ``src_<slug>`` schemas only run against Postgres

@@ -18,7 +18,7 @@ connect test. Wasabi backup + privacy posture + housekeeping folded in at the
 right points. Work on branch `postgres-migration`, commit + push per milestone.
 
 Specs: **[`docs/supabase-migration-spec.md`](docs/supabase-migration-spec.md)**
-(the backend move) + **[`docs/partner-schema-design.md`](docs/partner-schema-design.md)**
+(the backend move) + **[`docs/project-schema-design.md`](docs/project-schema-design.md)**
 (per-source schemas). A free Supabase slot opened up; moving the prod DB
 there ends the reseed-on-redeploy problem permanently. Core migration is
 low risk (code is already near-dialect-agnostic; "the reseed IS the
@@ -35,7 +35,7 @@ job; (1b) per-source plumbing — `{"schema":"source"}` on the 4 models,
 `app/services/sources.py`, view models, fold schema-sync into
 `load_upgrade_projects`, dual-backend tests green; (2) cutover — create
 project, flip `DATABASE_URL`, `flask db upgrade` + seed, verify; (3+,
-deferred) `jsonb`, SQL search. Sub-decisions P1–P5 in partner-schema-design §12.
+deferred) `jsonb`, SQL search. Sub-decisions P1–P5 in project-schema-design §12.
 
 **Privacy posture (spec §9.2.1 / D10, decided 2026-08-31):** Supabase exposes
 `public` via its Data API by default — turn it OFF at project creation or the

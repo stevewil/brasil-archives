@@ -127,7 +127,7 @@ right.
 **Specs (in-repo, read both):**
 - `docs/supabase-migration-spec.md` — the backend move. §9.1 = the prep
   checklist, §10 = decisions (all resolved), §11 = effort.
-- `docs/partner-schema-design.md` — per-source schemas. §12 = sub-decisions
+- `docs/project-schema-design.md` — per-source schemas. §12 = sub-decisions
   P1–P5.
 
 **Why it's low-risk (spec §1):** code is already near-dialect-agnostic
@@ -141,7 +141,7 @@ point at Postgres, `flask db upgrade`, run the seed sequence once.
 - D1 → **per-source schemas** `src_<slug>` (one identical table template each),
   NOT a single `harvest` schema. ⚠️ Spec §9.1 item 3 and §9.3 still say
   "`harvest` schema" in places — that wording predates the D1 resolution;
-  `partner-schema-design.md` + `TODO.md`'s phase 1a/1b breakdown are current.
+  `project-schema-design.md` + `TODO.md`'s phase 1a/1b breakdown are current.
 - D2 → fix the existing 5 migrations (they're nearly PG-ready), don't squash.
 - D4 → keep SQLite for local dev + unit tests; add a **Postgres CI job** for
   fidelity.

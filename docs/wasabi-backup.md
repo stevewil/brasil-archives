@@ -69,7 +69,7 @@ hand-entered that isn't in `configs/`.
 - **Backing up the `src_*` schemas.** They hold only harvested / cached
   partner data, 100% re-derivable by re-running `scripts/harvest.py`. A full
   `pg_dump` (no `--schema`) would sweep them in; we deliberately scope to
-  `public` (migration-spec §9.4, `partner-schema-design.md` §9).
+  `public` (migration-spec §9.4, `project-schema-design.md` §9).
 - **Wasabi as a live or queryable store.** It holds opaque encrypted blobs.
 - **Automatic restore.** Restore is a deliberate, operator-run drill (§8).
 - **Any change to the Flask app.** This is an ops/cron concern. `app/` and the

@@ -11,7 +11,7 @@ its own `localhost`** (cPanel → *PostgreSQL Databases*), db
 outbound `:443`, so the Supabase pooler is unreachable — the cPanel-local
 Postgres is what shipped (2026-09-01). Each partner source gets its own
 `src_<slug>` schema; cross-source reads go through the `public.*_all`
-views (`docs/partner-schema-design.md`).
+views (`docs/project-schema-design.md`).
 
 - **Config** lives in `~/flask/brasil-archives/.env` (`chmod 600`), read
   by `passenger_wsgi.py` at boot and by `python -m scripts.*`. It is a

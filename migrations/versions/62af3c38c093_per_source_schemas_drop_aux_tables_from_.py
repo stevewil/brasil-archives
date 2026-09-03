@@ -16,7 +16,7 @@ On SQLite (dev + tests) this is a no-op: there are no schemas, the tables
 stay put, and the models' symbolic ``"source"`` schema is translated away
 (see ``app/config.py`` / ``migrations/env.py``).
 
-See docs/partner-schema-design.md.
+See docs/project-schema-design.md.
 """
 from alembic import op
 

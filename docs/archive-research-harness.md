@@ -8,7 +8,7 @@ explorer the way `mipibu` and `povos-indigenas-rn` already are, with an AI
 research agent doing the deep archival research at its centre.
 
 > **Read alongside:** [`federation-v1.md`](federation-v1.md) (the contract a
-> partner must speak), [`partner-schema-design.md`](partner-schema-design.md)
+> partner must speak), [`project-schema-design.md`](project-schema-design.md)
 > (the `src_<slug>` schemas on the aggregator side),
 > [`scenario-driven-federation-model.md`](scenario-driven-federation-model.md)
 > (federation is an index, not a mirror; companion apps are monolithic),
@@ -411,7 +411,7 @@ Phase 7  Drift sync (ongoing)     ◄──────────────�
 | # | component | status | notes |
 |---|---|---|---|
 | C1 | Federation contract v1 | **known / stable** | `federation-v1.md` |
-| C2 | Aggregator ingest (`src_<slug>`, harvest, views, preview) | **known / shipped** | `partner-schema-design.md` |
+| C2 | Aggregator ingest (`src_<slug>`, harvest, views, preview) | **known / shipped** | `project-schema-design.md` |
 | C3 | `load_upgrade_projects` + YAML registration | **known / shipped** | idempotent upsert |
 | C4 | Deploy boilerplate (`passenger_wsgi`, `app.bat`, `Dockerfile`, `github-pull`, `monitoring/`) | **known — copy verbatim** | identical across mipibu/povos |
 | C5 | Explorer app module skeleton (`__init__`, `config`, `db`) | **known — copy verbatim** | |

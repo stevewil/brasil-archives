@@ -51,7 +51,7 @@ def get_metadata():
     return target_db.metadata
 
 
-# Per-source partner schemas (docs/partner-schema-design.md): the four
+# Per-source partner schemas (docs/project-schema-design.md): the four
 # per-source models carry a symbolic schema ``"source"`` that is rewritten
 # to ``src_<slug>`` at runtime, and the ``*_all`` views are not
 # Alembic-managed. Autogenerate must never diff any of those.
