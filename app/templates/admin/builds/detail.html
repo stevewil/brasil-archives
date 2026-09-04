@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Build #%(id)s", id=job.id) }}{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <h1>{{ _("Build #%(id)s", id=job.id) }} &mdash; <code>{{ status.anchor }}</code></h1>
+  <p class="page-header__lede">
+    <span class="status status--{{ job.status }}">{{ job.status }}</span>
+    {{ job.kind }}{% if job.construction_mode %} &middot; {{ _("mode") }} {{ job.construction_mode }}{% endif %}
+    {% if status.build_db_name %} &middot; {{ _("build DB") }} <code>{{ status.build_db_name }}</code>{% endif %}
+  </p>
+  <p><a href="{{ url_for('admin_builds.index') }}">&larr; {{ _("All builds") }}</a>
+     &middot; <a href="{{ url_for('admin_builds.detail', job_id=job.id, format='json') }}">JSON</a></p>
+</section>
+
+{% if status.over_1h and job.status in ('running', 'pause_requested', 'blocked_on_human') %}
+<section class="admin-panel panel--attention">
+  <h2>{{ _("Management report") }}</h2>
+  <p>
+    {{ _("Running %(elapsed)s.", elapsed=status.elapsed_human) }}
+    {{ _("Stage") }} <strong>{{ status.stage }}</strong>{% if status.stage_index is not none %}
+      ({{ status.stage_index + 1 }}/{{ status.plan|length }}){% endif %}.
+    {% if status.progress.done is not none %}
+      {{ status.progress.done }}{% if status.progress.total %} / {{ status.progress.total }}{% endif %}
+      {{ status.progress.unit }}{% if status.progress.pct is not none %} ({{ status.progress.pct }}%){% endif %}.
+    {% endif %}
+    {% if status.eta_human %}{{ _("ETA ~%(eta)s.", eta=status.eta_human) }}{% endif %}
+    {% if status.cost.spent_usd %}{{ _("Spent $%(spent)s", spent=status.cost.spent_usd) }}{% if status.cost.budget_usd %} / ${{ status.cost.budget_usd }} ({{ status.cost.pct }}%){% endif %}.{% endif %}
+  </p>
+  {% if status.last_error %}<p class="error">{{ _("Last error:") }} {{ status.last_error }}</p>{% endif %}
+  {% if status.operator_note %}<p>{{ _("Operator note:") }} {{ status.operator_note }}</p>{% endif %}
+</section>
+{% endif %}
+
+<section class="admin-panel">
+  <h2>{{ _("Status") }}</h2>
+  <dl class="summary-grid">
+    <dt>{{ _("Stage") }}</dt>
+    <dd>
+      {{ status.stage }}
+      {% if status.plan %}
+        <span class="muted">&mdash;
+          {% for st in status.plan %}{% if st == status.stage %}<strong>{{ st }}</strong>{% else %}{{ st }}{% endif %}{% if not loop.last %} &rarr; {% endif %}{% endfor %}
+        </span>
+      {% endif %}
+    </dd>
+    <dt>{{ _("Progress") }}</dt>
+    <dd>
+      {% if status.progress.done is not none %}
+        {{ status.progress.done }}{% if status.progress.total %} / {{ status.progress.total }}{% endif %}
+        {{ status.progress.unit }}
+        {% if status.progress.pct is not none %}({{ status.progress.pct }}%){% endif %}
+        {% if status.progress.rate_per_min %}&middot; {{ status.progress.rate_per_min }}/min{% endif %}
+      {% else %}&mdash;{% endif %}
+    </dd>
+    <dt>{{ _("Elapsed") }}</dt>
+    <dd>{{ status.elapsed_human or '—' }}{% if status.eta_human %} &middot; {{ _("ETA ~%(eta)s", eta=status.eta_human) }}{% endif %}</dd>
+    <dt>{{ _("Cost") }}</dt>
+    <dd>
+      ${{ status.cost.spent_usd }}
+      {% if status.cost.budget_usd %} / ${{ status.cost.budget_usd }} ({{ status.cost.pct }}%){% endif %}
+    </dd>
+    <dt>{{ _("Worker") }}</dt>
+    <dd><code>{{ status.worker_id or '—' }}</code>{% if status.heartbeat_at %} &middot; {{ _("last heartbeat") }} {{ status.heartbeat_at }}{% endif %}</dd>
+    <dt>{{ _("Created") }}</dt>
+    <dd>{{ status.created_at }}{% if status.started_at %} &middot; {{ _("started") }} {{ status.started_at }}{% endif %}{% if status.finished_at %} &middot; {{ _("finished") }} {{ status.finished_at }}{% endif %}</dd>
+    {% if status.last_error %}
+      <dt>{{ _("Last error") }}</dt>
+      <dd class="error">{{ status.last_error }}</dd>
+    {% endif %}
+    {% if status.operator_note %}
+      <dt>{{ _("Operator note") }}</dt>
+      <dd>{{ status.operator_note }}</dd>
+    {% endif %}
+  </dl>
+</section>
+
+{% if job.options %}
+<section class="admin-panel">
+  <h2>{{ _("Options") }}</h2>
+  <pre>{{ job.options | tojson(indent=2) }}</pre>
+</section>
+{% endif %}
+
+{% if status.recent_reports %}
+<section class="admin-panel">
+  <h2>{{ _("Recent snapshots") }}</h2>
+  <table class="data-table">
+    <thead><tr><th>{{ _("At") }}</th><th>{{ _("Stage") }}</th><th>{{ _("Summary") }}</th></tr></thead>
+    <tbody>
+      {% for r in status.recent_reports | reverse %}
+        <tr><td>{{ r.at }}</td><td>{{ r.stage }}</td><td>{{ r.summary or '—' }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+
+<section class="admin-panel">
+  <h2>{{ _("Actions") }}</h2>
+  <div class="action-row">
+    <form method="post" action="{{ url_for('admin_builds.pause', job_id=job.id) }}">
+      <input type="text" name="note" placeholder="{{ _('note (optional)') }}">
+      <button type="submit"{% if job.status not in ('queued', 'running') %} disabled{% endif %}>{{ _("Request pause") }}</button>
+    </form>
+    <form method="post" action="{{ url_for('admin_builds.resume', job_id=job.id) }}">
+      <button type="submit"{% if job.status not in ('paused', 'blocked_on_human') %} disabled{% endif %}>{{ _("Resume") }}</button>
+    </form>
+    <form method="post" action="{{ url_for('admin_builds.cancel', job_id=job.id) }}">
+      <input type="text" name="note" placeholder="{{ _('reason (optional)') }}">
+      <button type="submit" class="danger"{% if job.status in ('done', 'failed', 'cancelled') %} disabled{% endif %}>{{ _("Cancel") }}</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

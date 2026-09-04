@@ -91,13 +91,19 @@ def create_app(config_name: str | None = None) -> Flask:
     from .blueprints.main import bp as main_bp
     from .blueprints.archives import bp as archives_bp
     from .blueprints.harvest import bp as harvest_bp
-    from .blueprints.admin import bp as admin_bp
+    from .blueprints.admin import bp as admin_bp, builds_bp as admin_builds_bp
     from .oai import bp as oai_bp
     app.register_blueprint(main_bp)
     app.register_blueprint(archives_bp)
     app.register_blueprint(harvest_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(admin_builds_bp)
     app.register_blueprint(oai_bp)
+
+    # /admin/builds is the one write-capable admin corner (the miner work
+    # queue). Shared hosting has no auth boundary beyond the ADMIN gate, so
+    # CSRF tokens would only stop the operator driving the queue with curl.
+    csrf.exempt(admin_builds_bp)
 
     # The OAI-PMH provider is a public, read-only, machine surface that
     # accepts POST per the spec (§3.1.1). It has no forms and no session,

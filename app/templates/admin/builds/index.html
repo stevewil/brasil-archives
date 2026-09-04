@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Builds") }}{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <h1>{{ _("Archive-miner builds") }}</h1>
+  <p class="page-header__lede">
+    {{ _("The build queue. Jobs are executed by the out-of-app miner") }}
+    (<code>packages/archive-miner</code>) &mdash;
+    {{ _("this page enqueues them and reads their progress.") }}
+  </p>
+  <p>
+    {% if only_watched %}
+      <a href="{{ url_for('admin_builds.index') }}">{{ _("Show all") }}</a>
+    {% else %}
+      <a href="{{ url_for('admin_builds.index', filter='watched') }}">{{ _("Show only active / parked") }}</a>
+    {% endif %}
+  </p>
+</section>
+
+<section class="runs">
+  <h2>{{ _("Jobs (%(n)s)", n=jobs|length) }}</h2>
+  {% if jobs %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>{{ _("Job") }}</th>
+        <th>{{ _("Kind") }}</th>
+        <th>{{ _("Mode") }}</th>
+        <th>{{ _("Anchor") }}</th>
+        <th>{{ _("Status") }}</th>
+        <th>{{ _("Stage") }}</th>
+        <th>{{ _("Progress") }}</th>
+        <th>{{ _("Cost") }}</th>
+        <th>{{ _("Created") }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for job in jobs %}
+        {% set s = status_of(job) %}
+        <tr {% if s.over_1h and job.status in ('running', 'pause_requested') %}class="row--attention"{% endif %}>
+          <td><a href="{{ url_for('admin_builds.detail', job_id=job.id) }}">#{{ job.id }}</a></td>
+          <td>{{ job.kind }}</td>
+          <td>{{ job.construction_mode or '&mdash;'|safe }}</td>
+          <td><code>{{ s.anchor or '&mdash;'|safe }}</code></td>
+          <td><span class="status status--{{ job.status }}">{{ job.status }}</span></td>
+          <td>
+            {{ job.stage }}
+            {% if s.stage_index is not none %}
+              <span class="muted">({{ s.stage_index + 1 }}/{{ s.plan|length }})</span>
+            {% endif %}
+          </td>
+          <td class="num">
+            {% if s.progress.done is not none %}
+              {{ s.progress.done }}{% if s.progress.total %}/{{ s.progress.total }}{% endif %}
+              {% if s.progress.pct is not none %}<span class="muted">{{ s.progress.pct }}%</span>{% endif %}
+            {% else %}&mdash;{% endif %}
+          </td>
+          <td class="num">
+            {% if s.cost.spent_usd %}${{ s.cost.spent_usd }}{% if s.cost.budget_usd %} / ${{ s.cost.budget_usd }}{% endif %}
+            {% else %}&mdash;{% endif %}
+          </td>
+          <td>{{ job.created_at.strftime('%Y-%m-%d %H:%M') if job.created_at else '&mdash;'|safe }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>{{ _("No build jobs yet.") }}</p>
+  {% endif %}
+</section>
+
+<section class="admin-panel">
+  <h2>{{ _("Enqueue a build") }}</h2>
+  <form method="post" action="{{ url_for('admin_builds.create') }}" class="stacked-form">
+    <label>
+      {{ _("Archive slug") }}
+      <input type="text" name="archive_slug" required
+             placeholder="rn-laboratorio-de-imagens-labim-...-t1r8">
+    </label>
+    <label>
+      {{ _("Construction mode") }}
+      <select name="construction_mode">
+        <option value="">{{ _("(let triage decide)") }}</option>
+        {% for m in valid_modes %}<option value="{{ m }}">{{ m }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>
+      {{ _("Budget (USD, optional)") }}
+      <input type="number" name="budget_usd" step="0.01" min="0" placeholder="e.g. 25.00">
+    </label>
+    <label>
+      {{ _("Options (JSON, optional)") }}
+      <textarea name="options" rows="3"
+                placeholder='{"base_url": "http://...", "delay": 0.6, "build_db": "labim"}'></textarea>
+    </label>
+    <button type="submit">{{ _("Queue job") }}</button>
+  </form>
+  <p class="muted">
+    {{ _("The") }} <code>options</code> {{ _("field is passed straight through to the miner (adapter hints, scope filters, model overrides). A sync job instead takes a") }}
+    <code>project_slug</code>.
+  </p>
+</section>
+{% endblock %}

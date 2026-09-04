@@ -23,6 +23,7 @@
       <a href="{{ url_for('main.search') }}">{{ _("Search") }}</a>
       {% if admin_ui_enabled() %}
         <a href="{{ url_for('harvest.index') }}">{{ _("Harvest") }}</a>
+        <a href="{{ url_for('admin_builds.index') }}">{{ _("Builds") }}</a>
         <a href="{{ url_for('admin.index') }}">{{ _("Admin") }}</a>
       {% endif %}
     </nav>
